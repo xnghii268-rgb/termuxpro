@@ -120,12 +120,16 @@ public class TermuxProBackupManager {
             activity.runOnUiThread(() -> {
                 progress.dismiss();
                 if (finalSuccess) {
-                    new AlertDialog.Builder(activity)
-                        .setTitle("Sao lưu thành công")
-                        .setMessage(String.format(activity.getString(R.string.backup_created_success), targetArchive.getAbsolutePath()) +
-                            "\n\n" + activity.getString(R.string.backup_security_note))
-                        .setPositiveButton("Đồng ý", null)
-                        .show();
+                    com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                        activity,
+                        "Sao lưu thành công",
+                        String.format(activity.getString(R.string.backup_created_success), targetArchive.getAbsolutePath()) +
+                            "\n\n" + activity.getString(R.string.backup_security_note),
+                        "Đồng ý",
+                        null,
+                        null,
+                        null
+                    );
                 } else {
                     Toast.makeText(activity, "Sao lưu thất bại: " + (finalMsg != null ? finalMsg : "Lỗi không xác định"), Toast.LENGTH_LONG).show();
                 }
@@ -143,30 +147,33 @@ public class TermuxProBackupManager {
 
         Arrays.sort(archives, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
 
-        String[] items = new String[archives.length];
+        List<String> items = new ArrayList<>();
         for (int i = 0; i < archives.length; i++) {
-            items[i] = archives[i].getName() + " (" + (archives[i].length() / 1024) + " KB)";
+            items.add(archives[i].getName() + " (" + (archives[i].length() / 1024) + " KB)");
         }
 
-        new AlertDialog.Builder(activity)
-            .setTitle("Chọn bản sao lưu để khôi phục")
-            .setItems(items, (dialog, which) -> {
+        com.termux.app.ui.GlassSheet.showListSheet(
+            activity,
+            "Chọn bản sao lưu để khôi phục",
+            items,
+            -1,
+            which -> {
                 File selected = archives[which];
                 confirmAndRestore(activity, selected);
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+            }
+        );
     }
 
     private static void confirmAndRestore(final TermuxActivity activity, final File archive) {
-        new AlertDialog.Builder(activity)
-            .setTitle(R.string.backup_confirm_restore_title)
-            .setMessage(R.string.backup_confirm_restore_msg + "\n\nTệp: " + archive.getName())
-            .setPositiveButton("Khôi phục", (dialog, which) -> {
-                performRestore(activity, archive);
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+        com.termux.app.ui.GlassSheet.showConfirmationSheet(
+            activity,
+            activity.getString(R.string.backup_confirm_restore_title),
+            activity.getString(R.string.backup_confirm_restore_msg) + "\n\nTệp: " + archive.getName(),
+            "Khôi phục",
+            () -> performRestore(activity, archive),
+            "Hủy",
+            null
+        );
     }
 
     private static void performRestore(final TermuxActivity activity, final File archive) {

@@ -111,7 +111,7 @@ jobs:
 
           # Configure etc/apt/apt.conf for Termux Pro prefix compatibility
           echo "Configuring etc/apt/apt.conf for Termux Pro prefix compatibility..."
-          mkdir -p etc/apt/apt.conf.d etc/apt/trusted.gpg.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg
+          mkdir -p etc/apt/apt.conf.d etc/apt/trusted.gpg.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg/dpkg.cfg.d var/lib/dpkg/updates var/lib/dpkg/info share/terminfo
           printf '%s\n' \
           'Dir "/data/data/com.termuxpro.app/files/usr";' \
           'Dir::State "var/lib/apt";' \
@@ -130,6 +130,17 @@ jobs:
           '   "--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg";' \
           '   "--instdir=/data/data/com.termuxpro.app/files/usr";' \
           '};' > etc/apt/apt.conf
+
+          # Mark packages as installed in dpkg status
+          if [ -f "var/lib/dpkg/status" ]; then
+            sed -i 's|Status: install ok unpacked|Status: install ok installed|g' var/lib/dpkg/status
+            sed -i 's|Status: install ok half-configured|Status: install ok installed|g' var/lib/dpkg/status
+          fi
+
+          # Pre-lock second stage so fallback second-stage script never runs on login
+          mkdir -p etc/termux/second-stage
+          ln -sf termux-bootstrap-second-stage.sh etc/termux/second-stage/termux-bootstrap-second-stage.sh.lock
+          rm -f etc/profile.d/01-termux-bootstrap-second-stage-fallback.sh
 
           # Apply Bootstrap Overlay files
           echo "Applying Termux Pro bootstrap overlay..."
@@ -187,6 +198,10 @@ jobs:
           'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
           'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
           'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+          'export TERMINFO="/data/data/com.termuxpro.app/files/usr/share/terminfo"' \
+          'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
+          'export LANG="C.UTF-8"' \
+          'export LC_ALL="C.UTF-8"' \
           'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
           '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
           'fi' \
@@ -205,6 +220,10 @@ jobs:
             'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
             'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
             'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+            'export TERMINFO="/data/data/com.termuxpro.app/files/usr/share/terminfo"' \
+            'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
+            '[ -z "$LANG" ] && export LANG="C.UTF-8"' \
+            '[ -z "$LC_ALL" ] && export LC_ALL="C.UTF-8"' \
             'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
             '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
             'fi' >> etc/bash.bashrc
@@ -213,8 +232,11 @@ jobs:
           # Create v2 marker inside bootstrap
           touch .termuxpro-v2
 
+          # Comprehensive patch of remaining scripts
+          find bin etc lib share var -type f -exec grep -Il "/data/data/com.termux" {} + 2>/dev/null | xargs -r sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' || true
+
           echo "GATE 2: Auditing bootstrap contents for hardcoded com.termux..."
-          LEFTOVERS=$(grep -rnI "/data/data/com.termux\b" etc/ var/ SYMLINKS.txt bin/clipimg bin/lastshot 2>/dev/null || true)
+          LEFTOVERS=$(grep -rnI "/data/data/com.termux\b" etc/ var/ bin/ SYMLINKS.txt 2>/dev/null || true)
           if [ -n "$LEFTOVERS" ]; then
             echo "GATE 2 WARNING: Unexpected leftovers found:"
             echo "$LEFTOVERS"

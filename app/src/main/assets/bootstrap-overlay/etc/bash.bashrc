@@ -1,6 +1,11 @@
 # System-wide .bashrc file for interactive bash(1) shells in Termux Pro.
 # Configured for prefix: /data/data/com.termuxpro.app/files/usr
 
+export TERMINFO="/data/data/com.termuxpro.app/files/usr/share/terminfo"
+export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"
+[ -z "$LANG" ] && export LANG="C.UTF-8"
+[ -z "$LC_ALL" ] && export LC_ALL="C.UTF-8"
+
 if [ "$TERM" = "dumb" ] || [ -n "$NO_COLOR" ]; then
     PS1='\w \$ '
 else

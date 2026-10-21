@@ -180,14 +180,15 @@ public class TermuxProImageHelper {
         }
 
         if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-            new AlertDialog.Builder(activity)
-                .setTitle(R.string.action_latest_image)
-                .setMessage(R.string.image_permission_rationale)
-                .setPositiveButton("Đồng ý", (dialog, which) -> {
-                    ActivityCompat.requestPermissions(activity, new String[]{permission}, REQUEST_CODE_READ_IMAGES);
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+            com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                activity,
+                activity.getString(R.string.action_latest_image),
+                activity.getString(R.string.image_permission_rationale),
+                "Đồng ý",
+                () -> ActivityCompat.requestPermissions(activity, new String[]{permission}, REQUEST_CODE_READ_IMAGES),
+                "Hủy",
+                null
+            );
             return;
         }
 

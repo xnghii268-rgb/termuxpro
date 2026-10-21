@@ -35,7 +35,7 @@ public final class TerminalRenderer {
     /** The {@link #mFontLineSpacing} + {@link #mFontAscent}. */
     final int mFontLineSpacingAndAscent;
 
-    private final float[] asciiMeasures = new float[127];
+    private final float[] mCharWidthCache = new float[0x2600];
 
     public TerminalRenderer(int textSize, Typeface typeface) {
         mTextSize = textSize;
@@ -51,9 +51,9 @@ public final class TerminalRenderer {
         mFontWidth = mTextPaint.measureText("X");
 
         StringBuilder sb = new StringBuilder(" ");
-        for (int i = 0; i < asciiMeasures.length; i++) {
+        for (int i = 0; i < 128; i++) {
             sb.setCharAt(0, (char) i);
-            asciiMeasures[i] = mTextPaint.measureText(sb, 0, 1);
+            mCharWidthCache[i] = mTextPaint.measureText(sb, 0, 1);
         }
     }
 
@@ -130,8 +130,16 @@ public final class TerminalRenderer {
                 // This could happen for some fonts which are not truly monospace, or for more exotic characters such as
                 // smileys which android font renders as wide.
                 // If this is detected, we draw this code point scaled to match what wcwidth() expects.
-                final float measuredCodePointWidth = (codePoint < asciiMeasures.length) ? asciiMeasures[codePoint] : mTextPaint.measureText(line,
-                    currentCharIndex, charsForCodePoint);
+                float measuredCodePointWidth;
+                if (codePoint < mCharWidthCache.length) {
+                    measuredCodePointWidth = mCharWidthCache[codePoint];
+                    if (measuredCodePointWidth == 0.0f) {
+                        measuredCodePointWidth = mTextPaint.measureText(line, currentCharIndex, charsForCodePoint);
+                        mCharWidthCache[codePoint] = measuredCodePointWidth;
+                    }
+                } else {
+                    measuredCodePointWidth = mTextPaint.measureText(line, currentCharIndex, charsForCodePoint);
+                }
                 final boolean fontWidthMismatch = Math.abs(measuredCodePointWidth / mFontWidth - codePointWcWidth) > 0.01;
 
                 if (style != lastRunStyle || insideCursor != lastRunInsideCursor || insideSelection != lastRunInsideSelection || fontWidthMismatch || lastRunFontWidthMismatch) {

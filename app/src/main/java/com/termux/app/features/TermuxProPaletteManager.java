@@ -55,7 +55,7 @@ public class TermuxProPaletteManager {
         @NonNull
         @Override
         public String toString() {
-            return isSnippet ? "★ " + title + "\n  " + command : "  " + command;
+            return isSnippet ? title + "\n  " + command : "  " + command;
         }
     }
 
@@ -150,17 +150,64 @@ public class TermuxProPaletteManager {
 
         final List<PaletteItem> filteredItems = new ArrayList<>(allItems);
 
+        com.google.android.material.bottomsheet.BottomSheetDialog sheet =
+            com.termux.app.ui.GlassSheet.createBaseSheet(activity);
+
+        float density = activity.getResources().getDisplayMetrics().density;
+        String currentThemeId = com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(activity);
+        boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
+        int textColor = isDark ? android.graphics.Color.parseColor("#F3F4F6") : android.graphics.Color.parseColor("#1F2937");
+        int subTextColor = isDark ? android.graphics.Color.parseColor("#9CA3AF") : android.graphics.Color.parseColor("#6B7280");
+        int accentColor = android.graphics.Color.parseColor("#FF3C70");
+
         LinearLayout layout = new LinearLayout(activity);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(32, 24, 32, 16);
+        layout.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(16 * density));
 
+        // Drag handle
+        View handle = new View(activity);
+        android.graphics.drawable.GradientDrawable handleBg = new android.graphics.drawable.GradientDrawable();
+        handleBg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        handleBg.setCornerRadius(2 * density);
+        handleBg.setColor(isDark ? android.graphics.Color.parseColor("#4DFFFFFF") : android.graphics.Color.parseColor("#33000000"));
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(36 * density), (int)(4 * density));
+        handleParams.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+        handleParams.bottomMargin = (int)(14 * density);
+        handle.setLayoutParams(handleParams);
+        handle.setBackground(handleBg);
+        layout.addView(handle);
+
+        // Title
+        TextView titleView = new TextView(activity);
+        titleView.setText("Bảng lệnh tương tác");
+        titleView.setTextSize(17);
+        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextColor(textColor);
+        titleView.setPadding(0, 0, 0, (int)(12 * density));
+        layout.addView(titleView);
+
+        // Search Input
         final EditText searchInput = new EditText(activity);
-        searchInput.setHint(R.string.command_palette_search_hint);
+        searchInput.setHint("Tìm kiếm mẫu lệnh hoặc lịch sử...");
+        searchInput.setHintTextColor(subTextColor);
+        searchInput.setTextColor(textColor);
+        searchInput.setTextSize(14);
         searchInput.setSingleLine(true);
-        layout.addView(searchInput);
+        android.graphics.drawable.GradientDrawable inputBg = new android.graphics.drawable.GradientDrawable();
+        inputBg.setCornerRadius(10 * density);
+        inputBg.setColor(isDark ? android.graphics.Color.parseColor("#26000000") : android.graphics.Color.parseColor("#14000000"));
+        inputBg.setStroke((int)(1 * density), isDark ? android.graphics.Color.parseColor("#33FFFFFF") : android.graphics.Color.parseColor("#22000000"));
+        searchInput.setBackground(inputBg);
+        searchInput.setPadding((int)(12 * density), (int)(10 * density), (int)(12 * density), (int)(10 * density));
+        LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        inputParams.bottomMargin = (int)(12 * density);
+        layout.addView(searchInput, inputParams);
 
+        // List
         final ListView listView = new ListView(activity);
-        listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 800));
+        listView.setDivider(null);
+        listView.setDividerHeight((int)(4 * density));
+        listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)(320 * density)));
 
         final ArrayAdapter<PaletteItem> adapter = new ArrayAdapter<PaletteItem>(activity,
             android.R.layout.simple_list_item_2, android.R.id.text1, filteredItems) {
@@ -173,11 +220,17 @@ public class TermuxProPaletteManager {
                 PaletteItem item = getItem(position);
                 if (item != null) {
                     if (item.isSnippet) {
-                        text1.setText("★ " + item.title);
+                        text1.setText(item.title);
+                        text1.setTextColor(textColor);
+                        text1.setTypeface(null, android.graphics.Typeface.BOLD);
                         text2.setText(item.command);
+                        text2.setTextColor(accentColor);
                     } else {
                         text1.setText(item.command);
+                        text1.setTextColor(textColor);
+                        text1.setTypeface(null, android.graphics.Typeface.NORMAL);
                         text2.setText("Lịch sử lệnh");
+                        text2.setTextColor(subTextColor);
                     }
                 }
                 return view;
@@ -187,12 +240,37 @@ public class TermuxProPaletteManager {
         listView.setAdapter(adapter);
         layout.addView(listView);
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
-            .setTitle(R.string.command_palette_title)
-            .setView(layout)
-            .setPositiveButton("Thêm lệnh mẫu", (d, which) -> showAddSnippetDialog(activity))
-            .setNegativeButton("Đóng", null)
-            .create();
+        // Buttons
+        LinearLayout btnRow = new LinearLayout(activity);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(android.view.Gravity.END);
+        btnRow.setPadding(0, (int)(12 * density), 0, 0);
+
+        android.widget.Button closeBtn = new android.widget.Button(activity, null, android.R.attr.borderlessButtonStyle);
+        closeBtn.setText("Đóng");
+        closeBtn.setTextColor(subTextColor);
+        closeBtn.setTextSize(14);
+        closeBtn.setOnClickListener(v -> sheet.dismiss());
+        LinearLayout.LayoutParams closeParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
+        closeParams.rightMargin = (int)(8 * density);
+        btnRow.addView(closeBtn, closeParams);
+
+        android.widget.Button addBtn = new android.widget.Button(activity);
+        addBtn.setText("Thêm mẫu lệnh");
+        addBtn.setTextSize(14);
+        addBtn.setTextColor(android.graphics.Color.parseColor("#1A0A10"));
+        android.graphics.drawable.GradientDrawable addBg = new android.graphics.drawable.GradientDrawable();
+        addBg.setCornerRadius(10 * density);
+        addBg.setColor(accentColor);
+        addBtn.setBackground(addBg);
+        addBtn.setOnClickListener(v -> {
+            sheet.dismiss();
+            showAddSnippetDialog(activity);
+        });
+        LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
+        btnRow.addView(addBtn, addParams);
+
+        layout.addView(btnRow);
 
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -216,40 +294,122 @@ public class TermuxProPaletteManager {
                 if (session != null && session.isRunning()) {
                     session.write(selected.command);
                 }
-                dialog.dismiss();
+                sheet.dismiss();
             }
         });
 
-        dialog.show();
+        sheet.setContentView(layout);
+        sheet.show();
     }
 
     public static void showAddSnippetDialog(final TermuxActivity activity) {
+        com.google.android.material.bottomsheet.BottomSheetDialog sheet =
+            com.termux.app.ui.GlassSheet.createBaseSheet(activity);
+
+        float density = activity.getResources().getDisplayMetrics().density;
+        String currentThemeId = com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(activity);
+        boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
+        int textColor = isDark ? android.graphics.Color.parseColor("#F3F4F6") : android.graphics.Color.parseColor("#1F2937");
+        int subTextColor = isDark ? android.graphics.Color.parseColor("#9CA3AF") : android.graphics.Color.parseColor("#6B7280");
+        int accentColor = android.graphics.Color.parseColor("#FF3C70");
+
         LinearLayout layout = new LinearLayout(activity);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(32, 24, 32, 16);
+        layout.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(20 * density));
 
+        // Drag handle
+        View handle = new View(activity);
+        android.graphics.drawable.GradientDrawable handleBg = new android.graphics.drawable.GradientDrawable();
+        handleBg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        handleBg.setCornerRadius(2 * density);
+        handleBg.setColor(isDark ? android.graphics.Color.parseColor("#4DFFFFFF") : android.graphics.Color.parseColor("#33000000"));
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(36 * density), (int)(4 * density));
+        handleParams.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+        handleParams.bottomMargin = (int)(16 * density);
+        handle.setLayoutParams(handleParams);
+        handle.setBackground(handleBg);
+        layout.addView(handle);
+
+        // Title
+        TextView titleView = new TextView(activity);
+        titleView.setText("Thêm mẫu lệnh mới");
+        titleView.setTextSize(17);
+        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextColor(textColor);
+        titleView.setPadding(0, 0, 0, (int)(12 * density));
+        layout.addView(titleView);
+
+        // Title Input
         final EditText titleInput = new EditText(activity);
-        titleInput.setHint(R.string.snippets_name_hint);
-        layout.addView(titleInput);
+        titleInput.setHint("Tên mẫu lệnh (ví dụ: Cập nhật hệ thống)");
+        titleInput.setHintTextColor(subTextColor);
+        titleInput.setTextColor(textColor);
+        titleInput.setTextSize(14);
+        android.graphics.drawable.GradientDrawable titleBg = new android.graphics.drawable.GradientDrawable();
+        titleBg.setCornerRadius(10 * density);
+        titleBg.setColor(isDark ? android.graphics.Color.parseColor("#26000000") : android.graphics.Color.parseColor("#14000000"));
+        titleBg.setStroke((int)(1 * density), isDark ? android.graphics.Color.parseColor("#33FFFFFF") : android.graphics.Color.parseColor("#22000000"));
+        titleInput.setBackground(titleBg);
+        titleInput.setPadding((int)(12 * density), (int)(10 * density), (int)(12 * density), (int)(10 * density));
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        titleParams.bottomMargin = (int)(12 * density);
+        layout.addView(titleInput, titleParams);
 
+        // Cmd Input
         final EditText cmdInput = new EditText(activity);
-        cmdInput.setHint(R.string.snippets_cmd_hint);
-        layout.addView(cmdInput);
+        cmdInput.setHint("Câu lệnh thực thi (ví dụ: pkg update && pkg upgrade)");
+        cmdInput.setHintTextColor(subTextColor);
+        cmdInput.setTextColor(textColor);
+        cmdInput.setTextSize(14);
+        android.graphics.drawable.GradientDrawable cmdBg = new android.graphics.drawable.GradientDrawable();
+        cmdBg.setCornerRadius(10 * density);
+        cmdBg.setColor(isDark ? android.graphics.Color.parseColor("#26000000") : android.graphics.Color.parseColor("#14000000"));
+        cmdBg.setStroke((int)(1 * density), isDark ? android.graphics.Color.parseColor("#33FFFFFF") : android.graphics.Color.parseColor("#22000000"));
+        cmdInput.setBackground(cmdBg);
+        cmdInput.setPadding((int)(12 * density), (int)(10 * density), (int)(12 * density), (int)(10 * density));
+        LinearLayout.LayoutParams cmdParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        cmdParams.bottomMargin = (int)(20 * density);
+        layout.addView(cmdInput, cmdParams);
 
-        new AlertDialog.Builder(activity)
-            .setTitle(R.string.snippets_add)
-            .setView(layout)
-            .setPositiveButton("Lưu", (dialog, which) -> {
-                String title = titleInput.getText().toString().trim();
-                String cmd = cmdInput.getText().toString().trim();
-                if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(cmd)) {
-                    List<PaletteItem> snippets = loadSnippets(activity);
-                    snippets.add(new PaletteItem(title, cmd, true));
-                    saveSnippets(activity, snippets);
-                    Toast.makeText(activity, "Đã lưu lệnh mẫu", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+        // Buttons
+        LinearLayout btnRow = new LinearLayout(activity);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(android.view.Gravity.END);
+
+        android.widget.Button negBtn = new android.widget.Button(activity, null, android.R.attr.borderlessButtonStyle);
+        negBtn.setText("Hủy");
+        negBtn.setTextColor(subTextColor);
+        negBtn.setTextSize(14);
+        negBtn.setOnClickListener(v -> sheet.dismiss());
+        LinearLayout.LayoutParams negParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
+        negParams.rightMargin = (int)(8 * density);
+        btnRow.addView(negBtn, negParams);
+
+        android.widget.Button posBtn = new android.widget.Button(activity);
+        posBtn.setText("Lưu");
+        posBtn.setTextSize(14);
+        posBtn.setTextColor(android.graphics.Color.parseColor("#1A0A10"));
+        android.graphics.drawable.GradientDrawable posBg = new android.graphics.drawable.GradientDrawable();
+        posBg.setCornerRadius(10 * density);
+        posBg.setColor(accentColor);
+        posBtn.setBackground(posBg);
+        posBtn.setOnClickListener(v -> {
+            String title = titleInput.getText().toString().trim();
+            String cmd = cmdInput.getText().toString().trim();
+            if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(cmd)) {
+                List<PaletteItem> snippets = loadSnippets(activity);
+                snippets.add(new PaletteItem(title, cmd, true));
+                saveSnippets(activity, snippets);
+                Toast.makeText(activity, "Đã lưu mẫu lệnh", Toast.LENGTH_SHORT).show();
+                sheet.dismiss();
+            }
+        });
+        LinearLayout.LayoutParams posParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
+        btnRow.addView(posBtn, posParams);
+
+        layout.addView(btnRow);
+
+        sheet.setContentView(layout);
+        sheet.show();
     }
 }

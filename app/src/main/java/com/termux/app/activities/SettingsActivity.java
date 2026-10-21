@@ -83,22 +83,17 @@ public class SettingsActivity extends AppCompatActivity {
                     com.termux.app.theme.TermuxProThemeManager.init(context);
                     java.util.List<com.termux.app.theme.TermuxProThemeManager.ThemeItem> themes = com.termux.app.theme.TermuxProThemeManager.getAvailableThemes(context);
                     String currentId = com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(context);
-                    String[] names = new String[themes.size()];
+                    java.util.List<String> names = new java.util.ArrayList<>();
                     int selected = 0;
                     for (int i = 0; i < themes.size(); i++) {
                         com.termux.app.theme.TermuxProThemeManager.ThemeItem t = themes.get(i);
-                        names[i] = t.name + (t.isDark ? " (Tối)" : " (Sáng)");
+                        names.add(t.name + (t.isDark ? " (Tối)" : " (Sáng)"));
                         if (t.id.equals(currentId)) selected = i;
                     }
-                    new android.app.AlertDialog.Builder(getActivity())
-                        .setTitle("Chọn chủ đề giao diện")
-                        .setSingleChoiceItems(names, selected, (dialog, which) -> {
-                            com.termux.app.theme.TermuxProThemeManager.setCurrentThemeId(context, themes.get(which).id);
-                            android.widget.Toast.makeText(context, "Đã chọn chủ đề: " + themes.get(which).name, android.widget.Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        })
-                        .setNegativeButton("Đóng", null)
-                        .show();
+                    com.termux.app.ui.GlassSheet.showListSheet(getActivity(), "Chọn chủ đề giao diện", names, selected, which -> {
+                        com.termux.app.theme.TermuxProThemeManager.setCurrentThemeId(context, themes.get(which).id);
+                        android.widget.Toast.makeText(context, "Đã chọn chủ đề: " + themes.get(which).name, android.widget.Toast.LENGTH_SHORT).show();
+                    });
                     return true;
                 });
             }
@@ -108,18 +103,14 @@ public class SettingsActivity extends AppCompatActivity {
             Preference backupPreference = findPreference("backup_restore");
             if (backupPreference != null) {
                 backupPreference.setOnPreferenceClickListener(preference -> {
-                    String[] options = {"Tạo bản sao lưu thư mục cá nhân (~)", "Khôi phục dữ liệu từ bản sao lưu"};
-                    new android.app.AlertDialog.Builder(getActivity())
-                        .setTitle("Sao lưu & Phục hồi")
-                        .setItems(options, (dialog, which) -> {
-                            if (which == 0) {
-                                android.widget.Toast.makeText(context, "Vui lòng thực hiện tính năng sao lưu từ trong màn hình chính Termux Pro", android.widget.Toast.LENGTH_LONG).show();
-                            } else {
-                                android.widget.Toast.makeText(context, "Vui lòng mở phiên chính để khôi phục dữ liệu an toàn", android.widget.Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNegativeButton("Đóng", null)
-                        .show();
+                    java.util.List<String> options = java.util.Arrays.asList("Tạo bản sao lưu thư mục cá nhân (~)", "Khôi phục dữ liệu từ bản sao lưu");
+                    com.termux.app.ui.GlassSheet.showListSheet(getActivity(), "Sao lưu & phục hồi", options, -1, which -> {
+                        if (which == 0) {
+                            android.widget.Toast.makeText(context, "Vui lòng thực hiện tính năng sao lưu từ trong màn hình chính Termux Pro", android.widget.Toast.LENGTH_LONG).show();
+                        } else {
+                            android.widget.Toast.makeText(context, "Vui lòng mở phiên chính để khôi phục dữ liệu an toàn", android.widget.Toast.LENGTH_LONG).show();
+                        }
+                    });
                     return true;
                 });
             }
@@ -130,16 +121,19 @@ public class SettingsActivity extends AppCompatActivity {
             if (imagePref != null) {
                 imagePref.setOnPreferenceClickListener(preference -> {
                     boolean current = com.termux.app.image.TermuxProImageHelper.isDownscaleEnabled(context);
-                    new android.app.AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.image_downscale_title)
-                        .setMessage("Tự động nén ảnh (giới hạn cạnh dài 1568px, tối ưu cho Agent CLI và AI LLM).\n\n" +
-                            "Chính sách bảo mật: Toàn bộ ảnh được lưu trữ cục bộ trong thư mục ~/.clip trên điện thoại của bạn, tuyệt đối không gửi lên bất kỳ máy chủ nào.")
-                        .setPositiveButton(current ? "Đang bật (Nhấn để Tắt)" : "Đang tắt (Nhấn để Bật)", (d, w) -> {
+                    com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                        getActivity(),
+                        getString(R.string.image_downscale_title),
+                        "Tự động nén ảnh (giới hạn cạnh dài 1568px, tối ưu cho Agent CLI và AI LLM).\n\n" +
+                        "Chính sách bảo mật: Toàn bộ ảnh được lưu trữ cục bộ trong thư mục ~/.clip trên điện thoại của bạn, tuyệt đối không gửi lên bất kỳ máy chủ nào.",
+                        current ? "Đang bật (Nhấn để tắt)" : "Đang tắt (Nhấn để bật)",
+                        () -> {
                             com.termux.app.image.TermuxProImageHelper.setDownscaleEnabled(context, !current);
                             android.widget.Toast.makeText(context, !current ? "Đã bật tự động nén ảnh" : "Đã tắt tự động nén ảnh", android.widget.Toast.LENGTH_SHORT).show();
-                        })
-                        .setNegativeButton("Đóng", null)
-                        .show();
+                        },
+                        "Đóng",
+                        null
+                    );
                     return true;
                 });
             }
@@ -186,16 +180,18 @@ public class SettingsActivity extends AppCompatActivity {
             if (aboutPreference != null) {
                 aboutPreference.setOnPreferenceClickListener(preference -> {
                     String aboutMessage = "Termux Pro (com.termuxpro.app)\n" +
-                        "Phiên bản: 0.118.0 (Kiến trúc aarch64, API 28)\n\n" +
+                        "Phiên bản: 0.119.0 (Kiến trúc aarch64, API 28)\n\n" +
                         "• Giấy phép mã nguồn mở: GNU General Public License v3.0 (GPLv3)\n\n" +
                         "• Tri ân Upstream: Dự án Termux Pro được phát triển và tối ưu hóa dựa trên nền tảng mã nguồn mở Termux (termux/termux-app và termux/termux-packages) do Fredrik Fornwall và cộng đồng phát triển Termux sáng lập.\n\n" +
                         "• Tuyên bố độc lập: Termux Pro là một phiên bản phân phối mở rộng độc lập, không phải là ứng dụng chính thức hay được tài trợ bởi nhóm phát triển Termux gốc.\n\n" +
                         "• Mã nguồn công khai: https://github.com/xnghii268-rgb/termuxpro";
 
-                    new android.app.AlertDialog.Builder(getActivity())
-                        .setTitle("Giới thiệu & Bản quyền")
-                        .setMessage(aboutMessage)
-                        .setPositiveButton("Báo cáo chẩn đoán", (dialog, which) -> {
+                    com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                        getActivity(),
+                        "Giới thiệu & Bản quyền",
+                        aboutMessage,
+                        "Báo cáo chẩn đoán",
+                        () -> {
                             new Thread() {
                                 @Override
                                 public void run() {
@@ -218,9 +214,10 @@ public class SettingsActivity extends AppCompatActivity {
                                     ReportActivity.startReportActivity(context, reportInfo);
                                 }
                             }.start();
-                        })
-                        .setNegativeButton("Đóng", null)
-                        .show();
+                        },
+                        "Đóng",
+                        null
+                    );
 
                     return true;
                 });

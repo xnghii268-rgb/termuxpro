@@ -101,6 +101,12 @@ public class TermuxShellEnvironment extends AndroidShellEnvironment {
             environment.put("OPENSSL_CONF", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/openssl.cnf");
             environment.put("GIT_SSL_CAINFO", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
             environment.put("LD_PRELOAD", TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermuxpro-path.so:" + TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermux-exec.so");
+
+            // Terminfo and UTF-8 locale configuration
+            environment.put("TERMINFO", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/share/terminfo");
+            environment.put("TERMINFO_DIRS", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/share/terminfo:" + TermuxConstants.TERMUX_HOME_DIR_PATH + "/.terminfo");
+            environment.put("LANG", "C.UTF-8");
+            environment.put("LC_ALL", "C.UTF-8");
         }
 
         return environment;

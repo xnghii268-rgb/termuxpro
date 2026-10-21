@@ -123,17 +123,20 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
     }
 
     private void promptCloseSession(final TerminalSession session) {
-        new AlertDialog.Builder(mActivity)
-            .setTitle(R.string.title_confirm_kill_process)
-            .setMessage("Đóng phiên này sẽ dừng các tiến trình đang chạy trong phiên.")
-            .setPositiveButton("Đóng phiên", (dialog, which) -> {
+        com.termux.app.ui.GlassSheet.showConfirmationSheet(
+            mActivity,
+            mActivity.getString(R.string.title_confirm_kill_process),
+            "Đóng phiên này sẽ dừng các tiến trình đang chạy trong phiên.",
+            "Đóng phiên",
+            () -> {
                 session.finishIfRunning();
                 mActivity.getTermuxTerminalSessionClient().removeFinishedSession(session);
                 notifyDataSetChanged();
                 Toast.makeText(mActivity, "Đã đóng phiên", Toast.LENGTH_SHORT).show();
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+            },
+            "Hủy",
+            null
+        );
     }
 
     @Override
@@ -151,15 +154,18 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
         if (selectedSession == null || selectedSession.getTerminalSession() == null) return false;
         final TerminalSession session = selectedSession.getTerminalSession();
 
-        String[] options = {
+        List<String> options = java.util.Arrays.asList(
             "Đổi tên phiên",
             "Đổi màu thẻ",
             "Đóng phiên"
-        };
+        );
 
-        new AlertDialog.Builder(mActivity)
-            .setTitle("Tùy chọn phiên")
-            .setItems(options, (dialog, which) -> {
+        com.termux.app.ui.GlassSheet.showListSheet(
+            mActivity,
+            "Tùy chọn phiên",
+            options,
+            -1,
+            which -> {
                 if (which == 0) {
                     mActivity.getTermuxTerminalSessionClient().renameSession(session);
                 } else if (which == 1) {
@@ -167,22 +173,23 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
                 } else if (which == 2) {
                     promptCloseSession(session);
                 }
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+            }
+        );
 
         return true;
     }
 
     private void showColorTagDialog(final TerminalSession session) {
-        new AlertDialog.Builder(mActivity)
-            .setTitle(R.string.action_tag_color)
-            .setItems(TAG_COLOR_NAMES, (dialog, which) -> {
+        com.termux.app.ui.GlassSheet.showListSheet(
+            mActivity,
+            mActivity.getString(R.string.action_tag_color),
+            java.util.Arrays.asList(TAG_COLOR_NAMES),
+            -1,
+            which -> {
                 sSessionColorMap.put(session.mHandle, TAG_COLORS[which]);
                 notifyDataSetChanged();
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+            }
+        );
     }
 
 }

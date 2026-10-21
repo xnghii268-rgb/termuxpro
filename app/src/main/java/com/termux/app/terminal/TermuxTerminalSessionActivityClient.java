@@ -345,10 +345,18 @@ public class TermuxTerminalSessionActivityClient extends TermuxTerminalSessionCl
     public void renameSession(final TerminalSession sessionToRename) {
         if (sessionToRename == null) return;
 
-        TextInputDialogUtils.textInput(mActivity, R.string.title_rename_session, sessionToRename.mSessionName, R.string.action_rename_session_confirm, text -> {
-            renameSession(sessionToRename, text);
-            termuxSessionListNotifyUpdated();
-        }, -1, null, -1, null, null);
+        com.termux.app.ui.GlassSheet.showInputSheet(
+            mActivity,
+            mActivity.getString(R.string.title_rename_session),
+            "Nhập tên phiên",
+            sessionToRename.mSessionName,
+            "Lưu",
+            text -> {
+                renameSession(sessionToRename, text);
+                termuxSessionListNotifyUpdated();
+                mActivity.updateTopSessionChips();
+            }
+        );
     }
 
     private void renameSession(TerminalSession sessionToRename, String text) {
@@ -367,8 +375,15 @@ public class TermuxTerminalSessionActivityClient extends TermuxTerminalSessionCl
         if (service == null) return;
 
         if (service.getTermuxSessionsSize() >= MAX_SESSIONS) {
-            new AlertDialog.Builder(mActivity).setTitle(R.string.title_max_terminals_reached).setMessage(R.string.msg_max_terminals_reached)
-                .setPositiveButton(android.R.string.ok, null).show();
+            com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                mActivity,
+                mActivity.getString(R.string.title_max_terminals_reached),
+                mActivity.getString(R.string.msg_max_terminals_reached),
+                "Đã hiểu",
+                null,
+                null,
+                null
+            );
         } else {
             TerminalSession currentSession = mActivity.getCurrentSession();
 

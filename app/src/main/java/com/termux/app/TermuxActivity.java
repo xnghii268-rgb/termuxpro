@@ -38,6 +38,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
+import com.termux.app.perf.TermuxProPerfMonitor;
 import java.util.List;
 
 import com.termux.R;
@@ -342,6 +343,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
         checkHardwareKeyboardAndSelection();
 
+        com.termux.app.theme.TermuxProThemeManager.applyTheme(this, com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(this));
+
+        TermuxProPerfMonitor.getInstance().start("foreground_session");
+
         // Check if a crash happened on last run of the app or if a plugin crashed and show a
         // notification with the crash details if it did
         TermuxCrashUtils.notifyAppCrashFromCrashLogFile(this, LOG_TAG);
@@ -352,6 +357,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     @Override
     protected void onPause() {
         super.onPause();
+        TermuxProPerfMonitor.getInstance().stop();
         if (mExtraKeysView != null) {
             mExtraKeysView.resetExtraKeysState();
         }
@@ -697,14 +703,51 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private boolean mIsKeyboardOpen = false;
     private int mMeasuredFloatingNavHeight = 0;
+    private int mSystemNavBottomInset = 0;
+    private final Handler mImeResizeHandler = new Handler(Looper.getMainLooper());
+
+    private final Runnable mDebouncedImeResizeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mTerminalView != null) {
+                float density = getResources().getDisplayMetrics().density;
+                if (mIsKeyboardOpen) {
+                    mTerminalView.setPadding(0, 0, 0, 0);
+                } else {
+                    int navMarginBottom = (int)(12 * density + 0.5f);
+                    if (mMeasuredFloatingNavHeight <= 0 && mFloatingBottomNavBar != null) {
+                        mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
+                            mFloatingBottomNavBar.getHeight() : (int)(52 * density + 0.5f);
+                    }
+                    int totalBottomPadding = mMeasuredFloatingNavHeight + navMarginBottom + mSystemNavBottomInset;
+                    mTerminalView.setPadding(0, 0, 0, totalBottomPadding);
+                }
+                mTerminalView.updateSize();
+                if (mTerminalView.mEmulator != null) {
+                    mTerminalView.setTopRow(0, false);
+                }
+            }
+        }
+    };
 
     private void setupWindowInsetsAndFloatingNav() {
         if (mTermuxActivityRootView == null) return;
 
         ViewCompat.setOnApplyWindowInsetsListener(mTermuxActivityRootView, (v, insets) -> {
+            // Apply status bar and display cutout padding to session chips bar
+            int statusBarTop = insets.getInsets(WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout()).top;
+            HorizontalScrollView sessionScroll = findViewById(R.id.session_chips_scroll_view);
+            if (sessionScroll != null) {
+                float density = getResources().getDisplayMetrics().density;
+                int basePad = (int)(4 * density + 0.5f);
+                int sidePad = (int)(6 * density + 0.5f);
+                sessionScroll.setPadding(sidePad, statusBarTop + basePad, sidePad, basePad);
+            }
+
             boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
             int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            mSystemNavBottomInset = navBarHeight;
             handleKeyboardVisibilityChanged(imeVisible, imeHeight, navBarHeight);
             return insets;
         });
@@ -714,11 +757,29 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 @NonNull
                 @Override
                 public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                    // Translation-only tracking during animation; do NOT recompute terminal size per frame!
                     boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-                    int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-                    int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
-                    handleKeyboardVisibilityChanged(imeVisible, imeHeight, navBarHeight);
+                    if (mFloatingBottomNavBar != null) {
+                        float density = getResources().getDisplayMetrics().density;
+                        if (mMeasuredFloatingNavHeight <= 0) {
+                            mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
+                                mFloatingBottomNavBar.getHeight() : (int)(52 * density + 0.5f);
+                        }
+                        int navMarginBottom = (int)(12 * density + 0.5f);
+                        float targetTranslationY = imeVisible ? (mMeasuredFloatingNavHeight + navMarginBottom + 20) : 0f;
+                        float targetAlpha = imeVisible ? 0f : 1f;
+                        mFloatingBottomNavBar.setTranslationY(targetTranslationY);
+                        mFloatingBottomNavBar.setAlpha(targetAlpha);
+                    }
                     return insets;
+                }
+
+                @Override
+                public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+                    super.onEnd(animation);
+                    // Recompute terminal rows/cols ONCE at animation end with 50ms debounce
+                    mImeResizeHandler.removeCallbacks(mDebouncedImeResizeRunnable);
+                    mImeResizeHandler.postDelayed(mDebouncedImeResizeRunnable, 50);
                 }
             });
     }
@@ -764,15 +825,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                         mFloatingBottomNavBar.setEnabled(false);
                     })
                     .start();
-
-                // Remove bottom padding from terminal so terminal is flush above extra keys
-                if (mTerminalView != null) {
-                    mTerminalView.setPadding(0, 0, 0, 0);
-                    mTerminalView.updateSize();
-                    if (mTerminalView.mEmulator != null) {
-                        mTerminalView.setTopRow(0, false);
-                    }
-                }
             } else {
                 // Animate bottom nav in
                 mFloatingBottomNavBar.setVisibility(View.VISIBLE);
@@ -782,17 +834,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     .alpha(1f)
                     .setDuration(200)
                     .start();
-
-                // Set terminal bottom padding = measured nav height + margin + safe-area insets
-                if (mTerminalView != null) {
-                    int totalBottomPadding = mMeasuredFloatingNavHeight + navMarginBottom;
-                    mTerminalView.setPadding(0, 0, 0, totalBottomPadding);
-                    mTerminalView.updateSize();
-                    if (mTerminalView.mEmulator != null) {
-                        mTerminalView.setTopRow(0, false);
-                    }
-                }
             }
+
+            // Schedule terminal resize once with debounce
+            mImeResizeHandler.removeCallbacks(mDebouncedImeResizeRunnable);
+            mImeResizeHandler.postDelayed(mDebouncedImeResizeRunnable, 50);
         });
     }
 
@@ -859,7 +905,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 }
                 label.setText(title);
                 label.setTextSize(11);
-                label.setTextColor(isSelected ? Color.parseColor("#2DD4BF") : Color.parseColor("#E5E7EB"));
+                label.setTextColor(isSelected ? Color.parseColor("#FF3C70") : Color.parseColor("#E5E7EB"));
                 if (isSelected) label.setTypeface(null, android.graphics.Typeface.BOLD);
                 chip.addView(label);
 
@@ -888,7 +934,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             TextView addText = new TextView(TermuxActivity.this);
             addText.setText("+");
             addText.setTextSize(14);
-            addText.setTextColor(Color.parseColor("#2DD4BF"));
+            addText.setTextColor(Color.parseColor("#FF3C70"));
             addText.setTypeface(null, android.graphics.Typeface.BOLD);
             addChip.addView(addText);
 
@@ -1021,15 +1067,15 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private void showKillSessionDialog(TerminalSession session) {
         if (session == null) return;
 
-        final AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setIcon(android.R.drawable.ic_dialog_alert);
-        b.setMessage(R.string.title_confirm_kill_process);
-        b.setPositiveButton(android.R.string.yes, (dialog, id) -> {
-            dialog.dismiss();
-            session.finishIfRunning();
-        });
-        b.setNegativeButton(android.R.string.no, null);
-        b.show();
+        com.termux.app.ui.GlassSheet.showConfirmationSheet(
+            this,
+            getString(R.string.title_confirm_kill_process),
+            "Bạn có chắc chắn muốn dừng tiến trình đang chạy trong phiên này không?",
+            "Dừng tiến trình",
+            session::finishIfRunning,
+            "Hủy",
+            null
+        );
     }
 
     private void onResetTerminalSession(TerminalSession session) {
@@ -1043,18 +1089,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     private void showStylingDialog() {
-        Intent stylingIntent = new Intent();
-        stylingIntent.setClassName(TermuxConstants.TERMUX_STYLING_PACKAGE_NAME, TermuxConstants.TERMUX_STYLING_APP.TERMUX_STYLING_ACTIVITY_NAME);
-        try {
-            startActivity(stylingIntent);
-        } catch (ActivityNotFoundException | IllegalArgumentException e) {
-            // The startActivity() call is not documented to throw IllegalArgumentException.
-            // However, crash reporting shows that it sometimes does, so catch it here.
-            new AlertDialog.Builder(this).setMessage(getString(R.string.error_styling_not_installed))
-                .setPositiveButton(R.string.action_styling_install,
-                    (dialog, which) -> ActivityUtils.startActivity(this, new Intent(Intent.ACTION_VIEW, Uri.parse(TermuxConstants.TERMUX_STYLING_FDROID_PACKAGE_URL))))
-                .setNegativeButton(android.R.string.cancel, null).show();
-        }
+        com.termux.app.theme.TermuxProThemeManager.showThemeDialog(this);
     }
     private void toggleKeepScreenOn() {
         if (mTerminalView.getKeepScreenOn()) {

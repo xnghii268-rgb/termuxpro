@@ -196,9 +196,10 @@ final class TermuxInstaller {
                                             outStream.write(buffer, 0, readBytes);
                                     }
                                     if (zipEntryName.startsWith("bin/") || zipEntryName.startsWith("libexec") ||
-                                        zipEntryName.startsWith("lib/apt/apt-helper") || zipEntryName.startsWith("lib/apt/methods")) {
+                                        zipEntryName.startsWith("lib/apt/apt-helper") || zipEntryName.startsWith("lib/apt/methods") ||
+                                        zipEntryName.endsWith(".sh") || zipEntryName.equals("etc/motd.sh")) {
                                         //noinspection OctalInteger
-                                        Os.chmod(targetFile.getAbsolutePath(), 0700);
+                                        Os.chmod(targetFile.getAbsolutePath(), 0755);
                                     }
                                 }
                             }

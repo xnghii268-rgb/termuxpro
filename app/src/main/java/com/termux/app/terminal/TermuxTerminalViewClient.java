@@ -705,29 +705,36 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
 
         LinkedHashSet<CharSequence> urlSet = TermuxUrlUtils.extractUrls(text);
         if (urlSet.isEmpty()) {
-            new AlertDialog.Builder(mActivity).setMessage(R.string.title_select_url_none_found).show();
+            com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                mActivity,
+                mActivity.getString(R.string.title_select_url_dialog),
+                mActivity.getString(R.string.title_select_url_none_found),
+                "Đóng",
+                null,
+                null,
+                null
+            );
             return;
         }
 
         final CharSequence[] urls = urlSet.toArray(new CharSequence[0]);
         Collections.reverse(Arrays.asList(urls)); // Latest first.
 
-        // Click to copy url to clipboard:
-        final AlertDialog dialog = new AlertDialog.Builder(mActivity).setItems(urls, (di, which) -> {
-            String url = (String) urls[which];
-            ShareUtils.copyTextToClipboard(mActivity, url, mActivity.getString(R.string.msg_select_url_copied_to_clipboard));
-        }).setTitle(R.string.title_select_url_dialog).create();
+        final List<String> urlList = new ArrayList<>();
+        for (CharSequence u : urls) {
+            urlList.add(u.toString());
+        }
 
-        // Long press to open URL:
-        dialog.setOnShowListener(di -> {
-            ListView lv = dialog.getListView(); // this is a ListView with your "buds" in it
-            lv.setOnItemLongClickListener((parent, view, position, id) -> {
-                dialog.dismiss();
-                String url = (String) urls[position];
-                ShareUtils.openUrl(mActivity, url);
-                return true;
-            });
-        });
+        com.termux.app.ui.GlassSheet.showListSheet(
+            mActivity,
+            mActivity.getString(R.string.title_select_url_dialog),
+            urlList,
+            -1,
+            which -> {
+                String url = urlList.get(which);
+                ShareUtils.copyTextToClipboard(mActivity, url, mActivity.getString(R.string.msg_select_url_copied_to_clipboard));
+            }
+        );
 
         dialog.show();
     }

@@ -29,7 +29,7 @@ public class TermuxProThemeManager {
     private static final String LOG_TAG = "TermuxProThemeManager";
     private static final String PREFS_NAME = "termuxpro_preferences";
     private static final String KEY_CURRENT_THEME = "current_theme_id";
-    public static final String DEFAULT_THEME_ID = "obsidian_pro";
+    public static final String DEFAULT_THEME_ID = "than_dem";
 
     public static class ThemeItem {
         public final String id;
@@ -51,12 +51,12 @@ public class TermuxProThemeManager {
     }
 
     private static final String[] THEME_FILES = {
-        "obsidian_pro.json",
-        "mocha_warm.json",
-        "nordic_pine.json",
-        "slate_steel.json",
-        "paper_silk.json",
-        "alabaster_frost.json"
+        "than_dem.json",
+        "muc.json",
+        "ruou_vang.json",
+        "reu_dem.json",
+        "giay.json",
+        "suong.json"
     };
 
     private static final Map<String, ThemeItem> sThemes = new LinkedHashMap<>();
@@ -142,10 +142,22 @@ public class TermuxProThemeManager {
             Window window = activity.getWindow();
             if (window != null && window.getDecorView() != null) {
                 window.getDecorView().setBackgroundColor(bgColor);
+                androidx.core.view.WindowInsetsControllerCompat insetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(window, window.getDecorView());
+                if (insetsController != null) {
+                    insetsController.setAppearanceLightStatusBars(!theme.isDark);
+                    insetsController.setAppearanceLightNavigationBars(!theme.isDark);
+                }
             }
             if (activity.getTerminalView() != null) {
                 activity.getTerminalView().setBackgroundColor(bgColor);
                 activity.getTerminalView().invalidate();
+            }
+
+            android.view.View sessionScroll = activity.findViewById(com.termux.R.id.session_chips_scroll_view);
+            if (sessionScroll != null) {
+                int sessionBg = theme.isDark ? 0xFF0D1117 : 0xFFF0EDE4;
+                sessionScroll.setBackgroundColor(sessionBg);
             }
 
             if (activity.getExtraKeysView() != null) {
@@ -185,22 +197,21 @@ public class TermuxProThemeManager {
         List<ThemeItem> themeList = getAvailableThemes(activity);
         String currentId = getCurrentThemeId(activity);
 
-        String[] names = new String[themeList.size()];
+        List<String> names = new ArrayList<>();
         int selectedIndex = 0;
         for (int i = 0; i < themeList.size(); i++) {
             ThemeItem t = themeList.get(i);
-            names[i] = t.name + (t.isDark ? " (Tối)" : " (Sáng)");
+            names.add(t.name + (t.isDark ? " (Tối)" : " (Sáng)"));
             if (t.id.equals(currentId)) selectedIndex = i;
         }
 
-        new AlertDialog.Builder(activity)
-            .setTitle("Chọn chủ đề giao diện")
-            .setSingleChoiceItems(names, selectedIndex, (dialog, which) -> {
+        com.termux.app.ui.GlassSheet.showListSheet(activity,
+            "Chọn chủ đề giao diện",
+            names,
+            selectedIndex,
+            which -> {
                 ThemeItem selected = themeList.get(which);
                 applyTheme(activity, selected.id);
-                dialog.dismiss();
-            })
-            .setNegativeButton("Đóng", null)
-            .show();
+            });
     }
 }

@@ -19,6 +19,7 @@ import android.util.AttributeSet;
 import android.view.ActionMode;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;
+import android.view.Choreographer;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -535,8 +536,27 @@ public final class TerminalView extends View {
 
         mEmulator.clearScrollCounter();
 
-        invalidate();
-        if (mAccessibilityEnabled) setContentDescription(getText());
+        scheduleVsyncInvalidate();
+    }
+
+    private boolean mRedrawScheduled = false;
+
+    private final Choreographer.FrameCallback mRedrawFrameCallback = new Choreographer.FrameCallback() {
+        @Override
+        public void doFrame(long frameTimeNanos) {
+            mRedrawScheduled = false;
+            invalidate();
+            if (mAccessibilityEnabled) {
+                setContentDescription(getText());
+            }
+        }
+    };
+
+    public void scheduleVsyncInvalidate() {
+        if (!mRedrawScheduled) {
+            mRedrawScheduled = true;
+            Choreographer.getInstance().postFrameCallback(mRedrawFrameCallback);
+        }
     }
 
     /** This must be called by the hosting activity in {@link Activity#onContextMenuClosed(Menu)}
@@ -1506,6 +1526,11 @@ public final class TerminalView extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+
+        if (mRedrawScheduled) {
+            Choreographer.getInstance().removeFrameCallback(mRedrawFrameCallback);
+            mRedrawScheduled = false;
+        }
 
         if (mTextSelectionCursorController != null) {
             // Might solve the following exception

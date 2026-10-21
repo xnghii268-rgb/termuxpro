@@ -12,14 +12,14 @@
 #include <stdarg.h>
 
 #define OLD_PREFIX "/data/data/com.termux"
-#define OLD_PREFIX_LEN 22
+#define OLD_PREFIX_LEN (sizeof(OLD_PREFIX) - 1)
 #define NEW_PREFIX "/data/data/com.termuxpro.app"
-#define NEW_PREFIX_LEN 26
+#define NEW_PREFIX_LEN (sizeof(NEW_PREFIX) - 1)
 
 #define OLD_REL "data/data/com.termux"
-#define OLD_REL_LEN 21
+#define OLD_REL_LEN (sizeof(OLD_REL) - 1)
 #define NEW_REL "data/data/com.termuxpro.app"
-#define NEW_REL_LEN 25
+#define NEW_REL_LEN (sizeof(NEW_REL) - 1)
 
 static inline const char* rewrite_path(const char* path, char* buf, size_t bufsiz) {
     if (!path) return NULL;
@@ -52,6 +52,22 @@ int open(const char *pathname, int flags, ...) {
     return real_open ? real_open(p, flags, mode) : -1;
 }
 
+int open64(const char *pathname, int flags, ...) {
+    static int (*real_open64)(const char *, int, mode_t) = NULL;
+    if (!real_open64) real_open64 = dlsym(RTLD_NEXT, "open64");
+    if (!real_open64) real_open64 = dlsym(RTLD_NEXT, "open");
+    char buf[PATH_MAX];
+    const char *p = rewrite_path(pathname, buf, sizeof(buf));
+    mode_t mode = 0;
+    if (flags & O_CREAT) {
+        va_list args;
+        va_start(args, flags);
+        mode = (mode_t)va_arg(args, int);
+        va_end(args);
+    }
+    return real_open64 ? real_open64(p, flags, mode) : -1;
+}
+
 int openat(int dirfd, const char *pathname, int flags, ...) {
     static int (*real_openat)(int, const char *, int, mode_t) = NULL;
     if (!real_openat) real_openat = dlsym(RTLD_NEXT, "openat");
@@ -65,6 +81,37 @@ int openat(int dirfd, const char *pathname, int flags, ...) {
         va_end(args);
     }
     return real_openat ? real_openat(dirfd, p, flags, mode) : -1;
+}
+
+int openat64(int dirfd, const char *pathname, int flags, ...) {
+    static int (*real_openat64)(int, const char *, int, mode_t) = NULL;
+    if (!real_openat64) real_openat64 = dlsym(RTLD_NEXT, "openat64");
+    if (!real_openat64) real_openat64 = dlsym(RTLD_NEXT, "openat");
+    char buf[PATH_MAX];
+    const char *p = rewrite_path(pathname, buf, sizeof(buf));
+    mode_t mode = 0;
+    if (flags & O_CREAT) {
+        va_list args;
+        va_start(args, flags);
+        mode = (mode_t)va_arg(args, int);
+        va_end(args);
+    }
+    return real_openat64 ? real_openat64(dirfd, p, flags, mode) : -1;
+}
+
+FILE *fopen(const char *pathname, const char *mode) {
+    static FILE *(*real_fopen)(const char *, const char *) = NULL;
+    if (!real_fopen) real_fopen = dlsym(RTLD_NEXT, "fopen");
+    char buf[PATH_MAX];
+    return real_fopen ? real_fopen(rewrite_path(pathname, buf, sizeof(buf)), mode) : NULL;
+}
+
+FILE *fopen64(const char *pathname, const char *mode) {
+    static FILE *(*real_fopen64)(const char *, const char *) = NULL;
+    if (!real_fopen64) real_fopen64 = dlsym(RTLD_NEXT, "fopen64");
+    if (!real_fopen64) real_fopen64 = dlsym(RTLD_NEXT, "fopen");
+    char buf[PATH_MAX];
+    return real_fopen64 ? real_fopen64(rewrite_path(pathname, buf, sizeof(buf)), mode) : NULL;
 }
 
 int stat(const char *pathname, struct stat *statbuf) {
