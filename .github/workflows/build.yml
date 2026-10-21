@@ -76,16 +76,40 @@ jobs:
           mkdir -p $HOME/bs-patch && cd $HOME/bs-patch
           unzip -q "$HOME/termux-packages/$BS_FILE"
 
-          echo "Patching all /data/data/com.termux paths to /data/data/com.termuxpro.app with boundary checks..."
-          find . -type f -exec sed -i \
-            -e 's|/data/data/com\.termux/|/data/data/com.termuxpro.app/|g' \
-            -e 's|/data/data/com\.termux:|/data/data/com.termuxpro.app:|g' \
-            -e 's|/data/data/com\.termux;|/data/data/com.termuxpro.app;|g' \
-            -e 's|/data/data/com\.termux=|/data/data/com.termuxpro.app=|g' \
-            -e 's|/data/data/com\.termux"|/data/data/com.termuxpro.app"|g' \
-            -e 's|/data/data/com\.termux'\''|/data/data/com.termuxpro.app'\''|g' \
-            -e 's|/data/data/com\.termux |/data/data/com.termuxpro.app |g' \
-            -e 's|/data/data/com\.termux$|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
+          echo "Patching all /data/data/com.termux paths in text/scripts to /data/data/com.termuxpro.app (strictly skipping ELF binaries)..."
+          python3 -c "
+          import os, re
+          regex = re.compile(rb'/data/data/com\.termux([/\"\x27:; =]|$)')
+          patched = 0
+          skipped_elf = 0
+          for root, dirs, files in os.walk('.'):
+              for f in files:
+                  p = os.path.join(root, f)
+                  if os.path.islink(p): continue
+                  try:
+                      with open(p, 'rb') as fp:
+                          head = fp.read(4)
+                          if head == b'\x7fELF':
+                              skipped_elf += 1
+                              continue  # NEVER MUTATE ELF BINARIES
+                          fp.seek(0)
+                          data = fp.read()
+                  except Exception: continue
+                  changed = False
+                  if b'/data/data/com.termux' in data:
+                      data = regex.sub(rb'/data/data/com.termuxpro.app\1', data)
+                      changed = True
+                  if b'com.termuxpro.apppro' in data:
+                      data = data.replace(b'com.termuxpro.apppro.app', b'com.termuxpro.app').replace(b'com.termuxpro.apppro', b'com.termuxpro.app')
+                      changed = True
+                  if changed:
+                      st = os.stat(p)
+                      with open(p, 'wb') as fp:
+                          fp.write(data)
+                      os.chmod(p, st.st_mode)
+                      patched += 1
+          print(f'Successfully patched {patched} text/script files; preserved {skipped_elf} ELF binaries untouched.')
+          "
 
           # Compile libtermuxpro-path.so using NDK clang
           echo "Compiling libtermuxpro-path.so compatibility interceptor..."
@@ -247,29 +271,47 @@ jobs:
             'fi' >> etc/bash.bashrc
           fi
 
-          # Create v4, v3 and v2 markers inside bootstrap
-          touch .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
+          # Create v5, v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
-          # Cleanup any potential mangled prefixes
-          echo "Auditing and cleaning up any double-replaced prefixes..."
-          find . -type f -exec sed -i \
-            -e 's|com\.termuxpro\.apppro\.app|com.termuxpro.app|g' \
-            -e 's|com\.termuxpro\.apppro|com.termuxpro.app|g' {} + 2>/dev/null || true
-
-          echo "GATE 2: Auditing bootstrap contents for hardcoded com.termux..."
-          LEFTOVERS=$(grep -rnI "/data/data/com.termux/" etc/ var/ bin/ SYMLINKS.txt 2>/dev/null || true)
-          if [ -n "$LEFTOVERS" ]; then
-            echo "GATE 2 WARNING: Unexpected leftovers found:"
-            echo "$LEFTOVERS"
-            exit 1
-          fi
-          MANGLED=$(grep -rnI "com\.termuxpro\.apppro" . 2>/dev/null || true)
-          if [ -n "$MANGLED" ]; then
-            echo "GATE 2 ERROR: Mangled com.termuxpro.apppro paths found:"
-            echo "$MANGLED"
-            exit 1
-          fi
-          echo "GATE 2 PASSED: Zero hardcoded /data/data/com.termux paths and zero mangled prefixes!"
+          echo "GATE 2: Auditing bootstrap contents for binary safety and path correctness..."
+          python3 -c "
+          import os, sys
+          elf_corrupted = 0
+          text_leftover = 0
+          mangled = 0
+          elf_count = 0
+          text_count = 0
+          for root, dirs, files in os.walk('.'):
+              for f in files:
+                  p = os.path.join(root, f)
+                  if os.path.islink(p): continue
+                  try:
+                      with open(p, 'rb') as fp:
+                          head = fp.read(4)
+                          fp.seek(0)
+                          data = fp.read()
+                  except Exception: continue
+                  if head == b'\x7fELF':
+                      elf_count += 1
+                      if p.endswith('libtermuxpro-path.so'): continue
+                      if b'com.termuxpro.app' in data:
+                          print('GATE 2 ERROR: Upstream ELF binary was modified by sed/patch:', p)
+                          elf_corrupted += 1
+                  else:
+                      text_count += 1
+                      if b'/data/data/com.termux/' in data:
+                          print('GATE 2 ERROR: Text file has leftover com.termux:', p)
+                          text_leftover += 1
+                  if b'com.termuxpro.apppro' in data:
+                      print('GATE 2 ERROR: Mangled prefix in:', p)
+                      mangled += 1
+          print(f'GATE 2 AUDIT: {elf_count} ELF binaries verified untouched, {text_count} text files audited.')
+          if elf_corrupted > 0 or text_leftover > 0 or mangled > 0:
+              print(f'GATE 2 FAILED: corrupted_elf={elf_corrupted}, leftover_text={text_leftover}, mangled={mangled}')
+              sys.exit(1)
+          print('GATE 2 PASSED: 0 corrupted ELFs, 0 leftover com.termux in text, 0 mangled prefixes!')
+          "
 
           # Repack bootstrap-aarch64.zip
           rm -f "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-aarch64.zip"

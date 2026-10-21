@@ -103,18 +103,20 @@ final class TermuxInstaller {
             return;
         }
 
-        // If prefix directory exists and has the v4 marker, and key binaries exist, assume that it is correct and be done
-        File v4Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v4");
+        // If prefix directory exists and has the v5 marker, and key binaries exist, assume that it is correct and be done
+        File v5Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v5");
         File loginBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/login");
         File bashBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/bash");
+        File dashBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/dash");
         File shBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/sh");
         File libDir = new File(TERMUX_PREFIX_DIR_PATH, "lib");
         File etcDir = new File(TERMUX_PREFIX_DIR_PATH, "etc");
 
         boolean prefixHealthy = FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) &&
-            v4Marker.exists() &&
+            v5Marker.exists() &&
             loginBin.exists() && loginBin.canExecute() &&
             bashBin.exists() && bashBin.canExecute() &&
+            (dashBin.exists() || shBin.exists()) &&
             libDir.isDirectory() &&
             etcDir.isDirectory();
 
@@ -124,8 +126,8 @@ final class TermuxInstaller {
             return;
         }
 
-        Logger.logInfo(LOG_TAG, "Prefix not healthy (v4Marker=" + v4Marker.exists() +
-            ", login=" + loginBin.exists() + ", bash=" + bashBin.exists() + ", sh=" + shBin.exists() +
+        Logger.logInfo(LOG_TAG, "Prefix not healthy (v5Marker=" + v5Marker.exists() +
+            ", login=" + loginBin.exists() + ", bash=" + bashBin.exists() + ", dash=" + dashBin.exists() + ", sh=" + shBin.exists() +
             "), (re-)installing bootstrap packages.");
 
         final ProgressDialog progress = ProgressDialog.show(activity, null, activity.getString(R.string.bootstrap_installer_body), true, false);
@@ -158,12 +160,9 @@ final class TermuxInstaller {
                         return;
                     }
 
-                    // Create prefix directory if it does not already exist and set required permissions
-                    error = TermuxFileUtils.isTermuxPrefixDirectoryAccessible(true, true);
-                    if (error != null) {
-                        showBootstrapErrorDialog(activity, whenDone, Error.getErrorMarkdownString(error));
-                        return;
-                    }
+                    // Ensure files directory exists
+                    File filesDir = new File(TermuxConstants.TERMUX_FILES_DIR_PATH);
+                    if (!filesDir.exists()) filesDir.mkdirs();
 
                     Logger.logInfo(LOG_TAG, "Extracting bootstrap zip to prefix staging directory \"" + TERMUX_STAGING_PREFIX_DIR_PATH + "\".");
 
@@ -293,6 +292,7 @@ final class TermuxInstaller {
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v2").createNewFile();
