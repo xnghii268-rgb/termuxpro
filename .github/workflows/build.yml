@@ -71,6 +71,73 @@ jobs:
             find etc/apt/ -type f -exec sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
           fi
 
+          # Compile libtermuxpro-path.so using NDK clang
+          echo "Compiling libtermuxpro-path.so compatibility interceptor..."
+          NDK_ROOT="${ANDROID_NDK_LATEST_HOME:-}"
+          if [ -z "$NDK_ROOT" ] || [ ! -d "$NDK_ROOT" ]; then
+            NDK_ROOT=$(ls -d $ANDROID_HOME/ndk/* 2>/dev/null | tail -n 1 || true)
+          fi
+          NDK_CLANG=$(find "$NDK_ROOT" -name "aarch64-linux-android28-clang" 2>/dev/null | head -n 1 || true)
+          if [ -z "$NDK_CLANG" ]; then
+            NDK_CLANG=$(find "$NDK_ROOT" -name "aarch64-linux-android*-clang" 2>/dev/null | head -n 1 || true)
+          fi
+          if [ -n "$NDK_CLANG" ]; then
+            echo "Found NDK clang: $NDK_CLANG"
+            mkdir -p lib
+            $NDK_CLANG -shared -fPIC -O2 -Wall "$GITHUB_WORKSPACE/app/src/main/cpp/termuxpro-path.c" -o lib/libtermuxpro-path.so -ldl
+            echo "Successfully compiled lib/libtermuxpro-path.so"
+          else
+            echo "Warning: NDK clang not found during bootstrap generation step"
+          fi
+
+          # Configure etc/apt/apt.conf for Termux Pro prefix compatibility
+          echo "Configuring etc/apt/apt.conf for Termux Pro prefix compatibility..."
+          mkdir -p etc/apt/apt.conf.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg
+          cat << 'EOF' > etc/apt/apt.conf
+Dir "/data/data/com.termuxpro.app/files/usr";
+Dir::State "var/lib/apt";
+Dir::State::status "/data/data/com.termuxpro.app/files/usr/var/lib/dpkg/status";
+Dir::Cache "/data/data/com.termuxpro.app/cache/apt";
+Dir::Cache::archives "archives/";
+Dir::Etc "etc/apt";
+Dir::Etc::parts "apt.conf.d";
+Dir::Etc::sourcelist "sources.list";
+Dir::Etc::sourceparts "sources.list.d";
+Dir::Bin::methods "/data/data/com.termuxpro.app/files/usr/lib/apt/methods";
+Dir::Bin::dpkg "/data/data/com.termuxpro.app/files/usr/bin/dpkg";
+Dir::Log "var/log/apt";
+DPkg::Path "/data/data/com.termuxpro.app/files/usr/bin";
+DPkg::Options {
+   "--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg";
+   "--instdir=/data/data/com.termuxpro.app/files/usr";
+};
+EOF
+
+          echo "Injecting compatibility exports into etc/profile and etc/bash.bashrc..."
+          cat << 'EOF' >> etc/profile
+export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"
+export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"
+export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"
+export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"
+export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"
+if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
+    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
+fi
+EOF
+
+          if [ -f "etc/bash.bashrc" ]; then
+            cat << 'EOF' >> etc/bash.bashrc
+export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"
+export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"
+export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"
+export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"
+export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"
+if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
+    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
+fi
+EOF
+          fi
+
           # Add Phase 8 shell helpers: clipimg and lastshot
           mkdir -p bin
           cat << 'EOF' > bin/clipimg

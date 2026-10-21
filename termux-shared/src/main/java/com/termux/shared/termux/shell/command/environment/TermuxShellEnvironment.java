@@ -89,6 +89,14 @@ public class TermuxShellEnvironment extends AndroidShellEnvironment {
                 environment.put(ENV_PATH, TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH);
                 environment.put(ENV_LD_LIBRARY_PATH, TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
             }
+
+            // Compatibility configuration for apt & dpkg in Termux Pro
+            environment.put("APT_CONFIG", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/apt/apt.conf");
+            environment.put("DPKG_ADMINDIR", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/var/lib/dpkg");
+            environment.put("TERMUX__PREFIX", TermuxConstants.TERMUX_PREFIX_DIR_PATH);
+            environment.put("TERMUX_APP__DATA_DIR", "/data/data/com.termuxpro.app");
+            environment.put("TERMUX_APP__LEGACY_DATA_DIR", "/data/data/com.termuxpro.app");
+            environment.put("LD_PRELOAD", TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermuxpro-path.so:" + TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermux-exec.so");
         }
 
         return environment;
