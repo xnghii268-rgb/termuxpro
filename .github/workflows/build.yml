@@ -93,80 +93,75 @@ jobs:
           # Configure etc/apt/apt.conf for Termux Pro prefix compatibility
           echo "Configuring etc/apt/apt.conf for Termux Pro prefix compatibility..."
           mkdir -p etc/apt/apt.conf.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg
-          sed -e 's/^[ \t]*//' << 'EOF' > etc/apt/apt.conf
-          Dir "/data/data/com.termuxpro.app/files/usr";
-          Dir::State "var/lib/apt";
-          Dir::State::status "/data/data/com.termuxpro.app/files/usr/var/lib/dpkg/status";
-          Dir::Cache "/data/data/com.termuxpro.app/cache/apt";
-          Dir::Cache::archives "archives/";
-          Dir::Etc "etc/apt";
-          Dir::Etc::parts "apt.conf.d";
-          Dir::Etc::sourcelist "sources.list";
-          Dir::Etc::sourceparts "sources.list.d";
-          Dir::Bin::methods "/data/data/com.termuxpro.app/files/usr/lib/apt/methods";
-          Dir::Bin::dpkg "/data/data/com.termuxpro.app/files/usr/bin/dpkg";
-          Dir::Log "var/log/apt";
-          DPkg::Path "/data/data/com.termuxpro.app/files/usr/bin";
-          DPkg::Options {
-             "--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg";
-             "--instdir=/data/data/com.termuxpro.app/files/usr";
-          };
-          EOF
+          printf '%s\n' \
+          'Dir "/data/data/com.termuxpro.app/files/usr";' \
+          'Dir::State "var/lib/apt";' \
+          'Dir::State::status "/data/data/com.termuxpro.app/files/usr/var/lib/dpkg/status";' \
+          'Dir::Cache "/data/data/com.termuxpro.app/cache/apt";' \
+          'Dir::Cache::archives "archives/";' \
+          'Dir::Etc "etc/apt";' \
+          'Dir::Etc::parts "apt.conf.d";' \
+          'Dir::Etc::sourcelist "sources.list";' \
+          'Dir::Etc::sourceparts "sources.list.d";' \
+          'Dir::Bin::methods "/data/data/com.termuxpro.app/files/usr/lib/apt/methods";' \
+          'Dir::Bin::dpkg "/data/data/com.termuxpro.app/files/usr/bin/dpkg";' \
+          'Dir::Log "var/log/apt";' \
+          'DPkg::Path "/data/data/com.termuxpro.app/files/usr/bin";' \
+          'DPkg::Options {' \
+          '   "--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg";' \
+          '   "--instdir=/data/data/com.termuxpro.app/files/usr";' \
+          '};' > etc/apt/apt.conf
 
           echo "Injecting compatibility exports into etc/profile and etc/bash.bashrc..."
-          sed -e 's/^[ \t]*//' << 'EOF' >> etc/profile
-          export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"
-          export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"
-          export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"
-          export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"
-          export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"
-          if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
-              export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
-          fi
-          EOF
+          printf '%s\n' \
+          'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
+          'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
+          'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
+          'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
+          'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
+          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
+          '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+          'fi' >> etc/profile
 
           if [ -f "etc/bash.bashrc" ]; then
-            sed -e 's/^[ \t]*//' << 'EOF' >> etc/bash.bashrc
-            export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"
-            export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"
-            export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"
-            export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"
-            export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"
-            if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
-                export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
-            fi
-            EOF
+            printf '%s\n' \
+            'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
+            'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
+            'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
+            'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
+            'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
+            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
+            '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+            'fi' >> etc/bash.bashrc
           fi
 
           # Add Phase 8 shell helpers: clipimg and lastshot
           mkdir -p bin
-          cat << 'EOF' > bin/clipimg
-          #!/data/data/com.termuxpro.app/files/usr/bin/bash
-          LATEST=$(ls -t "$HOME/.clip"/img-*.png 2>/dev/null | head -n 1)
-          if [ -n "$LATEST" ]; then
-              echo "$LATEST"
-          else
-              echo "Không tìm thấy ảnh nào trong ~/.clip" >&2
-              exit 1
-          fi
-          EOF
+          printf '%s\n' \
+          '#!/data/data/com.termuxpro.app/files/usr/bin/bash' \
+          'LATEST=$(ls -t "$HOME/.clip"/img-*.png 2>/dev/null | head -n 1)' \
+          'if [ -n "$LATEST" ]; then' \
+          '    echo "$LATEST"' \
+          'else' \
+          '    echo "Không tìm thấy ảnh nào trong ~/.clip" >&2' \
+          '    exit 1' \
+          'fi' > bin/clipimg
           chmod 755 bin/clipimg
 
-          cat << 'EOF' > bin/lastshot
-          #!/data/data/com.termuxpro.app/files/usr/bin/bash
-          LATEST=$(ls -t "$HOME/storage/shared/DCIM/Screenshots"/*.{png,jpg,jpeg} "$HOME/storage/shared/Pictures/Screenshots"/*.{png,jpg,jpeg} 2>/dev/null | head -n 1)
-          if [ -n "$LATEST" ]; then
-              echo "$LATEST"
-          else
-              LATEST=$(ls -t "$HOME/.clip"/img-*.png 2>/dev/null | head -n 1)
-              if [ -n "$LATEST" ]; then
-                  echo "$LATEST"
-              else
-                  echo "Không tìm thấy ảnh chụp màn hình nào" >&2
-                  exit 1
-              fi
-          fi
-          EOF
+          printf '%s\n' \
+          '#!/data/data/com.termuxpro.app/files/usr/bin/bash' \
+          'LATEST=$(ls -t "$HOME/storage/shared/DCIM/Screenshots"/*.{png,jpg,jpeg} "$HOME/storage/shared/Pictures/Screenshots"/*.{png,jpg,jpeg} 2>/dev/null | head -n 1)' \
+          'if [ -n "$LATEST" ]; then' \
+          '    echo "$LATEST"' \
+          'else' \
+          '    LATEST=$(ls -t "$HOME/.clip"/img-*.png 2>/dev/null | head -n 1)' \
+          '    if [ -n "$LATEST" ]; then' \
+          '        echo "$LATEST"' \
+          '    else' \
+          '        echo "Không tìm thấy ảnh chụp màn hình nào" >&2' \
+          '        exit 1' \
+          '    fi' \
+          'fi' > bin/lastshot
           chmod 755 bin/lastshot
 
           echo "GATE 2: Auditing bootstrap contents for hardcoded com.termux..."
