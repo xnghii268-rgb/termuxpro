@@ -156,8 +156,6 @@ jobs:
           # Patch bin/login to preserve libtermuxpro-path.so in LD_PRELOAD
           if [ -f "bin/login" ]; then
             sed -i 's|unset LD_PRELOAD|true # keep LD_PRELOAD for termux pro|g' bin/login
-            sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
-            sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
           fi
 
           # Add Phase 8 shell helpers: clipimg and lastshot
@@ -203,8 +201,19 @@ jobs:
           'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
           'export LANG="C.UTF-8"' \
           'export LC_ALL="C.UTF-8"' \
+          'PRELOAD=""' \
           'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-          '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+          '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
+          'fi' \
+          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then' \
+          '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
+          '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+          'elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so" ]; then' \
+          '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
+          '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"' \
+          'fi' \
+          'if [ -n "$PRELOAD" ]; then' \
+          '    export LD_PRELOAD="$PRELOAD"' \
           'fi' \
           'if [ -f "/data/data/com.termuxpro.app/files/usr/etc/motd.sh" ]; then' \
           '    bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh' \
@@ -225,8 +234,19 @@ jobs:
             'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
             '[ -z "$LANG" ] && export LANG="C.UTF-8"' \
             '[ -z "$LC_ALL" ] && export LC_ALL="C.UTF-8"' \
+            'PRELOAD=""' \
             'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-            '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+            '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
+            'fi' \
+            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then' \
+            '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
+            '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+            'elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so" ]; then' \
+            '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
+            '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"' \
+            'fi' \
+            'if [ -n "$PRELOAD" ]; then' \
+            '    export LD_PRELOAD="$PRELOAD"' \
             'fi' >> etc/bash.bashrc
           fi
 

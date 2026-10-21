@@ -24,10 +24,19 @@ else
 	done
 fi
 
+PRELOAD=""
 if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
-	export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
-elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then
-	export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
+	PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"
+fi
+if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then
+	[ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"
+	PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
+elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so" ]; then
+	[ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"
+	PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"
+fi
+if [ -n "$PRELOAD" ]; then
+	export LD_PRELOAD="$PRELOAD"
 fi
 
 if [ -f /data/data/com.termuxpro.app/files/usr/etc/termux-login.sh ]; then

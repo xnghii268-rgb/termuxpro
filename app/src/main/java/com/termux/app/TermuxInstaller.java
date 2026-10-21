@@ -306,6 +306,39 @@ final class TermuxInstaller {
                 Logger.logError(LOG_TAG, "Error installing libtermuxpro-path.so: " + e.getMessage());
             }
 
+            // Ensure libtermux-exec.so is linked if any termux-exec library is present
+            try {
+                File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
+                File execLib = new File(prefixLib, "libtermux-exec.so");
+                if (!execLib.exists()) {
+                    File[] execCandidates = new File[] {
+                        new File(prefixLib, "libtermux-exec-ld-preload.so"),
+                        new File(prefixLib, "libtermux-exec-direct-ld-preload.so"),
+                        new File(prefixLib, "libtermux-exec-linker-ld-preload.so")
+                    };
+                    for (File cand : execCandidates) {
+                        if (cand.exists()) {
+                            try {
+                                android.system.Os.symlink(cand.getName(), execLib.getAbsolutePath());
+                            } catch (Exception e) {
+                                try (java.io.InputStream in = new java.io.FileInputStream(cand);
+                                     FileOutputStream out = new FileOutputStream(execLib)) {
+                                    byte[] buf = new byte[8192];
+                                    int len;
+                                    while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+                                } catch (Exception ignored) {}
+                            }
+                            execLib.setReadable(true, false);
+                            execLib.setExecutable(true, false);
+                            Logger.logInfo(LOG_TAG, "Created missing libtermux-exec.so link to " + cand.getName());
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error ensuring libtermux-exec.so: " + e.getMessage());
+            }
+
             // Ensure $PREFIX/bin/login exists, is executable, does not unset LD_PRELOAD and uses Termux Pro paths
             try {
                 File loginFile = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, "login");
@@ -320,8 +353,19 @@ final class TermuxInstaller {
                         "else\n" +
                         "    export SHELL=/system/bin/sh\n" +
                         "fi\n" +
+                        "PRELOAD=\"\"\n" +
                         "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\" ]; then\n" +
-                        "    export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"\n" +
+                        "    PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\"\n" +
+                        "fi\n" +
+                        "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\" ]; then\n" +
+                        "    [ -n \"$PRELOAD\" ] && PRELOAD=\"${PRELOAD}:\"\n" +
+                        "    PRELOAD=\"${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"\n" +
+                        "elif [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\" ]; then\n" +
+                        "    [ -n \"$PRELOAD\" ] && PRELOAD=\"${PRELOAD}:\"\n" +
+                        "    PRELOAD=\"${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\"\n" +
+                        "fi\n" +
+                        "if [ -n \"$PRELOAD\" ]; then\n" +
+                        "    export LD_PRELOAD=\"$PRELOAD\"\n" +
                         "fi\n" +
                         "if [ -f /data/data/com.termuxpro.app/files/usr/etc/profile ]; then\n" +
                         "    . /data/data/com.termuxpro.app/files/usr/etc/profile\n" +
