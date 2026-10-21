@@ -46,6 +46,8 @@ public class TerminalToolbarViewPager {
                 ExtraKeysView extraKeysView = (ExtraKeysView) layout;
                 extraKeysView.setExtraKeysViewClient(mActivity.getTermuxTerminalExtraKeys());
                 extraKeysView.setButtonTextAllCaps(false);
+                String styleMode = mActivity.getPreferences() != null ? mActivity.getPreferences().getExtraKeysStyleMode() : ExtraKeysView.STYLE_MODE_PRO;
+                extraKeysView.setStyleMode(styleMode);
                 mActivity.setExtraKeysView(extraKeysView);
                 com.termux.app.theme.TermuxProThemeManager.updateExtraKeysTheme(mActivity, extraKeysView);
                 extraKeysView.reload(mActivity.getTermuxTerminalExtraKeys().getExtraKeysInfo(),

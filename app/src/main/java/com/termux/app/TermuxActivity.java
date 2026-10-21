@@ -215,6 +215,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Logger.logDebug(LOG_TAG, "onCreate");
+        sCurrentActivity = new java.lang.ref.WeakReference<>(this);
         mIsOnResumeAfterOnCreate = true;
 
         if (savedInstanceState != null)
@@ -343,7 +344,14 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         if (mExtraKeysView != null) {
             mExtraKeysView.resetExtraKeysState();
+            if (mPreferences != null) {
+                String styleMode = mPreferences.getExtraKeysStyleMode();
+                if (!styleMode.equalsIgnoreCase(mExtraKeysView.getStyleMode())) {
+                    reloadExtraKeys();
+                }
+            }
         }
+        sCurrentActivity = new java.lang.ref.WeakReference<>(this);
         checkHardwareKeyboardAndSelection();
 
         com.termux.app.theme.TermuxProThemeManager.applyTheme(this, com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(this));
@@ -399,6 +407,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         super.onDestroy();
 
         Logger.logDebug(LOG_TAG, "onDestroy");
+
+        if (sCurrentActivity != null && sCurrentActivity.get() == this) {
+            sCurrentActivity = null;
+        }
 
         if (mIsInvalidState) return;
 
@@ -1218,6 +1230,29 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     public View getTermuxActivityBottomSpaceView() {
         return mTermuxActivityBottomSpaceView;
+    }
+
+    private static java.lang.ref.WeakReference<TermuxActivity> sCurrentActivity;
+
+    public static TermuxActivity getCurrentActivity() {
+        return sCurrentActivity != null ? sCurrentActivity.get() : null;
+    }
+
+    public void reloadExtraKeys() {
+        runOnUiThread(() -> {
+            if (mTermuxTerminalExtraKeys != null) {
+                mTermuxTerminalExtraKeys.reloadExtraKeys();
+            }
+            if (mExtraKeysView != null) {
+                String styleMode = mPreferences != null ? mPreferences.getExtraKeysStyleMode() : ExtraKeysView.STYLE_MODE_PRO;
+                mExtraKeysView.setStyleMode(styleMode);
+                com.termux.app.theme.TermuxProThemeManager.updateExtraKeysTheme(this, mExtraKeysView);
+                if (mTermuxTerminalExtraKeys != null) {
+                    mExtraKeysView.reload(mTermuxTerminalExtraKeys.getExtraKeysInfo(), mTerminalToolbarDefaultHeight);
+                }
+            }
+            setTerminalToolbarHeight();
+        });
     }
 
     public ExtraKeysView getExtraKeysView() {

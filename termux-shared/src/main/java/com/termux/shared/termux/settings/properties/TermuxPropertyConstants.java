@@ -325,7 +325,7 @@ public final class TermuxPropertyConstants {
 
     /** Defines the key for extra keys */
     public static final String KEY_EXTRA_KEYS =  "extra-keys"; // Default: "extra-keys"
-    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[{'key':'ESC','display':'Esc'},{'key':'TAB','display':'⇥'},{'key':'HOME','display':'Home'},{'key':'END','display':'End'},{'key':'PGUP','display':'PgUp'},{'key':'PGDN','display':'PgDn'},{'key':'UP','display':'↑'}],[{'key':'CTRL','display':'Ctrl'},{'key':'ALT','display':'Alt'},{'key':'LEFT','display':'←'},{'key':'DOWN','display':'↓'},{'key':'RIGHT','display':'→'},{'key':'/','popup':'|'},{'key':'PALETTE','display':'Lệnh','popup':{'key':'THEME','display':'Giao diện'}}]]";
+    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[\"ESC\",\"/\",\"-\",\"HOME\",\"UP\",\"END\",\"PGUP\"],[\"TAB\",\"CTRL\",\"ALT\",\"LEFT\",\"DOWN\",\"RIGHT\",\"PGDN\"]]";
 
     /** Defines the key for extra keys style */
     public static final String KEY_EXTRA_KEYS_STYLE =  "extra-keys-style"; // Default: "extra-keys-style"

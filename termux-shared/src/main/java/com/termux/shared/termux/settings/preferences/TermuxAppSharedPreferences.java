@@ -258,4 +258,28 @@ public class TermuxAppSharedPreferences extends AppSharedPreferences {
         SharedPreferenceUtils.setBoolean(mSharedPreferences, TERMUX_APP.KEY_CRASH_REPORT_NOTIFICATIONS_ENABLED, value, false);
     }
 
+    public String getExtraKeysStyleMode() {
+        return SharedPreferenceUtils.getString(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_STYLE_MODE, TERMUX_APP.DEFAULT_VALUE_KEY_EXTRA_KEYS_STYLE_MODE, true);
+    }
+
+    public void setExtraKeysStyleMode(String value) {
+        SharedPreferenceUtils.setString(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_STYLE_MODE, value, false);
+    }
+
+    public String getExtraKeysLayout() {
+        return SharedPreferenceUtils.getString(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_LAYOUT, null, true);
+    }
+
+    public void setExtraKeysLayout(String value) {
+        SharedPreferenceUtils.setString(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_LAYOUT, value, false);
+    }
+
+    public int getExtraKeysMigrationVersion() {
+        return SharedPreferenceUtils.getInt(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_MIGRATION_VERSION, 0);
+    }
+
+    public void setExtraKeysMigrationVersion(int version) {
+        SharedPreferenceUtils.setInt(mSharedPreferences, TERMUX_APP.KEY_EXTRA_KEYS_MIGRATION_VERSION, version, false);
+    }
+
 }

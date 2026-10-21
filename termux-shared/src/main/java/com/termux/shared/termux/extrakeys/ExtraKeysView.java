@@ -187,6 +187,15 @@ public final class ExtraKeysView extends GridLayout {
      * {@link #DEFAULT_BUTTON_ACTIVE_BACKGROUND_COLOR}. */
     protected int mButtonActiveBackgroundColor;
 
+    public static final String STYLE_MODE_PRO = "pro";
+    public static final String STYLE_MODE_CLASSIC = "classic";
+    protected String mStyleMode = STYLE_MODE_PRO;
+    protected ExtraKeysInfo mLastExtraKeysInfo;
+    protected float mLastHeightPx;
+    protected int mTerminalBg = 0xFF0D1117;
+    protected int mTerminalFg = 0xFFF3F4F6;
+    protected int mTerminalAccent = 0xFF2DD4BF;
+
     protected int mBarBackgroundColor = 0xDE0D1117;
     protected int mKeyNormalBackgroundColor = 0x24FFFFFF;
     protected int mKeyPressedBackgroundColor = 0x40FFFFFF;
@@ -395,13 +404,44 @@ public final class ExtraKeysView extends GridLayout {
 
 
 
+    public boolean isClassicMode() {
+        return STYLE_MODE_CLASSIC.equalsIgnoreCase(mStyleMode);
+    }
+
+    public String getStyleMode() {
+        return mStyleMode != null ? mStyleMode : STYLE_MODE_PRO;
+    }
+
+    public void setStyleMode(String styleMode) {
+        if (styleMode == null || (!styleMode.equalsIgnoreCase(STYLE_MODE_PRO) && !styleMode.equalsIgnoreCase(STYLE_MODE_CLASSIC))) {
+            styleMode = STYLE_MODE_PRO;
+        }
+        this.mStyleMode = styleMode.toLowerCase(Locale.ROOT);
+        setSemanticTheme(mTerminalBg, mTerminalFg, mTerminalAccent, mIsDarkTheme);
+        if (mLastExtraKeysInfo != null) {
+            reload(mLastExtraKeysInfo, mLastHeightPx);
+        }
+    }
+
     public void setSemanticTheme(int terminalBg, int terminalFg, int accent, boolean isDark) {
+        mTerminalBg = terminalBg;
+        mTerminalFg = terminalFg;
+        mTerminalAccent = accent;
         mIsDarkTheme = isDark;
         mAccentColor = accent != 0 ? accent : (isDark ? 0xFF2DD4BF : 0xFF0D9488);
         mButtonTextColor = terminalFg != 0 ? terminalFg : (isDark ? 0xFFF3F4F6 : 0xFF111827);
         mButtonActiveTextColor = mAccentColor;
 
-        if (isDark) {
+        if (isClassicMode()) {
+            mBarBackgroundColor = 0xFF000000;
+            mKeyNormalBackgroundColor = 0x00000000;
+            mKeyPressedBackgroundColor = 0x33FFFFFF;
+            mKeyStrokeColor = 0;
+            mAccentBgColor = 0x33FFFFFF;
+            mAccentStrokeColor = 0;
+            mButtonTextColor = 0xFFFFFFFF;
+            mButtonActiveTextColor = mAccentColor;
+        } else if (isDark) {
             mBarBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.08f);
             mBarBackgroundColor = ColorUtils.setAlphaComponent(mBarBackgroundColor, 0xEE);
 
@@ -429,11 +469,16 @@ public final class ExtraKeysView extends GridLayout {
     public Drawable createKeyDrawable(int bgColor, int strokeColor) {
         GradientDrawable gd = new GradientDrawable();
         gd.setShape(GradientDrawable.RECTANGLE);
-        gd.setCornerRadius(10 * getResources().getDisplayMetrics().density);
-        gd.setColor(bgColor);
-        if (strokeColor != 0) {
-            int strokeWidth = Math.max(1, (int)(0.5f * getResources().getDisplayMetrics().density + 0.5f));
-            gd.setStroke(strokeWidth, strokeColor);
+        if (isClassicMode()) {
+            gd.setCornerRadius(0);
+            gd.setColor(bgColor);
+        } else {
+            gd.setCornerRadius(10 * getResources().getDisplayMetrics().density);
+            gd.setColor(bgColor);
+            if (strokeColor != 0) {
+                int strokeWidth = Math.max(1, (int)(0.5f * getResources().getDisplayMetrics().density + 0.5f));
+                gd.setStroke(strokeWidth, strokeColor);
+            }
         }
         return gd;
     }
@@ -444,27 +489,33 @@ public final class ExtraKeysView extends GridLayout {
         String key = buttonInfo.getKey();
         if (display == null) display = key != null ? key : "";
 
-        if ("ESC".equalsIgnoreCase(display) || "ESC".equalsIgnoreCase(key)) return "Esc";
-        if ("CTRL".equalsIgnoreCase(display) || "CTRL".equalsIgnoreCase(key)) return "Ctrl";
-        if ("ALT".equalsIgnoreCase(display) || "ALT".equalsIgnoreCase(key)) return "Alt";
+        // Plain hyphen and slash
+        if ("-".equals(key) || "-".equals(display) || "―".equals(display)) return "-";
+        if ("/".equals(key) || "/".equals(display)) return "/";
+
+        // Uppercase labels matching stock reference
+        if ("ESC".equalsIgnoreCase(display) || "ESC".equalsIgnoreCase(key)) return "ESC";
+        if ("CTRL".equalsIgnoreCase(display) || "CTRL".equalsIgnoreCase(key)) return "CTRL";
+        if ("ALT".equalsIgnoreCase(display) || "ALT".equalsIgnoreCase(key)) return "ALT";
         if ("TAB".equalsIgnoreCase(display) || "TAB".equalsIgnoreCase(key)) return "⇥";
-        if ("HOME".equalsIgnoreCase(display) || "HOME".equalsIgnoreCase(key)) return "Home";
-        if ("END".equalsIgnoreCase(display) || "END".equalsIgnoreCase(key)) return "End";
+        if ("HOME".equalsIgnoreCase(display) || "HOME".equalsIgnoreCase(key)) return "HOME";
+        if ("END".equalsIgnoreCase(display) || "END".equalsIgnoreCase(key)) return "END";
+        if ("PGUP".equalsIgnoreCase(display) || "PGUP".equalsIgnoreCase(key)) return "PGUP";
+        if ("PGDN".equalsIgnoreCase(display) || "PGDN".equalsIgnoreCase(key)) return "PGDN";
+
+        // Arrows
         if ("UP".equalsIgnoreCase(display) || "UP".equalsIgnoreCase(key)) return "↑";
         if ("LEFT".equalsIgnoreCase(display) || "LEFT".equalsIgnoreCase(key)) return "←";
         if ("DOWN".equalsIgnoreCase(display) || "DOWN".equalsIgnoreCase(key)) return "↓";
         if ("RIGHT".equalsIgnoreCase(display) || "RIGHT".equalsIgnoreCase(key)) return "→";
+
+        // Pro special keys
         if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(display)) return "Dán ảnh";
         if ("RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(display)) return "Ảnh mới";
         if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(display)) return "Lệnh";
         if ("THEME".equalsIgnoreCase(key) || "GIAO DIỆN".equalsIgnoreCase(display)) return "Giao diện";
         if ("TELEX".equalsIgnoreCase(key) || "TELEX".equalsIgnoreCase(display)) return "Telex";
 
-        if (display.length() <= 1) return display;
-
-        if (display.equals(display.toUpperCase(Locale.ROOT)) && display.matches("^[A-Z0-9_]+$")) {
-            return display.substring(0, 1).toUpperCase(Locale.ROOT) + display.substring(1).toLowerCase(Locale.ROOT);
-        }
         return display;
     }
 
@@ -538,6 +589,9 @@ public final class ExtraKeysView extends GridLayout {
         if (extraKeysInfo == null)
             return;
 
+        mLastExtraKeysInfo = extraKeysInfo;
+        mLastHeightPx = heightPx;
+
         for(SpecialButtonState state : mSpecialButtons.values())
             state.buttons = new ArrayList<>();
 
@@ -550,7 +604,7 @@ public final class ExtraKeysView extends GridLayout {
 
         float density = getContext().getResources().getDisplayMetrics().density;
         int minHeightPx = (int)(44 * density + 0.5f);
-        int marginPx = Math.max(1, (int)(2 * density + 0.5f));
+        int marginPx = isClassicMode() ? 0 : Math.max(1, (int)(2 * density + 0.5f));
 
         for (int row = 0; row < buttons.length; row++) {
             for (int col = 0; col < buttons[row].length; col++) {
@@ -573,7 +627,7 @@ public final class ExtraKeysView extends GridLayout {
                 button.setSingleLine(true);
                 button.setEllipsize(null);
                 button.setPadding(0, 0, 0, 0);
-                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(button, 10, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(button, 11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
                 button.setMinHeight(minHeightPx);
                 button.setMinimumHeight(minHeightPx);
 
@@ -587,7 +641,9 @@ public final class ExtraKeysView extends GridLayout {
                 button.setOnTouchListener((view, event) -> {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                            if (!isClassicMode()) {
+                                view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                            }
                             button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                             startScheduledExecutors(view, buttonInfo, button);
                             return true;
@@ -596,12 +652,16 @@ public final class ExtraKeysView extends GridLayout {
                             if (buttonInfo.getPopup() != null) {
                                 if (mPopupWindow == null && event.getY() < 0) {
                                     stopScheduledExecutors();
-                                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                    if (!isClassicMode()) {
+                                        view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                    }
                                     applyButtonDefaultState(button, buttonInfo);
                                     showPopup(view, buttonInfo.getPopup());
                                 }
                                 if (mPopupWindow != null && event.getY() > 0) {
-                                    view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                                    if (!isClassicMode()) {
+                                        view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                                    }
                                     button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                                     dismissPopup();
                                 }
@@ -609,13 +669,17 @@ public final class ExtraKeysView extends GridLayout {
                             return true;
 
                         case MotionEvent.ACTION_CANCEL:
-                            view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            if (!isClassicMode()) {
+                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            }
                             applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
                             return true;
 
                         case MotionEvent.ACTION_UP:
-                            view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            if (!isClassicMode()) {
+                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            }
                             applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
                             if (mLongPressCount == 0 || mPopupWindow != null) {
@@ -627,6 +691,13 @@ public final class ExtraKeysView extends GridLayout {
                                 } else {
                                     view.performClick();
                                 }
+                            }
+                            return true;
+
+                        default:
+                            return true;
+                    }
+                });
                             }
                             return true;
 

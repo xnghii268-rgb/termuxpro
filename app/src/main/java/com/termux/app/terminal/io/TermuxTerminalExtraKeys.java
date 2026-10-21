@@ -13,6 +13,7 @@ import com.termux.app.terminal.TermuxTerminalViewClient;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.extrakeys.ExtraKeysConstants;
 import com.termux.shared.termux.extrakeys.ExtraKeysInfo;
+import com.termux.shared.termux.settings.preferences.TermuxAppSharedPreferences;
 import com.termux.shared.termux.settings.properties.TermuxPropertyConstants;
 import com.termux.shared.termux.settings.properties.TermuxSharedProperties;
 import com.termux.shared.termux.terminal.io.TerminalExtraKeys;
@@ -43,6 +44,100 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
     }
 
 
+    public void reloadExtraKeys() {
+        setExtraKeys();
+    }
+
+    private void checkAndRunMigration() {
+        TermuxAppSharedPreferences preferences = mActivity.getPreferences();
+        if (preferences == null) return;
+        if (preferences.getExtraKeysMigrationVersion() < 1) {
+            try {
+                // 1. Check custom layout in SharedPreferences
+                String saved = preferences.getExtraKeysLayout();
+                if (saved != null && !saved.trim().isEmpty()) {
+                    if (isOldProDefault(saved)) {
+                        preferences.setExtraKeysLayout(null);
+                    } else if (saved.contains("PALETTE") || saved.contains("LỆNH") || saved.contains("Lệnh")) {
+                        preferences.setExtraKeysLayout(removePaletteFromLayoutJson(saved));
+                    }
+                }
+
+                // 2. Check termux.properties
+                java.io.File propFile = new java.io.File(com.termux.shared.termux.TermuxConstants.TERMUX_PROPERTIES_PRIMARY_FILE_PATH);
+                if (propFile.exists() && propFile.canRead()) {
+                    String content = com.termux.shared.file.FileUtils.readStringFromFile("termux.properties", propFile.getAbsolutePath(), null);
+                    if (content != null && (content.contains("PALETTE") || content.contains("LỆNH") || content.contains("Lệnh"))) {
+                        String[] lines = content.split("\n");
+                        StringBuilder sb = new StringBuilder();
+                        for (String line : lines) {
+                            if (line.trim().startsWith("extra-keys") && (line.contains("PALETTE") || line.contains("LỆNH") || line.contains("Lệnh"))) {
+                                if (isOldProDefault(line)) {
+                                    sb.append("extra-keys = ").append(TermuxPropertyConstants.DEFAULT_IVALUE_EXTRA_KEYS).append("\n");
+                                } else {
+                                    int eq = line.indexOf('=');
+                                    String val = line.substring(eq + 1).trim();
+                                    sb.append("extra-keys = ").append(removePaletteFromLayoutJson(val)).append("\n");
+                                }
+                            } else {
+                                sb.append(line).append("\n");
+                            }
+                        }
+                        com.termux.shared.file.FileUtils.writeStringToFile("termux.properties", propFile.getAbsolutePath(), null, sb.toString(), false);
+                        if (mActivity.getProperties() != null) {
+                            mActivity.getProperties().loadPropertiesFromDisk();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Logger.logStackTraceWithMessage(LOG_TAG, "checkAndRunMigration failed: ", e);
+            } finally {
+                preferences.setExtraKeysMigrationVersion(1);
+            }
+        }
+    }
+
+    public static boolean isOldProDefault(String layout) {
+        if (layout == null) return false;
+        return layout.contains("PALETTE") && (layout.contains("THEME") || layout.contains("Giao diện") || layout.contains("popup"));
+    }
+
+    public static String removePaletteFromLayoutJson(String jsonStr) {
+        if (jsonStr == null || jsonStr.trim().isEmpty()) return jsonStr;
+        try {
+            org.json.JSONArray rows = new org.json.JSONArray(jsonStr);
+            org.json.JSONArray newRows = new org.json.JSONArray();
+            for (int r = 0; r < rows.length(); r++) {
+                org.json.JSONArray row = rows.getJSONArray(r);
+                org.json.JSONArray newRow = new org.json.JSONArray();
+                for (int c = 0; c < row.length(); c++) {
+                    Object item = row.get(c);
+                    if (item instanceof String) {
+                        String s = (String) item;
+                        if ("PALETTE".equalsIgnoreCase(s) || "LỆNH".equalsIgnoreCase(s)) {
+                            continue;
+                        }
+                        newRow.put(s);
+                    } else if (item instanceof org.json.JSONObject) {
+                        org.json.JSONObject obj = (org.json.JSONObject) item;
+                        String key = obj.optString("key", "");
+                        String display = obj.optString("display", "");
+                        if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(display)) {
+                            continue;
+                        }
+                        newRow.put(obj);
+                    } else {
+                        newRow.put(item);
+                    }
+                }
+                newRows.put(newRow);
+            }
+            return newRows.toString();
+        } catch (Exception e) {
+            return jsonStr.replace("\"PALETTE\"", "").replace("'PALETTE'", "");
+        }
+    }
+
     /**
      * Set the terminal extra keys and style.
      */
@@ -50,10 +145,13 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         mExtraKeysInfo = null;
 
         try {
-            // The mMap stores the extra key and style string values while loading properties
-            // Check {@link #getExtraKeysInternalPropertyValueFromValue(String)} and
-            // {@link #getExtraKeysStyleInternalPropertyValueFromValue(String)}
-            String extrakeys = (String) mActivity.getProperties().getInternalPropertyValue(TermuxPropertyConstants.KEY_EXTRA_KEYS, true);
+            checkAndRunMigration();
+
+            TermuxAppSharedPreferences preferences = mActivity.getPreferences();
+            String extrakeys = preferences != null ? preferences.getExtraKeysLayout() : null;
+            if (extrakeys == null || extrakeys.trim().isEmpty()) {
+                extrakeys = (String) mActivity.getProperties().getInternalPropertyValue(TermuxPropertyConstants.KEY_EXTRA_KEYS, true);
+            }
             String extraKeysStyle = (String) mActivity.getProperties().getInternalPropertyValue(TermuxPropertyConstants.KEY_EXTRA_KEYS_STYLE, true);
 
             ExtraKeysConstants.ExtraKeyDisplayMap extraKeyDisplayMap = ExtraKeysInfo.getCharDisplayMapForStyle(extraKeysStyle);

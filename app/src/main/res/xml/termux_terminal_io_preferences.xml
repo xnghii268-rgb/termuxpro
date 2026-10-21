@@ -18,4 +18,28 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:key="extra_keys_category"
+        app:title="Bàn phím phụ (Extra Keys)">
+
+        <Preference
+            app:key="extra_keys_style_picker"
+            app:title="Kiểu phím"
+            app:summary="Pro (viên kính bo tròn 10dp, khe hở 4dp) hoặc Cổ điển (thanh đen phẳng, chuẩn Termux)"
+            app:persistent="false" />
+
+        <Preference
+            app:key="extra_keys_layout_editor"
+            app:title="Tùy biến phím phụ"
+            app:summary="Thêm, xóa, sắp xếp phím và bật các phím tùy chọn (Dán ảnh, Ảnh mới, Lệnh, Telex)"
+            app:persistent="false" />
+
+        <Preference
+            app:key="extra_keys_reset_layout"
+            app:title="Đặt lại phím phụ mặc định"
+            app:summary="Khôi phục 14 phím chuẩn 7 cột x 2 hàng của Termux gốc"
+            app:persistent="false" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

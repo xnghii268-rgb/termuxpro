@@ -12,7 +12,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 120).
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 121).
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
 ## 3. Hệ thống Tokens Thiết kế (Design Tokens)
@@ -21,7 +21,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **6 chủ đề tiếng Việt**: Than đêm (`than_dem`), Mực (`muc`), Rượu vang (`ruou_vang`), Rêu đêm (`reu_dem`), Giấy (`giay`), Sương (`suong`).
 - **Thanh điều hướng nổi & Bottom Inset**: 5 mục (Terminal, Phiên, Lệnh, Ảnh, Cài đặt). Ẩn mượt khi IME mở. Terminal bottom padding = runtime `mSystemNavBottomInset + navTotalHeight` (khi bàn phím đóng) và `0` (khi bàn phím mở).
 - **Thanh phiên đỉnh (Session Chips)**: Tự động thụt top padding = runtime `max(statusBars, displayCutout)` chống chạm đồng hồ tai thỏ.
-- **Thanh phím tắt (Extra Keys)**: Kiểu kính mờ bo tròn 10dp, khoảng cách 4dp, hairline 0.5dp, reset trạng thái khi pause/resume.
+- **Thanh phím phụ (Extra Keys)**: Chuẩn 14 phím Termux gốc (Row 1: `ESC | / | - | HOME | UP | END | PGUP`, Row 2: `TAB | CTRL | ALT | LEFT | DOWN | RIGHT | PGDN`). Bỏ phím "Lệnh". Hỗ trợ 2 kiểu phím: "Pro" (viên kính bo 10dp, khe hở 4dp) và "Cổ điển" (thanh đen phẳng 0 viền). Tự động migration một lần. Bộ chỉnh sửa layout trong Cài đặt > Terminal.
 - **Material 3 GlassSheet**: Thay thế AlertDialog bằng BottomSheet bo góc 20dp, chữ tiếng Việt sentence-case, nút nhấn rõ ràng.
 
 ## 4. Tối ưu Hiệu năng & Tương thích Linux

@@ -102,6 +102,22 @@ public final class TermuxPreferenceConstants {
         public static final String KEY_SHOW_TERMINAL_TOOLBAR = "show_extra_keys";
         public static final boolean DEFAULT_VALUE_SHOW_TERMINAL_TOOLBAR = true;
 
+        /**
+         * Extra keys style mode: "pro" (rounded 10dp glass pills, 4dp gaps) or "classic" (flat black bar, 0 margins)
+         */
+        public static final String KEY_EXTRA_KEYS_STYLE_MODE = "extra_keys_style_mode";
+        public static final String DEFAULT_VALUE_KEY_EXTRA_KEYS_STYLE_MODE = "pro";
+
+        /**
+         * Key for custom extra keys layout JSON
+         */
+        public static final String KEY_EXTRA_KEYS_LAYOUT = "extra_keys_layout";
+
+        /**
+         * Key for extra keys layout migration version flag (one-time migration)
+         */
+        public static final String KEY_EXTRA_KEYS_MIGRATION_VERSION = "extra_keys_migration_v4";
+
 
         /**
          * Defines the key for whether the soft keyboard will be enabled, for cases where users want
