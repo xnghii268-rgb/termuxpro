@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -202,25 +203,93 @@ ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
     return real_readlinkat ? real_readlinkat(dirfd, rewrite_path(pathname, pbuf, sizeof(pbuf)), buf, bufsiz) : -1;
 }
 
+static inline int handle_shebang_exec(const char *p, char *const argv[], char *const envp[], int (*real_fn)(const char *, char *const[], char *const[])) {
+    static int (*real_open_fn)(const char *, int, mode_t) = NULL;
+    if (!real_open_fn) real_open_fn = dlsym(RTLD_NEXT, "open");
+    int fd = real_open_fn ? real_open_fn(p, O_RDONLY | O_CLOEXEC, 0) : -1;
+    if (fd >= 0) {
+        char head[512];
+        ssize_t n = read(fd, head, sizeof(head) - 1);
+        close(fd);
+        if (n > 2 && head[0] == '#' && head[1] == '!') {
+            head[n] = '\0';
+            char *eol = strchr(head, '\n');
+            if (eol) *eol = '\0';
+            char *interp = head + 2;
+            while (*interp == ' ' || *interp == '\t') interp++;
+            char *arg = NULL;
+            char *sp = strchr(interp, ' ');
+            if (sp) {
+                *sp = '\0';
+                arg = sp + 1;
+                while (*arg == ' ' || *arg == '\t') arg++;
+                if (*arg == '\0') arg = NULL;
+            }
+            char interp_buf[PATH_MAX];
+            const char *new_interp = rewrite_path(interp, interp_buf, sizeof(interp_buf));
+            bool need_rewrite = (new_interp != interp) || (strncmp(interp, "/bin/", 5) == 0) || (strncmp(interp, "/usr/bin/", 9) == 0);
+            if (need_rewrite) {
+                if (strncmp(interp, "/bin/", 5) == 0) {
+                    snprintf(interp_buf, sizeof(interp_buf), "%s/bin/%s", NEW_PREFIX, interp + 5);
+                    new_interp = interp_buf;
+                } else if (strncmp(interp, "/usr/bin/", 9) == 0) {
+                    snprintf(interp_buf, sizeof(interp_buf), "%s/bin/%s", NEW_PREFIX, interp + 9);
+                    new_interp = interp_buf;
+                }
+                int argc = 0;
+                while (argv && argv[argc]) argc++;
+                int extra = (arg ? 1 : 0);
+                char **new_argv = (char **)malloc((argc + extra + 2) * sizeof(char *));
+                if (new_argv) {
+                    int idx = 0;
+                    new_argv[idx++] = (char *)new_interp;
+                    if (arg) new_argv[idx++] = arg;
+                    new_argv[idx++] = (char *)p;
+                    for (int i = 1; i <= argc; i++) {
+                        new_argv[idx++] = argv[i];
+                    }
+                    int ret = real_fn ? real_fn(new_interp, new_argv, envp) : -1;
+                    free(new_argv);
+                    return ret;
+                }
+            }
+        }
+    }
+    return real_fn ? real_fn(p, argv, envp) : -1;
+}
+
 int execve(const char *pathname, char *const argv[], char *const envp[]) {
     static int (*real_execve)(const char *, char *const[], char *const[]) = NULL;
     if (!real_execve) real_execve = dlsym(RTLD_NEXT, "execve");
     char buf[PATH_MAX];
-    return real_execve ? real_execve(rewrite_path(pathname, buf, sizeof(buf)), argv, envp) : -1;
+    const char *p = rewrite_path(pathname, buf, sizeof(buf));
+    return handle_shebang_exec(p, argv, envp, real_execve);
+}
+
+static inline int call_execv(const char *p, char *const argv[], char *const envp[]) {
+    (void)envp;
+    static int (*real_execv)(const char *, char *const[]) = NULL;
+    if (!real_execv) real_execv = dlsym(RTLD_NEXT, "execv");
+    return real_execv ? real_execv(p, argv) : -1;
+}
+
+static inline int call_execvp(const char *p, char *const argv[], char *const envp[]) {
+    (void)envp;
+    static int (*real_execvp)(const char *, char *const[]) = NULL;
+    if (!real_execvp) real_execvp = dlsym(RTLD_NEXT, "execvp");
+    return real_execvp ? real_execvp(p, argv) : -1;
 }
 
 int execv(const char *pathname, char *const argv[]) {
-    static int (*real_execv)(const char *, char *const[]) = NULL;
-    if (!real_execv) real_execv = dlsym(RTLD_NEXT, "execv");
     char buf[PATH_MAX];
-    return real_execv ? real_execv(rewrite_path(pathname, buf, sizeof(buf)), argv) : -1;
+    const char *p = rewrite_path(pathname, buf, sizeof(buf));
+    return handle_shebang_exec(p, argv, NULL, call_execv);
 }
 
 int execvp(const char *file, char *const argv[]) {
-    static int (*real_execvp)(const char *, char *const[]) = NULL;
-    if (!real_execvp) real_execvp = dlsym(RTLD_NEXT, "execvp");
     char buf[PATH_MAX];
-    return real_execvp ? real_execvp(rewrite_path(file, buf, sizeof(buf)), argv) : -1;
+    const char *p = rewrite_path(file, buf, sizeof(buf));
+    return handle_shebang_exec(p, argv, NULL, call_execvp);
 }
 
 int rename(const char *oldpath, const char *newpath) {

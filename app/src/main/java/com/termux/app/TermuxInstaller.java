@@ -521,13 +521,13 @@ final class TermuxInstaller {
             }
 
             try {
-                File profileFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/profile");
-                if (profileFile.exists()) {
-                    String profileContent = new String(java.nio.file.Files.readAllBytes(profileFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                File etcProfileFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/profile");
+                if (etcProfileFile.exists()) {
+                    String profileContent = new String(java.nio.file.Files.readAllBytes(etcProfileFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
                     if (profileContent.contains("etc/motd.sh")) {
                         profileContent = profileContent.replace("bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh", "true")
                                                        .replace("bash \"/data/data/com.termuxpro.app/files/usr/etc/motd.sh\"", "true");
-                        java.nio.file.Files.write(profileFile.toPath(), profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        java.nio.file.Files.write(etcProfileFile.toPath(), profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                         Logger.logInfo(LOG_TAG, "Cleaned redundant motd call from etc/profile.");
                     }
                 }
