@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE resources [
+    <!ENTITY TERMUX_PACKAGE_NAME "com.termuxpro.app">
+    <!ENTITY TERMUX_APP_NAME "Termux Pro">
+    <!ENTITY TERMUX_API_APP_NAME "Termux Pro:API">
+    <!ENTITY TERMUX_BOOT_APP_NAME "Termux Pro:Boot">
+    <!ENTITY TERMUX_FLOAT_APP_NAME "Termux Pro:Float">
+    <!ENTITY TERMUX_STYLING_APP_NAME "Termux Pro:Styling">
+    <!ENTITY TERMUX_TASKER_APP_NAME "Termux Pro:Tasker">
+    <!ENTITY TERMUX_WIDGET_APP_NAME "Termux Pro:Widget">
+    ]>
+
+<resources>
+
+    <string name="application_name">&TERMUX_APP_NAME;</string>
+    <string name="shared_user_label">Người dùng &TERMUX_APP_NAME;</string>
+
+    <!-- Termux RUN_COMMAND permission -->
+    <string name="permission_run_command_label">Chạy lệnh trong môi trường &TERMUX_APP_NAME;</string>
+    <string name="permission_run_command_description">thực thi lệnh tùy ý trong môi trường &TERMUX_APP_NAME; và truy cập tệp</string>
+
+    <!-- Termux Bootstrap Packages Installation -->
+    <string name="bootstrap_installer_body">Đang thiết lập môi trường hệ thống ban đầu…</string>
+    <string name="bootstrap_error_title">Không thể cài đặt môi trường hệ thống</string>
+    <string name="bootstrap_error_body">&TERMUX_APP_NAME; không thể cài đặt các gói hệ thống cần thiết.</string>
+    <string name="bootstrap_error_abort">Hủy bỏ</string>
+    <string name="bootstrap_error_try_again">Thử lại</string>
+    <string name="bootstrap_error_not_primary_user_message">&TERMUX_APP_NAME; chỉ có thể chạy dưới tài khoản người dùng chính của thiết bị.\nCác tệp nhị phân yêu cầu đường dẫn tiền tố:\n%1$s.</string>
+    <string name="bootstrap_error_installed_on_portable_sd">&TERMUX_APP_NAME; không thể chạy trên bộ nhớ ngoài hoặc thẻ nhớ di động.\nĐường dẫn yêu cầu:\n%1$s.</string>
+
+    <!-- Terminal Sidebar and Shortcuts -->
+    <string name="action_new_session">Phiên mới</string>
+    <string name="action_new_session_failsafe">Chế độ an toàn</string>
+    <string name="title_max_terminals_reached">Đã đạt giới hạn số phiên</string>
+    <string name="msg_max_terminals_reached">Vui lòng đóng bớt các phiên cũ trước khi tạo thêm.</string>
+
+    <string name="title_rename_session">Đổi tên phiên làm việc</string>
+    <string name="action_rename_session_confirm">Lưu</string>
+    <string name="title_create_named_session">Tạo phiên có tên</string>
+    <string name="action_create_named_session_confirm">Tạo</string>
+
+    <string name="action_toggle_soft_keyboard">Bàn phím</string>
+
+    <string name="msg_enabling_terminal_toolbar">Đã bật thanh phím bổ trợ</string>
+    <string name="msg_disabling_terminal_toolbar">Đã tắt thanh phím bổ trợ</string>
+
+    <!-- Terminal Popup -->
+    <string name="action_select_url">Chọn liên kết</string>
+    <string name="title_select_url_dialog">Chạm để sao chép liên kết hoặc nhấn giữ để mở</string>
+    <string name="title_select_url_none_found">Không tìm thấy liên kết web nào trong màn hình lệnh.</string>
+    <string name="msg_select_url_copied_to_clipboard">Đã sao chép liên kết vào bộ nhớ tạm</string>
+
+    <string name="action_share_transcript">Chia sẻ toàn bộ văn bản</string>
+    <string name="title_share_transcript">Văn bản phiên làm việc</string>
+    <string name="title_share_transcript_with">Gửi văn bản tới:</string>
+
+    <string name="action_share_selected_text">Chia sẻ phần đã chọn</string>
+    <string name="title_share_selected_text">Văn bản đã chọn</string>
+    <string name="title_share_selected_text_with">Gửi phần văn bản tới:</string>
+
+    <string name="action_autofill_username">Tự động điền tên người dùng</string>
+    <string name="action_autofill_password">Tự động điền mật khẩu</string>
+
+    <string name="action_reset_terminal">Đặt lại</string>
+    <string name="msg_terminal_reset">Đã đặt lại thiết bị đầu cuối</string>
+
+    <string name="action_kill_process">Dừng tiến trình (%d)</string>
+    <string name="title_confirm_kill_process">Bạn có chắc chắn muốn dừng phiên này?</string>
+
+    <string name="action_style_terminal">Giao diện</string>
+    <string name="action_toggle_keep_screen_on">Giữ sáng màn hình</string>
+    <string name="action_open_help">Trợ giúp</string>
+    <string name="action_open_settings">Cài đặt</string>
+
+    <string name="action_report_issue">Báo cáo lỗi</string>
+    <string name="msg_generating_report">Đang tổng hợp thông tin chẩn đoán</string>
+    <string name="msg_add_termux_debug_info">Đính kèm thông tin chẩn đoán vào báo cáo?</string>
+
+    <string name="error_styling_not_installed">Ứng dụng giao diện &TERMUX_STYLING_APP_NAME; chưa được cài đặt.</string>
+    <string name="action_styling_install">Cài đặt</string>
+
+    <!-- Termux Notifications -->
+    <string name="notification_action_exit">Dừng</string>
+    <string name="notification_action_wake_lock">Bật giữ nền (Wakelock)</string>
+    <string name="notification_action_wake_unlock">Tắt giữ nền (Wakelock)</string>
+
+    <!-- TermuxService -->
+    <string name="error_display_over_other_apps_permission_not_granted_to_start_terminal">&TERMUX_APP_NAME; cần quyền \"Hiển thị trên các ứng dụng khác\" để mở phiên từ nền trên Android 10 trở lên.\nVui lòng cấp quyền trong Cài đặt hệ thống.</string>
+    <string name="error_termux_service_invalid_execution_command_runner">Trình thực thi lệnh không hợp lệ: `%1$s`</string>
+    <string name="error_termux_service_unsupported_execution_command_runner">Trình thực thi lệnh chưa được hỗ trợ: `%1$s`</string>
+    <string name="error_termux_service_unsupported_execution_command_shell_create_mode">Chế độ tạo shell không hợp lệ: `%1$s`</string>
+    <string name="error_termux_service_execution_command_shell_name_unset">Tên shell chưa được khai báo với chế độ `%1$s`</string>
+
+    <!-- Termux RunCommandService -->
+    <string name="error_run_command_service_invalid_intent_action">Hành động gọi RunCommandService không hợp lệ: `%1$s`</string>
+    <string name="error_run_command_service_invalid_execution_command_runner">Trình thực thi RunCommandService không hợp lệ: `%1$s`</string>
+    <string name="error_run_command_service_mandatory_extra_missing">Thiếu tham số bắt buộc trong RunCommandService: \"%1$s\"</string>
+    <string name="error_run_command_service_api_help">Truy cập %1$s để biết chi tiết hướng dẫn sử dụng RUN_COMMAND Intent.</string>
+
+    <!-- Termux File Receiver -->
+    <string name="title_file_received">Lưu tệp vào ~/downloads/</string>
+    <string name="action_file_received_edit">Chỉnh sửa</string>
+    <string name="action_file_received_open_directory">Mở thư mục</string>
+
+    <!-- Miscellaneous -->
+    <string name="error_termux_service_start_failed_general">Không thể khởi động tiến trình nền. Kiểm tra nhật ký logcat để biết chi tiết.</string>
+    <string name="error_termux_service_start_failed_bg">Không thể khởi động dịch vụ khi ứng dụng đang chạy nền do chính sách hạn chế của hệ điều hành.</string>
+
+    <!-- Termux Settings -->
+    <string name="title_activity_termux_settings">Cài đặt &TERMUX_APP_NAME;</string>
+
+    <!-- Termux App Preferences -->
+    <string name="termux_preferences_title">&TERMUX_APP_NAME;</string>
+    <string name="termux_preferences_summary">Tùy chỉnh &TERMUX_APP_NAME;</string>
+
+    <!-- Debugging Preferences -->
+    <string name="termux_debugging_preferences_title">Gỡ lỗi và Chẩn đoán</string>
+    <string name="termux_debugging_preferences_summary">Tùy chỉnh mức ghi nhật ký hoạt động</string>
+    <string name="termux_logging_header">Nhật ký</string>
+    <string name="termux_log_level_title">Mức độ chi tiết nhật ký</string>
+    <string name="termux_terminal_view_key_logging_enabled_title">Ghi nhật ký phím bấm</string>
+    <string name="termux_terminal_view_key_logging_enabled_off">Không ghi nhận các phím bấm vào nhật ký. (Mặc định)</string>
+    <string name="termux_terminal_view_key_logging_enabled_on">Ghi lại phím bấm vào logcat. Chỉ nên bật khi cần kiểm tra lỗi.</string>
+    <string name="termux_plugin_error_notifications_enabled_title">Thông báo lỗi tiện ích mở rộng</string>
+    <string name="termux_plugin_error_notifications_enabled_off">Tắt thông báo khi xảy ra sự cố với tiện ích mở rộng.</string>
+    <string name="termux_plugin_error_notifications_enabled_on">Hiển thị thông báo khi tiện ích mở rộng gặp lỗi. (Mặc định)</string>
+    <string name="termux_crash_report_notifications_enabled_title">Thông báo báo cáo sự cố</string>
+    <string name="termux_crash_report_notifications_enabled_off">Tắt thông báo sự cố ngoài ý muốn.</string>
+    <string name="termux_crash_report_notifications_enabled_on">Hiển thị thông báo khi ứng dụng gặp sự cố. (Mặc định)</string>
+
+    <!-- Terminal IO Preferences -->
+    <string name="termux_terminal_io_preferences_title">Nhập / Xuất dữ liệu</string>
+    <string name="termux_terminal_io_preferences_summary">Tùy biến bàn phím ảo và phím tắt</string>
+    <string name="termux_keyboard_header">Bàn phím</string>
+    <string name="termux_soft_keyboard_enabled_title">Bật bàn phím ảo</string>
+    <string name="termux_soft_keyboard_enabled_off">Bàn phím ảo bị tắt.</string>
+    <string name="termux_soft_keyboard_enabled_on">Bàn phím ảo luôn sẵn sàng. (Mặc định)</string>
+    <string name="termux_soft_keyboard_enabled_only_if_no_hardware_title">Tự ẩn khi gắn bàn phím vật lý</string>
+    <string name="termux_soft_keyboard_enabled_only_if_no_hardware_off">Luôn cho phép hiển thị bàn phím ảo ngay cả khi kết nối bàn phím rời. (Mặc định)</string>
+    <string name="termux_soft_keyboard_enabled_only_if_no_hardware_on">Chỉ bật bàn phím ảo khi không có bàn phím rời kết nối.</string>
+
+    <!-- Terminal View Preferences -->
+    <string name="termux_terminal_view_preferences_title">Hiển thị màn hình dòng lệnh</string>
+    <string name="termux_terminal_view_preferences_summary">Cấu hình căn lề và tỷ lệ hiển thị</string>
+    <string name="termux_terminal_view_view_header">Giao diện nhìn</string>
+    <string name="termux_terminal_view_terminal_margin_adjustment_title">Tự động căn lề bàn phím ảo</string>
+    <string name="termux_terminal_view_terminal_margin_adjustment_off">Tắt tính năng căn lề tự động.</string>
+    <string name="termux_terminal_view_terminal_margin_adjustment_on">Tự động nâng màn hình lệnh khi bàn phím ảo mở ra. (Mặc định)</string>
+
+    <!-- About & Legal -->
+    <string name="about_preference_title">Giới thiệu</string>
+    <string name="about_preference_summary">Bản quyền, mã nguồn mở và tri ân nhóm phát triển upstream</string>
+    <string name="donate_preference_title">Ủng hộ dự án gốc Termux</string>
+
+    <!-- Phase 5 - Theme System -->
+    <string name="theme_title">Chủ đề giao diện</string>
+    <string name="theme_obsidian_pro">Obsidian Pro (Mặc định tối)</string>
+    <string name="theme_mocha_warm">Mocha Warm (Cà phê ấm)</string>
+    <string name="theme_nordic_pine">Nordic Pine (Thông bắc âu)</string>
+    <string name="theme_slate_steel">Slate Steel (Thép đá xám)</string>
+    <string name="theme_paper_silk">Paper Silk (Giấy lụa sáng)</string>
+    <string name="theme_alabaster_frost">Alabaster Frost (Sương trắng sáng)</string>
+
+    <!-- Phase 6 - Glass Bar & Session Tabs -->
+    <string name="sessions_title">Danh sách phiên</string>
+    <string name="sessions_empty">Chưa có phiên nào hoạt động</string>
+    <string name="action_tag_color">Gắn màu thẻ</string>
+    <string name="action_close_session">Đóng phiên</string>
+    <string name="session_closed_undo">Đã đóng phiên. Bạn có muốn hoàn tác?</string>
+    <string name="action_undo">Hoàn tác</string>
+
+    <!-- Phase 7 - Command Palette, Snippets, Backup -->
+    <string name="command_palette_title">Bảng lệnh nhanh</string>
+    <string name="command_palette_search_hint">Tìm lịch sử lệnh hoặc lệnh mẫu…</string>
+    <string name="command_palette_empty">Không tìm thấy lệnh phù hợp</string>
+    <string name="snippets_title">Quản lý lệnh mẫu</string>
+    <string name="snippets_add">Thêm lệnh mẫu</string>
+    <string name="snippets_name_hint">Tên gợi nhớ</string>
+    <string name="snippets_cmd_hint">Nội dung câu lệnh</string>
+    <string name="backup_title">Sao lưu &amp; Phục hồi</string>
+    <string name="backup_action_create">Tạo bản sao lưu thư mục cá nhân</string>
+    <string name="backup_action_restore">Khôi phục từ tệp sao lưu</string>
+    <string name="backup_confirm_restore_title">Xác nhận khôi phục</string>
+    <string name="backup_confirm_restore_msg">Quá trình này sẽ ghi đè các tệp hiện tại trong thư mục cá nhân (~). Bạn có muốn tiếp tục?</string>
+    <string name="backup_created_success">Đã tạo sao lưu thành công tại:\n%s</string>
+    <string name="backup_restored_success">Đã khôi phục dữ liệu thành công.</string>
+    <string name="backup_security_note">Lưu ý bảo mật: Các tệp nhạy cảm (keystore, .env, token, khóa bí mật) được tự động loại trừ khỏi bản sao lưu.</string>
+
+    <!-- Phase 8 - Image Paste for CLI Agents -->
+    <string name="action_paste_image">Dán ảnh</string>
+    <string name="action_latest_image">Ảnh mới nhất</string>
+    <string name="image_clipboard_empty">Không có ảnh trong bộ nhớ tạm</string>
+    <string name="image_saved_inserted">Đã lưu ảnh và chèn đường dẫn vào dòng lệnh</string>
+    <string name="image_permission_rationale">Termux Pro cần quyền đọc ảnh để tự động tìm ảnh chụp màn hình mới nhất và chèn vào dòng lệnh.</string>
+    <string name="image_permission_denied">Không thể lấy ảnh do chưa được cấp quyền truy cập ảnh.</string>
+    <string name="image_downscale_title">Tự động nén ảnh cho Agent AI</string>
+    <string name="image_downscale_summary">Giới hạn cạnh dài 1568px để tối ưu gửi cho mô hình ngôn ngữ lớn (Agent CLI). Mặc định bật.</string>
+    <string name="image_privacy_notice">Mọi hình ảnh chỉ được xử lý và lưu trữ cục bộ trong thư mục ~/.clip trên thiết bị của bạn, tuyệt đối không gửi lên máy chủ bên ngoài.</string>
+
+</resources>

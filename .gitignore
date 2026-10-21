@@ -1,23 +1,43 @@
-# Ignore secrets and local files
-.env
-*.env
-*.keystore
-*.jks
-*.token
-local.properties
+# From https://gist.github.com/iainconnor/8605514
+# with the addition of the /captures below.
+/captures
 
-# Build directories & caches
-.gradle/
+# Built application files
 build/
-bin/
-gen/
-out/
-dist/
+release/
 *.apk
+*.so
+.externalNativeBuild
+.cxx
 *.zip
 
-# OS and editor files
-.DS_Store
-Thumbs.db
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Gradle generated files
+.gradle/
+
+# Signing files
+.signing/
+*.keystore
+*.jks
+.secrets/
+*.env*
+
+# Intellij
 .idea/
 *.iml
+
+# Vim
+*.swo
+*.swp
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.swp
+ehthumbs.db
+Thumbs.db

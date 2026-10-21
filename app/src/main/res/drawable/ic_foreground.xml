@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Original Termux Pro Geometric Chevron Symbol (Pine Green) -->
+    <path
+        android:fillColor="#34A872"
+        android:pathData="M38,36 L54,54 L38,72 L44,72 L60,54 L44,36 Z" />
+
+    <!-- Terminal Prompt Block / Pro Marker -->
+    <path
+        android:fillColor="#F1F4F6"
+        android:pathData="M64,62 L74,62 L74,70 L64,70 Z" />
+
+    <!-- Top Status Indicator Pip -->
+    <path
+        android:fillColor="#34A872"
+        android:pathData="M64,38 L72,38 L72,42 L64,42 Z" />
+</vector>

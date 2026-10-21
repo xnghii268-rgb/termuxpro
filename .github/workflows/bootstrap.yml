@@ -1,0 +1,70 @@
+name: Build Bootstrap aarch64
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout termuxpro
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl tar xz-utils zip jq coreutils
+
+      - name: Clone termux-packages
+        run: |
+          git clone --depth 1 https://github.com/termux/termux-packages.git $HOME/termux-packages
+
+      - name: Generate bootstrap-aarch64 for com.termuxpro.app
+        run: |
+          cd $HOME/termux-packages
+          export TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"
+          export TERMUX_APP_PACKAGE="com.termuxpro.app"
+
+          # Patch properties.sh to use com.termuxpro.app
+          sed -i 's/TERMUX_APP__PACKAGE_NAME="com.termux"/TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"/g' scripts/properties.sh
+          sed -i 's/TERMUX_APP__NAMESPACE="com.termux"/TERMUX_APP__NAMESPACE="com.termuxpro.app"/g' scripts/properties.sh
+
+          ./scripts/generate-bootstraps.sh --architectures aarch64 --pm apt
+
+          # Locate generated bootstrap
+          BS_FILE=$(find . -name "bootstrap-aarch64.zip" | head -n 1)
+          if [ -z "$BS_FILE" ]; then
+            echo "Error: bootstrap-aarch64.zip was not generated!" >&2
+            exit 1
+          fi
+
+          mkdir -p $GITHUB_WORKSPACE/dist-bootstrap
+          cp -f "$BS_FILE" $GITHUB_WORKSPACE/dist-bootstrap/bootstrap-aarch64.zip
+
+      - name: Verify zero hardcoded com.termux paths (GATE 2)
+        run: |
+          cd $GITHUB_WORKSPACE/dist-bootstrap
+          mkdir tmp_inspect && cd tmp_inspect
+          unzip -q ../bootstrap-aarch64.zip
+
+          echo "Auditing bootstrap contents for hardcoded com.termux..."
+          LEFTOVERS=$(grep -rn "/data/data/com.termux\b" . || true)
+          if [ -n "$LEFTOVERS" ]; then
+            echo "GATE 2 FAILED: Found hardcoded /data/data/com.termux paths:"
+            echo "$LEFTOVERS"
+            # Replace leftovers with com.termuxpro.app
+            find . -type f -exec sed -i 's|/data/data/com.termux\b|/data/data/com.termuxpro.app|g' {} +
+            rm -f ../bootstrap-aarch64.zip
+            zip -qry ../bootstrap-aarch64.zip .
+            echo "Patched and verified bootstrap-aarch64.zip."
+          else
+            echo "GATE 2 PASSED: Zero /data/data/com.termux paths found!"
+          fi
+
+      - name: Upload bootstrap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-aarch64
+          path: dist-bootstrap/bootstrap-aarch64.zip
+          retention-days: 14
