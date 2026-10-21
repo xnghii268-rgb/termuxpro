@@ -4,11 +4,26 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Deep obsidian dark base fill -->
     <path
-        android:fillColor="#0D1117"
+        android:fillColor="#090D16"
         android:pathData="M0,0h108v108h-108z" />
-    <!-- Rounded subtle inner container tile -->
+
+    <!-- Rounded Pro dark glass plate (Squircle, safe area) -->
     <path
-        android:fillColor="#161B22"
-        android:pathData="M24,20 h60 a12,12 0 0 1 12,12 v44 a12,12 0 0 1 -12,12 h-60 a12,12 0 0 1 -12,-12 v-44 a12,12 0 0 1 12,-12 z" />
+        android:fillColor="#0F172A"
+        android:pathData="M34,16 h40 a18,18 0 0 1 18,18 v40 a18,18 0 0 1 -18,18 h-40 a18,18 0 0 1 -18,-18 v-40 a18,18 0 0 1 18,-18 z" />
+
+    <!-- Subtle border hairline -->
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.2"
+        android:pathData="M34,16 h40 a18,18 0 0 1 18,18 v40 a18,18 0 0 1 -18,18 h-40 a18,18 0 0 1 -18,-18 v-40 a18,18 0 0 1 18,-18 z" />
+
+    <!-- Top edge rim light -->
+    <path
+        android:strokeColor="#25FFFFFF"
+        android:strokeWidth="0.8"
+        android:pathData="M36,17 h36" />
 </vector>

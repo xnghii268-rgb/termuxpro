@@ -1,11 +1,16 @@
 package com.termux.view;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Lightweight in-terminal Vietnamese Telex input engine for Termux Pro.
- * Transforms raw keystrokes (e.g. "as" -> "á", "dd" -> "đ") seamlessly in real-time.
+ * Lightweight, smart in-terminal Vietnamese Telex input engine for Termux Pro.
+ * Transforms raw keystrokes (e.g. "as" -> "á", "dd" -> "đ") seamlessly in real-time
+ * while preserving English commands, linux paths, and keywords (e.g. "downloads", "words",
+ * "status", "cards", "clear", "add") without corruption or duplication.
  */
 public final class VietnameseTelexEngine {
 
@@ -21,6 +26,17 @@ public final class VietnameseTelexEngine {
 
     private static final Map<String, String[]> VOWEL_TABLE = new HashMap<>();
     private static final Map<Character, VowelInfo> CHAR_TO_VOWEL = new HashMap<>();
+
+    private static final Set<String> VALID_DIPHTHONGS = new HashSet<>(Arrays.asList(
+        "ia", "iê", "ya", "yê", "ua", "uô", "ưa", "ươ", "ai", "ao", "au", "ay", "âu",
+        "eo", "êu", "iu", "oi", "ôi", "ơi", "ui", "ưi", "uy", "uơ",
+        "oa", "oe", "ie", "ye", "uo",
+        "iêu", "yêu", "oai", "oao", "oay", "oeo", "uao", "uay", "uôi", "ươi", "ươu", "uya", "uyê", "uyu"
+    ));
+
+    private static final Set<String> VALID_ENDINGS = new HashSet<>(Arrays.asList(
+        "", "c", "ch", "m", "n", "ng", "nh", "p", "t"
+    ));
 
     private static class VowelInfo {
         final String base;
@@ -61,9 +77,9 @@ public final class VietnameseTelexEngine {
 
     private boolean mEnabled = true;
     private final StringBuilder mWordBuffer = new StringBuilder();
+    private final StringBuilder mRawBuffer = new StringBuilder();
     private char mLastTransformTrigger = 0;
     private String mLastPreTransform = null;
-    private int mLastTransLen = 0;
 
     public boolean isEnabled() {
         return mEnabled;
@@ -76,18 +92,20 @@ public final class VietnameseTelexEngine {
 
     public synchronized void reset() {
         mWordBuffer.setLength(0);
+        mRawBuffer.setLength(0);
         mLastTransformTrigger = 0;
         mLastPreTransform = null;
-        mLastTransLen = 0;
     }
 
     public synchronized void handleBackspace() {
         if (mWordBuffer.length() > 0) {
             mWordBuffer.deleteCharAt(mWordBuffer.length() - 1);
         }
+        if (mRawBuffer.length() > 0) {
+            mRawBuffer.deleteCharAt(mRawBuffer.length() - 1);
+        }
         mLastTransformTrigger = 0;
         mLastPreTransform = null;
-        mLastTransLen = 0;
     }
 
     public synchronized TransformResult processChar(char c) {
@@ -100,33 +118,73 @@ public final class VietnameseTelexEngine {
 
         // 1. Undo on repeated trigger key (e.g. "á" + 's' -> "as", "đ" + 'd' -> "dd")
         if (mLastTransformTrigger != 0 && mLastTransformTrigger == c && mLastPreTransform != null) {
-            String revert = mLastPreTransform + c;
-            int bs = mLastTransLen;
+            String currentWord = mWordBuffer.toString();
+            String targetWord = mLastPreTransform + c;
+            int prefixLen = 0;
+            int minLen = Math.min(currentWord.length(), targetWord.length());
+            while (prefixLen < minLen && currentWord.charAt(prefixLen) == targetWord.charAt(prefixLen)) {
+                prefixLen++;
+            }
+            int bs = currentWord.length() - prefixLen;
+            String rep = targetWord.substring(prefixLen);
+
             mWordBuffer.setLength(0);
-            mWordBuffer.append(revert);
+            mWordBuffer.append(targetWord);
+            mRawBuffer.append(c);
             mLastTransformTrigger = 0;
             mLastPreTransform = null;
-            mLastTransLen = 0;
-            return new TransformResult(bs, revert);
+            return new TransformResult(bs, rep);
         }
 
         // 2. Check vowel / roof / horn modifiers (aa, aw, ee, oo, ow, uw, dd, uow)
         String modWord = applyModifier(mWordBuffer.toString(), c);
         if (modWord != null && !modWord.equals(mWordBuffer.toString())) {
+            mRawBuffer.append(c);
             return applyChange(modWord, c);
         }
 
         // 3. Check tone marks (s, f, r, x, j, z)
         String toneWord = applyTone(mWordBuffer.toString(), c);
         if (toneWord != null && !toneWord.equals(mWordBuffer.toString())) {
+            mRawBuffer.append(c);
             return applyChange(toneWord, c);
         }
 
-        // 4. Normal character
+        // 4. Auto-restore raw English keystrokes if typing this char invalidates Vietnamese phonetics
+        String tentativeWord = mWordBuffer.toString() + c;
+        String tentativeRaw = mRawBuffer.toString() + c;
+        if (!mWordBuffer.toString().equals(mRawBuffer.toString())) {
+            int firstVowel = -1;
+            int lastVowel = -1;
+            int vCount = 0;
+            for (int i = 0; i < tentativeWord.length(); i++) {
+                if (CHAR_TO_VOWEL.containsKey(tentativeWord.charAt(i))) {
+                    if (firstVowel == -1) firstVowel = i;
+                    lastVowel = i;
+                    vCount++;
+                }
+            }
+            if (vCount > 0) {
+                String ending = tentativeWord.substring(lastVowel + 1).toLowerCase();
+                if (!VALID_ENDINGS.contains(ending) && !"g".equals(ending) && !"h".equals(ending)) {
+                    // Restore raw English keystrokes
+                    int bs = mWordBuffer.length();
+                    mWordBuffer.setLength(0);
+                    mWordBuffer.append(tentativeRaw);
+                    mRawBuffer.setLength(0);
+                    mRawBuffer.append(tentativeRaw);
+                    mLastTransformTrigger = 0;
+                    mLastPreTransform = null;
+                    return new TransformResult(bs, tentativeRaw);
+                }
+            }
+        }
+
+        // 5. Normal character
         mWordBuffer.append(c);
+        mRawBuffer.append(c);
         mLastTransformTrigger = 0;
         mLastPreTransform = null;
-        mLastTransLen = 0;
         return null;
     }
 
@@ -143,7 +201,6 @@ public final class VietnameseTelexEngine {
 
         mLastPreTransform = oldWord;
         mLastTransformTrigger = trigger;
-        mLastTransLen = rep.length();
 
         mWordBuffer.setLength(0);
         mWordBuffer.append(newWord);
@@ -156,9 +213,34 @@ public final class VietnameseTelexEngine {
         char last = word.charAt(word.length() - 1);
         char mkl = Character.toLowerCase(mk);
 
-        // dd -> đ, Dd/DD -> Đ
+        // dd -> đ, Dd/DD -> Đ (ONLY if no vowel exists yet in the word, e.g. "dd" -> "đ", but "add" -> "add")
         if ((last == 'd' || last == 'D') && mkl == 'd') {
-            return word.substring(0, word.length() - 1) + (Character.isUpperCase(last) ? "Đ" : "đ");
+            boolean hasVowel = false;
+            for (int i = 0; i < word.length(); i++) {
+                if (CHAR_TO_VOWEL.containsKey(word.charAt(i))) {
+                    hasVowel = true;
+                    break;
+                }
+            }
+            if (!hasVowel) {
+                return word.substring(0, word.length() - 1) + (Character.isUpperCase(last) ? "Đ" : "đ");
+            }
+            return null;
+        }
+
+        // Ensure vowels in the word are contiguous before applying vowel modifiers
+        int firstVowel = -1;
+        int lastVowel = -1;
+        int vCount = 0;
+        for (int i = 0; i < word.length(); i++) {
+            if (CHAR_TO_VOWEL.containsKey(word.charAt(i))) {
+                if (firstVowel == -1) firstVowel = i;
+                lastVowel = i;
+                vCount++;
+            }
+        }
+        if (vCount > 0 && (lastVowel - firstVowel + 1 != vCount)) {
+            return null; // Consonants between vowels -> foreign word
         }
 
         // uo + w -> ươ
@@ -195,6 +277,55 @@ public final class VietnameseTelexEngine {
         return null;
     }
 
+    private boolean canApplyTone(String word, int targetTone) {
+        int firstVowel = -1;
+        int lastVowel = -1;
+        int vCount = 0;
+        for (int i = 0; i < word.length(); i++) {
+            if (CHAR_TO_VOWEL.containsKey(word.charAt(i))) {
+                if (firstVowel == -1) firstVowel = i;
+                lastVowel = i;
+                vCount++;
+            }
+        }
+        if (vCount == 0) return false;
+
+        // Vowels must be contiguous
+        if (lastVowel - firstVowel + 1 != vCount) return false;
+
+        // Validate vowel group against Vietnamese diphthongs/triphthongs (rejects "ea", "ae", "ou", etc.)
+        if (vCount > 1) {
+            StringBuilder baseGroup = new StringBuilder();
+            for (int i = firstVowel; i <= lastVowel; i++) {
+                VowelInfo vi = CHAR_TO_VOWEL.get(word.charAt(i));
+                if (vi != null) baseGroup.append(vi.base);
+            }
+            if (!VALID_DIPHTHONGS.contains(baseGroup.toString())) {
+                return false;
+            }
+        }
+
+        // Check if word already has a tone mark
+        boolean hasTone = false;
+        for (int i = firstVowel; i <= lastVowel; i++) {
+            VowelInfo vi = CHAR_TO_VOWEL.get(word.charAt(i));
+            if (vi != null && vi.tone != 0) {
+                hasTone = true;
+                break;
+            }
+        }
+        if (targetTone == 0) {
+            return hasTone; // 'z' removes tone
+        }
+        if (hasTone) {
+            return false; // Cannot add a second tone to a word that already has one
+        }
+
+        // Validate final consonants
+        String ending = word.substring(lastVowel + 1).toLowerCase();
+        return VALID_ENDINGS.contains(ending) || "g".equals(ending) || "h".equals(ending);
+    }
+
     private String applyTone(String word, char tk) {
         int t = -1;
         char tkl = Character.toLowerCase(tk);
@@ -207,6 +338,8 @@ public final class VietnameseTelexEngine {
             case 'z': t = 0; break; // Xóa dấu
             default: return null;
         }
+
+        if (!canApplyTone(word, t)) return null;
 
         int[] vPos = new int[word.length()];
         int vCount = 0;
@@ -229,7 +362,7 @@ public final class VietnameseTelexEngine {
 
             if ("oa".equals(pair) || "oe".equals(pair) || "uy".equals(pair)) {
                 target = vPos[1];
-            } else if ("ia".equals(pair) || "ya".equals(pair) || "ua".equals(pair)) {
+            } else if ("ia".equals(pair) || "ya".equals(pair) || "ua".equals(pair) || "ưa".equals(pair)) {
                 target = vPos[0];
             } else if ("iê".equals(pair) || "yê".equals(pair) || "uô".equals(pair) || "ươ".equals(pair)) {
                 target = vPos[1];

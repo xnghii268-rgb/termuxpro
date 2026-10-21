@@ -5,18 +5,23 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Original Termux Pro Geometric Chevron Symbol (Pine Green) -->
+    <!-- Termux Pro Command Prompt Chevron (Hot Neon Pink) -->
     <path
-        android:fillColor="#34A872"
-        android:pathData="M38,36 L54,54 L38,72 L44,72 L60,54 L44,36 Z" />
+        android:fillColor="#FF3C70"
+        android:pathData="M32,33 L55,54 L32,75 L41,75 L62,54 L41,33 Z" />
 
-    <!-- Terminal Prompt Block / Pro Marker -->
+    <!-- Terminal Underscore Cursor (Pure Ice Platinum) -->
     <path
-        android:fillColor="#F1F4F6"
-        android:pathData="M64,62 L74,62 L74,70 L64,70 Z" />
+        android:fillColor="#F8FAFC"
+        android:pathData="M66,67 h14 a2,2 0 0 1 2,2 v3 a2,2 0 0 1 -2,2 h-14 a2,2 0 0 1 -2,-2 v-3 a2,2 0 0 1 2,-2 z" />
 
-    <!-- Top Status Indicator Pip -->
+    <!-- Top-Right PRO Diamond Spark (Holographic Cyan) -->
     <path
-        android:fillColor="#34A872"
-        android:pathData="M64,38 L72,38 L72,42 L64,42 Z" />
+        android:fillColor="#38BDF8"
+        android:pathData="M73,33.5 L77.5,40 L73,46.5 L68.5,40 Z" />
+
+    <!-- Diamond Center Core Spark (Pure White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M73,38.5 A1.5,1.5 0 1,1 72.99,38.5 Z" />
 </vector>
