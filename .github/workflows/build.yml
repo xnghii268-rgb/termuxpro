@@ -150,7 +150,7 @@ jobs:
 
           # Ensure shell scripts have correct permissions
           mkdir -p bin
-          chmod 755 etc/motd.sh bin/tp || true
+          chmod 755 etc/motd.sh bin/tp bin/login || true
           ln -sf tp bin/menu
 
           # Patch bin/login to preserve libtermuxpro-path.so in LD_PRELOAD

@@ -21,17 +21,49 @@
 #define NEW_REL "data/data/com.termuxpro.app"
 #define NEW_REL_LEN (sizeof(NEW_REL) - 1)
 
+#define OLD_USER0 "/data/user/0/com.termux"
+#define OLD_USER0_LEN (sizeof(OLD_USER0) - 1)
+#define NEW_USER0 "/data/user/0/com.termuxpro.app"
+#define NEW_USER0_LEN (sizeof(NEW_USER0) - 1)
+
+#define OLD_USER0_REL "data/user/0/com.termux"
+#define OLD_USER0_REL_LEN (sizeof(OLD_USER0_REL) - 1)
+#define NEW_USER0_REL "data/user/0/com.termuxpro.app"
+#define NEW_USER0_REL_LEN (sizeof(NEW_USER0_REL) - 1)
+
 static inline const char* rewrite_path(const char* path, char* buf, size_t bufsiz) {
     if (!path) return NULL;
     if (strncmp(path, OLD_PREFIX, OLD_PREFIX_LEN) == 0) {
-        int ret = snprintf(buf, bufsiz, "%s%s", NEW_PREFIX, path + OLD_PREFIX_LEN);
-        if (ret > 0 && (size_t)ret < bufsiz) {
-            return buf;
+        char next = path[OLD_PREFIX_LEN];
+        if (next == '/' || next == '\0') {
+            int ret = snprintf(buf, bufsiz, "%s%s", NEW_PREFIX, path + OLD_PREFIX_LEN);
+            if (ret > 0 && (size_t)ret < bufsiz) {
+                return buf;
+            }
         }
     } else if (strncmp(path, OLD_REL, OLD_REL_LEN) == 0) {
-        int ret = snprintf(buf, bufsiz, "%s%s", NEW_REL, path + OLD_REL_LEN);
-        if (ret > 0 && (size_t)ret < bufsiz) {
-            return buf;
+        char next = path[OLD_REL_LEN];
+        if (next == '/' || next == '\0') {
+            int ret = snprintf(buf, bufsiz, "%s%s", NEW_REL, path + OLD_REL_LEN);
+            if (ret > 0 && (size_t)ret < bufsiz) {
+                return buf;
+            }
+        }
+    } else if (strncmp(path, OLD_USER0, OLD_USER0_LEN) == 0) {
+        char next = path[OLD_USER0_LEN];
+        if (next == '/' || next == '\0') {
+            int ret = snprintf(buf, bufsiz, "%s%s", NEW_USER0, path + OLD_USER0_LEN);
+            if (ret > 0 && (size_t)ret < bufsiz) {
+                return buf;
+            }
+        }
+    } else if (strncmp(path, OLD_USER0_REL, OLD_USER0_REL_LEN) == 0) {
+        char next = path[OLD_USER0_REL_LEN];
+        if (next == '/' || next == '\0') {
+            int ret = snprintf(buf, bufsiz, "%s%s", NEW_USER0_REL, path + OLD_USER0_REL_LEN);
+            if (ret > 0 && (size_t)ret < bufsiz) {
+                return buf;
+            }
         }
     }
     return path;

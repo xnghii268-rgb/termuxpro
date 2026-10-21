@@ -287,7 +287,8 @@ final class TermuxInstaller {
                 File apkPathLib = new File(nativeLibDir, "libtermuxpro-path.so");
                 File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
                 File destPathLib = new File(prefixLib, "libtermuxpro-path.so");
-                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length())) {
+                File v4Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v4");
+                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v4Marker.exists())) {
                     if (!prefixLib.exists()) prefixLib.mkdirs();
                     try (java.io.InputStream in = new java.io.FileInputStream(apkPathLib);
                          FileOutputStream out = new FileOutputStream(destPathLib)) {
@@ -305,10 +306,38 @@ final class TermuxInstaller {
                 Logger.logError(LOG_TAG, "Error installing libtermuxpro-path.so: " + e.getMessage());
             }
 
-            // Ensure $PREFIX/bin/login does not unset LD_PRELOAD and uses Termux Pro paths
+            // Ensure $PREFIX/bin/login exists, is executable, does not unset LD_PRELOAD and uses Termux Pro paths
             try {
                 File loginFile = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, "login");
-                if (loginFile.exists()) {
+                if (!loginFile.exists()) {
+                    File binDir = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH);
+                    if (!binDir.exists()) binDir.mkdirs();
+                    String fallbackLogin = "#!/data/data/com.termuxpro.app/files/usr/bin/sh\n" +
+                        "if [ -x /data/data/com.termuxpro.app/files/usr/bin/bash ]; then\n" +
+                        "    export SHELL=/data/data/com.termuxpro.app/files/usr/bin/bash\n" +
+                        "elif [ -x /data/data/com.termuxpro.app/files/usr/bin/sh ]; then\n" +
+                        "    export SHELL=/data/data/com.termuxpro.app/files/usr/bin/sh\n" +
+                        "else\n" +
+                        "    export SHELL=/system/bin/sh\n" +
+                        "fi\n" +
+                        "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\" ]; then\n" +
+                        "    export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"\n" +
+                        "fi\n" +
+                        "if [ -f /data/data/com.termuxpro.app/files/usr/etc/profile ]; then\n" +
+                        "    . /data/data/com.termuxpro.app/files/usr/etc/profile\n" +
+                        "fi\n" +
+                        "if [ -n \"$TERM\" ]; then\n" +
+                        "    exec \"$SHELL\" -l \"$@\"\n" +
+                        "else\n" +
+                        "    exec \"$SHELL\" \"$@\"\n" +
+                        "fi\n";
+                    try (FileOutputStream fos = new FileOutputStream(loginFile)) {
+                        fos.write(fallbackLogin.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    }
+                    loginFile.setReadable(true, false);
+                    loginFile.setExecutable(true, false);
+                    Logger.logInfo(LOG_TAG, "Created fallback $PREFIX/bin/login.");
+                } else {
                     String loginContent = new String(java.nio.file.Files.readAllBytes(loginFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
                     boolean modified = false;
                     if (loginContent.contains("/data/data/com.termux/")) {
@@ -343,7 +372,7 @@ final class TermuxInstaller {
             }
 
             try {
-                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
             } catch (Exception ignored) {}
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error setting up default shell config files: " + e.getMessage());

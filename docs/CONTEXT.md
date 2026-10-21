@@ -12,7 +12,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 121).
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 122).
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
 ## 3. Hệ thống Tokens Thiết kế (Design Tokens)
@@ -28,7 +28,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **Vsync Rate Limiting**: Hạn chế vẽ lại tối đa 60 FPS qua `Choreographer.scheduleVsyncInvalidate()`, gom cụm frame khi CLI xả log nhanh.
 - **Bộ đệm độ rộng ký tự Unicode**: `mCharWidthCache[0x2600]` loại bỏ hoàn toàn hàng nghìn cuộc gọi JNI `measureText` mỗi frame.
 - **Nền mờ đục trên Terminal**: Thanh điều hướng và extra keys dùng màu đục tối ưu để tránh GPU re-blur mỗi khung hình.
-- **Prefix Interceptor C**: Sửa lỗi macro `OLD_PREFIX_LEN` thành `sizeof(OLD_PREFIX)-1` = 21 trong `termuxpro-path.c`, hook 27 syscalls.
+- **Prefix Interceptor C**: Thêm kiểm tra ranh giới ký tự (`next == '/' || next == '\0'`) và `/data/user/0` trong `termuxpro-path.c`, tránh biến `com.termuxpro.app` thành `com.termuxpro.apppro.app`. Tự động tạo/sửa `$PREFIX/bin/login` chuẩn.
 - **Terminfo & UTF-8**: Xuất `TERMINFO`, `TERMINFO_DIRS`, `LANG=C.UTF-8` trong Java, profile và bashrc, tránh lỗi `clear: unknown terminal`.
 - **Bảng chào đón Clean Rule**: MOTD kẻ 2 đường ngang `─` trên và dưới, không viền dọc, không lệch ký tự, hiển thị thông tin thực tế.
 
