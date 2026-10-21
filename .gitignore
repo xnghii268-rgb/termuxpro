@@ -1,0 +1,23 @@
+# Ignore secrets and local files
+.env
+*.env
+*.keystore
+*.jks
+*.token
+local.properties
+
+# Build directories & caches
+.gradle/
+build/
+bin/
+gen/
+out/
+dist/
+*.apk
+*.zip
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
