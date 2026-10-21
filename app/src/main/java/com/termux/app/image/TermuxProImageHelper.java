@@ -244,6 +244,7 @@ public class TermuxProImageHelper {
         try {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             activity.startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), REQUEST_CODE_PICK_IMAGE);
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error launching photo picker: " + e.getMessage());
@@ -251,6 +252,10 @@ public class TermuxProImageHelper {
     }
 
     public static String saveImageFromUri(Context context, Uri uri) {
+        return saveImageFromUri(context, uri, 0);
+    }
+
+    public static String saveImageFromUri(Context context, Uri uri, int index) {
         try {
             ContentResolver cr = context.getContentResolver();
             String mimeType = cr.getType(uri);
@@ -260,8 +265,9 @@ public class TermuxProImageHelper {
             cleanOldClipImages();
 
             String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
+            String suffix = index > 0 ? ("-" + index) : ("-" + (System.currentTimeMillis() % 1000));
             String ext = isJpeg ? ".jpg" : ".png";
-            File outFile = new File(clipDir, "img-" + timeStamp + ext);
+            File outFile = new File(clipDir, "img-" + timeStamp + suffix + ext);
 
             boolean downscale = isDownscaleEnabled(context);
 

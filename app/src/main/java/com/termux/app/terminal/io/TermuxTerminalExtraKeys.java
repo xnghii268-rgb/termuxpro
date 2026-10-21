@@ -104,6 +104,13 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
             com.termux.app.features.TermuxProPaletteManager.showCommandPalette(mActivity);
         } else if ("THEME".equalsIgnoreCase(key) || "GIAO DIỆN".equalsIgnoreCase(key)) {
             com.termux.app.theme.TermuxProThemeManager.showThemeDialog(mActivity);
+        } else if ("TELEX".equalsIgnoreCase(key)) {
+            TerminalView tv = mActivity.getTerminalView();
+            if (tv != null && tv.getTelexEngine() != null) {
+                boolean nextState = !tv.getTelexEngine().isEnabled();
+                tv.getTelexEngine().setEnabled(nextState);
+                android.widget.Toast.makeText(mActivity, "Gõ tiếng Việt (Telex): " + (nextState ? "BẬT" : "TẮT"), android.widget.Toast.LENGTH_SHORT).show();
+            }
         } else if ("SCROLL".equals(key)) {
             TerminalView terminalView = mTermuxTerminalViewClient.getActivity().getTerminalView();
             if (terminalView != null && terminalView.mEmulator != null)

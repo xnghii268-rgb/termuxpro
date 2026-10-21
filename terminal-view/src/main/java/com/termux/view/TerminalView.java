@@ -63,6 +63,12 @@ public final class TerminalView extends View {
 
     public TerminalViewClient mClient;
 
+    private final VietnameseTelexEngine mTelexEngine = new VietnameseTelexEngine();
+
+    public VietnameseTelexEngine getTelexEngine() {
+        return mTelexEngine;
+    }
+
     private TextSelectionCursorController mTextSelectionCursorController;
 
     private Handler mTerminalCursorBlinkerHandler;
@@ -167,6 +173,7 @@ public final class TerminalView extends View {
                     stopTextSelectionMode();
                     return true;
                 }
+                if (mTelexEngine != null) mTelexEngine.reset();
                 requestFocus();
                 mClient.onSingleTapUp(event);
                 return true;
@@ -382,6 +389,9 @@ public final class TerminalView extends View {
             public boolean deleteSurroundingText(int leftLength, int rightLength) {
                 if (TERMINAL_VIEW_KEY_LOGGING_ENABLED) {
                     mClient.logInfo(LOG_TAG, "IME: deleteSurroundingText(" + leftLength + ", " + rightLength + ")");
+                }
+                if (mTelexEngine != null) {
+                    for (int i = 0; i < leftLength; i++) mTelexEngine.handleBackspace();
                 }
                 // The stock Samsung keyboard with 'Auto check spelling' enabled sends leftLength > 1.
                 KeyEvent deleteKey = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
@@ -964,6 +974,17 @@ public final class TerminalView extends View {
                 }
             }
 
+            if (!controlDown && !altDown && codePoint <= 0xFFFF && mTelexEngine != null && mTelexEngine.isEnabled()) {
+                VietnameseTelexEngine.TransformResult tr = mTelexEngine.processChar((char) codePoint);
+                if (tr != null) {
+                    for (int i = 0; i < tr.backspaces; i++) {
+                        mTermSession.writeCodePoint(false, 0x7F);
+                    }
+                    mTermSession.write(tr.text);
+                    return;
+                }
+            }
+
             // If left alt, send escape before the code point to make e.g. Alt+B and Alt+F work in readline:
             mTermSession.writeCodePoint(altDown, codePoint);
         }
@@ -971,6 +992,12 @@ public final class TerminalView extends View {
 
     /** Input the specified keyCode if applicable and return if the input was consumed. */
     public boolean handleKeyCode(int keyCode, int keyMod) {
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            if (mTelexEngine != null) mTelexEngine.handleBackspace();
+        } else if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+            if (mTelexEngine != null) mTelexEngine.reset();
+        }
+
         // Ensure cursor is shown when a key is pressed down like long hold on (arrow) keys
         if (mEmulator != null)
             mEmulator.setCursorBlinkState(true);

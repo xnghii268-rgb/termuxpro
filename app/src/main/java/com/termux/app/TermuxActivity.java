@@ -688,7 +688,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navImage = findViewById(R.id.nav_item_image);
         if (navImage != null) {
             navImage.setOnClickListener(v -> {
-                com.termux.app.image.TermuxProImageHelper.pasteImageFromClipboard(TermuxActivity.this);
+                com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
             });
             navImage.setOnLongClickListener(v -> {
                 com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
@@ -1159,9 +1159,30 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (requestCode == PermissionUtils.REQUEST_GRANT_STORAGE_PERMISSION) {
             requestStoragePermission(true);
         } else if (requestCode == com.termux.app.image.TermuxProImageHelper.REQUEST_CODE_PICK_IMAGE && resultCode == RESULT_OK && data != null) {
-            android.net.Uri uri = data.getData();
-            if (uri != null) {
-                String saved = com.termux.app.image.TermuxProImageHelper.saveImageFromUri(this, uri);
+            android.content.ClipData clipData = data.getClipData();
+            if (clipData != null && clipData.getItemCount() > 0) {
+                java.util.List<String> savedPaths = new java.util.ArrayList<>();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    android.net.Uri uri = clipData.getItemAt(i).getUri();
+                    if (uri != null) {
+                        String saved = com.termux.app.image.TermuxProImageHelper.saveImageFromUri(this, uri, i + 1);
+                        if (saved != null) {
+                            savedPaths.add(saved);
+                        }
+                    }
+                }
+                if (!savedPaths.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String path : savedPaths) {
+                        if (sb.length() > 0) sb.append(" ");
+                        sb.append(path);
+                    }
+                    com.termux.app.image.TermuxProImageHelper.insertPathToTerminal(this, sb.toString());
+                    android.widget.Toast.makeText(this, "Đã chèn " + savedPaths.size() + " ảnh", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            } else if (data.getData() != null) {
+                android.net.Uri uri = data.getData();
+                String saved = com.termux.app.image.TermuxProImageHelper.saveImageFromUri(this, uri, 0);
                 if (saved != null) {
                     com.termux.app.image.TermuxProImageHelper.insertPathToTerminal(this, saved);
                     android.widget.Toast.makeText(this, R.string.image_saved_inserted, android.widget.Toast.LENGTH_SHORT).show();
