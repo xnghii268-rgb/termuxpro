@@ -116,6 +116,16 @@ public class TermuxSession {
                 isLoginShell = true;
             }
 
+            // Fallback to bash if login is missing or empty
+            if (executionCommand.executable != null && executionCommand.executable.endsWith("/login")) {
+                File loginF = new File(executionCommand.executable);
+                if (!loginF.exists() || loginF.length() == 0) {
+                    File bashF = new File(defaultBinPath, "bash");
+                    if (bashF.canExecute()) {
+                        executionCommand.executable = bashF.getAbsolutePath();
+                    }
+                }
+            }
         }
 
         // Setup command args

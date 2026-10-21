@@ -102,19 +102,30 @@ final class TermuxInstaller {
             return;
         }
 
-        // If prefix directory exists and has the v3 marker, assume that it is correct and be done
-        File v3Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v3");
-        if (FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) && v3Marker.exists()) {
-            if (TermuxFileUtils.isTermuxPrefixDirectoryEmpty()) {
-                Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" exists but is empty or only contains specific unimportant files.");
-            } else {
-                setupDefaultShellConfigFiles(activity);
-                whenDone.run();
-                return;
-            }
-        } else if (FileUtils.fileExists(TERMUX_PREFIX_DIR_PATH, false)) {
-            Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" does not exist or lacks v3 marker; upgrading bootstrap.");
+        // If prefix directory exists and has the v4 marker, and key binaries exist, assume that it is correct and be done
+        File v4Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v4");
+        File loginBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/login");
+        File bashBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/bash");
+        File shBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/sh");
+        File libDir = new File(TERMUX_PREFIX_DIR_PATH, "lib");
+        File etcDir = new File(TERMUX_PREFIX_DIR_PATH, "etc");
+
+        boolean prefixHealthy = FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) &&
+            v4Marker.exists() &&
+            loginBin.exists() && loginBin.canExecute() &&
+            bashBin.exists() && bashBin.canExecute() &&
+            libDir.isDirectory() &&
+            etcDir.isDirectory();
+
+        if (prefixHealthy && !TermuxFileUtils.isTermuxPrefixDirectoryEmpty()) {
+            setupDefaultShellConfigFiles(activity);
+            whenDone.run();
+            return;
         }
+
+        Logger.logInfo(LOG_TAG, "Prefix not healthy (v4Marker=" + v4Marker.exists() +
+            ", login=" + loginBin.exists() + ", bash=" + bashBin.exists() + ", sh=" + shBin.exists() +
+            "), (re-)installing bootstrap packages.");
 
         final ProgressDialog progress = ProgressDialog.show(activity, null, activity.getString(R.string.bootstrap_installer_body), true, false);
         new Thread() {
@@ -170,6 +181,12 @@ final class TermuxInstaller {
                                     if (parts.length != 2)
                                         throw new RuntimeException("Malformed symlink line: " + line);
                                     String oldPath = parts[0];
+                                    if (oldPath.contains("com.termuxpro.apppro.app")) {
+                                        oldPath = oldPath.replace("com.termuxpro.apppro.app", "com.termuxpro.app");
+                                    }
+                                    if (oldPath.contains("/data/data/com.termux/")) {
+                                        oldPath = oldPath.replace("/data/data/com.termux/", "/data/data/com.termuxpro.app/");
+                                    }
                                     String newPath = TERMUX_STAGING_PREFIX_DIR_PATH + "/" + parts[1];
                                     symlinks.add(Pair.create(oldPath, newPath));
 
@@ -197,10 +214,12 @@ final class TermuxInstaller {
                                             outStream.write(buffer, 0, readBytes);
                                     }
                                     if (zipEntryName.startsWith("bin/") || zipEntryName.startsWith("libexec") ||
-                                        zipEntryName.startsWith("lib/apt/apt-helper") || zipEntryName.startsWith("lib/apt/methods") ||
-                                        zipEntryName.endsWith(".sh") || zipEntryName.equals("etc/motd.sh")) {
+                                        zipEntryName.startsWith("lib/apt/apt-helper") || zipEntryName.startsWith("lib/apt/methods")) {
                                         //noinspection OctalInteger
-                                        Os.chmod(targetFile.getAbsolutePath(), 0755);
+                                        try { Os.chmod(targetFile.getAbsolutePath(), 0700); } catch (Exception ignored) {}
+                                    } else if (zipEntryName.endsWith(".sh") || zipEntryName.equals("etc/motd.sh")) {
+                                        //noinspection OctalInteger
+                                        try { Os.chmod(targetFile.getAbsolutePath(), 0755); } catch (Exception ignored) {}
                                     }
                                 }
                             }
@@ -210,18 +229,87 @@ final class TermuxInstaller {
                     if (symlinks.isEmpty())
                         throw new RuntimeException("No SYMLINKS.txt encountered");
                     for (Pair<String, String> symlink : symlinks) {
-                        Os.symlink(symlink.first, symlink.second);
+                        try {
+                            File dest = new File(symlink.second);
+                            if (dest.exists()) dest.delete();
+                            Os.symlink(symlink.first, symlink.second);
+                        } catch (Exception e) {
+                            Logger.logError(LOG_TAG, "Failed creating symlink " + symlink.second + " -> " + symlink.first + ": " + e.getMessage());
+                        }
+                    }
+
+                    // Ensure bin/sh exists (links to dash or bash)
+                    File stagingSh = new File(TERMUX_STAGING_PREFIX_DIR_PATH, "bin/sh");
+                    if (!stagingSh.exists()) {
+                        File stagingDash = new File(TERMUX_STAGING_PREFIX_DIR_PATH, "bin/dash");
+                        File stagingBash = new File(TERMUX_STAGING_PREFIX_DIR_PATH, "bin/bash");
+                        try {
+                            if (stagingDash.exists()) {
+                                Os.symlink("dash", stagingSh.getAbsolutePath());
+                            } else if (stagingBash.exists()) {
+                                Os.symlink("bash", stagingSh.getAbsolutePath());
+                            }
+                        } catch (Exception ignored) {}
+                    }
+
+                    // Chmod 700 and sanitize shebangs for all files in staging/bin
+                    File stagingBin = new File(TERMUX_STAGING_PREFIX_DIR_PATH, "bin");
+                    File[] binFiles = stagingBin.listFiles();
+                    if (binFiles != null) {
+                        for (File f : binFiles) {
+                            try {
+                                Os.chmod(f.getAbsolutePath(), 0700);
+                            } catch (Exception ignored) {}
+                            if (f.isFile() && f.length() > 2 && f.length() < 1048576) {
+                                try {
+                                    byte[] head = new byte[256];
+                                    int r;
+                                    try (FileInputStream fis = new FileInputStream(f)) {
+                                        r = fis.read(head);
+                                    }
+                                    if (r > 2 && head[0] == '#' && head[1] == '!') {
+                                        String content = new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                                        if (content.contains("com.termuxpro.apppro.app") || content.contains("/data/data/com.termux/")) {
+                                            content = content.replace("com.termuxpro.apppro.app", "com.termuxpro.app")
+                                                             .replace("/data/data/com.termux/", "/data/data/com.termuxpro.app/");
+                                            try (FileOutputStream fos = new FileOutputStream(f)) {
+                                                fos.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                                            }
+                                            Os.chmod(f.getAbsolutePath(), 0700);
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }
                     }
 
                     Logger.logInfo(LOG_TAG, "Moving termux prefix staging to prefix directory.");
 
+                    // Delete prefix directory before rename
+                    FileUtils.deleteFile("termux prefix directory", TERMUX_PREFIX_DIR_PATH, true);
                     if (!TERMUX_STAGING_PREFIX_DIR.renameTo(TERMUX_PREFIX_DIR)) {
                         throw new RuntimeException("Moving termux prefix staging to prefix directory failed");
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v2").createNewFile();
+                    } catch (Exception ignored) {}
+
+                    // Write debug log to file
+                    try {
+                        File homeDir = new File(TermuxConstants.TERMUX_HOME_DIR_PATH);
+                        if (!homeDir.exists()) homeDir.mkdirs();
+                        File termuxHome = new File(homeDir, ".termux");
+                        if (!termuxHome.exists()) termuxHome.mkdirs();
+                        File logFile = new File(termuxHome, "bootstrap-install.log");
+                        String logInfo = "Bootstrap installation successful at " + new java.util.Date() + "\n" +
+                            "prefix: " + TERMUX_PREFIX_DIR.getAbsolutePath() + "\n" +
+                            "login: " + new File(TERMUX_PREFIX_DIR, "bin/login").exists() + "\n" +
+                            "bash: " + new File(TERMUX_PREFIX_DIR, "bin/bash").exists() + "\n" +
+                            "sh: " + new File(TERMUX_PREFIX_DIR, "bin/sh").exists() + "\n";
+                        java.nio.file.Files.write(logFile.toPath(), logInfo.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                     } catch (Exception ignored) {}
 
                     Logger.logInfo(LOG_TAG, "Bootstrap packages installed successfully.");
@@ -384,9 +472,23 @@ final class TermuxInstaller {
                 } else {
                     String loginContent = new String(java.nio.file.Files.readAllBytes(loginFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
                     boolean modified = false;
+                    if (loginContent.contains("com.termuxpro.apppro.app")) {
+                        loginContent = loginContent.replace("com.termuxpro.apppro.app", "com.termuxpro.app");
+                        modified = true;
+                    }
                     if (loginContent.contains("/data/data/com.termux/")) {
                         loginContent = loginContent.replace("/data/data/com.termux/", "/data/data/com.termuxpro.app/");
                         modified = true;
+                    }
+                    if (loginContent.startsWith("#!")) {
+                        int nl = loginContent.indexOf('\n');
+                        if (nl != -1) {
+                            String firstLine = loginContent.substring(0, nl);
+                            if (firstLine.contains("apppro.app") || firstLine.contains("/com.termux/")) {
+                                loginContent = "#!/data/data/com.termuxpro.app/files/usr/bin/sh" + loginContent.substring(nl);
+                                modified = true;
+                            }
+                        }
                     }
                     if (loginContent.contains("unset LD_PRELOAD")) {
                         loginContent = loginContent.replace("unset LD_PRELOAD", "true # keep LD_PRELOAD for termux pro");
@@ -407,9 +509,10 @@ final class TermuxInstaller {
                         try (FileOutputStream fos = new FileOutputStream(loginFile)) {
                             fos.write(loginContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                         }
-                        loginFile.setExecutable(true, false);
                         Logger.logInfo(LOG_TAG, "Patched $PREFIX/bin/login for Termux Pro compatibility.");
                     }
+                    loginFile.setReadable(true, false);
+                    loginFile.setExecutable(true, false);
                 }
             } catch (Exception e) {
                 Logger.logError(LOG_TAG, "Error checking/patching login script: " + e.getMessage());

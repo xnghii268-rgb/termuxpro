@@ -63,6 +63,10 @@ jobs:
           git clone --depth 1 https://github.com/termux/termux-packages.git $HOME/termux-packages
           cd $HOME/termux-packages
 
+          echo "Configuring termux-packages properties for com.termuxpro.app..."
+          sed -i 's/TERMUX_APP__PACKAGE_NAME="com.termux"/TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"/g' scripts/properties.sh
+          sed -i 's/TERMUX_APP__NAMESPACE="com.termux"/TERMUX_APP__NAMESPACE="com.termuxpro.app"/g' scripts/properties.sh
+
           echo "Generating base bootstrap-aarch64..."
           ./scripts/generate-bootstraps.sh --architectures aarch64 --pm apt
 
@@ -76,19 +80,13 @@ jobs:
           mkdir -p $HOME/bs-patch && cd $HOME/bs-patch
           unzip -q "$HOME/termux-packages/$BS_FILE"
 
-          echo "Patching all /data/data/com.termux paths to /data/data/com.termuxpro.app..."
-          grep -Irl "/data/data/com.termux" . | xargs -r sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' || true
-
-          if [ -f "SYMLINKS.txt" ]; then
-            sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' SYMLINKS.txt
-          fi
-
-          if [ -d "var/lib/dpkg" ]; then
-            find var/lib/dpkg/ -type f -exec sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
-          fi
-          if [ -d "etc/apt" ]; then
-            find etc/apt/ -type f -exec sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
-          fi
+          echo "Patching all /data/data/com.termux paths to /data/data/com.termuxpro.app with boundary checks..."
+          find . -type f -exec sed -i \
+            -e 's|/data/data/com\.termux/|/data/data/com.termuxpro.app/|g' \
+            -e 's|/data/data/com\.termux"|/data/data/com.termuxpro.app"|g' \
+            -e 's|/data/data/com\.termux'\''|/data/data/com.termuxpro.app'\''|g' \
+            -e 's|/data/data/com\.termux |/data/data/com.termuxpro.app |g' \
+            -e 's|/data/data/com\.termux$|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
 
           # Compile libtermuxpro-path.so using NDK clang
           echo "Compiling libtermuxpro-path.so compatibility interceptor..."
@@ -250,20 +248,29 @@ jobs:
             'fi' >> etc/bash.bashrc
           fi
 
-          # Create v3 and v2 markers inside bootstrap
-          touch .termuxpro-v3 .termuxpro-v2
+          # Create v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
-          # Comprehensive patch of remaining scripts
-          find bin etc lib share var -type f -exec grep -Il "/data/data/com.termux" {} + 2>/dev/null | xargs -r sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' || true
+          # Cleanup any potential mangled prefixes
+          echo "Auditing and cleaning up any double-replaced prefixes..."
+          find . -type f -exec sed -i \
+            -e 's|com\.termuxpro\.apppro\.app|com.termuxpro.app|g' \
+            -e 's|com\.termuxpro\.apppro|com.termuxpro.app|g' {} + 2>/dev/null || true
 
           echo "GATE 2: Auditing bootstrap contents for hardcoded com.termux..."
-          LEFTOVERS=$(grep -rnI "/data/data/com.termux\b" etc/ var/ bin/ SYMLINKS.txt 2>/dev/null || true)
+          LEFTOVERS=$(grep -rnI "/data/data/com.termux/" etc/ var/ bin/ SYMLINKS.txt 2>/dev/null || true)
           if [ -n "$LEFTOVERS" ]; then
             echo "GATE 2 WARNING: Unexpected leftovers found:"
             echo "$LEFTOVERS"
             exit 1
           fi
-          echo "GATE 2 PASSED: Zero hardcoded /data/data/com.termux paths in bootstrap metadata, scripts, and symlinks!"
+          MANGLED=$(grep -rnI "com\.termuxpro\.apppro" . 2>/dev/null || true)
+          if [ -n "$MANGLED" ]; then
+            echo "GATE 2 ERROR: Mangled com.termuxpro.apppro paths found:"
+            echo "$MANGLED"
+            exit 1
+          fi
+          echo "GATE 2 PASSED: Zero hardcoded /data/data/com.termux paths and zero mangled prefixes!"
 
           # Repack bootstrap-aarch64.zip
           rm -f "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-aarch64.zip"

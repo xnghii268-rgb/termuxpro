@@ -53,11 +53,26 @@ public class TermuxShellUtils {
                                     // Skip whitespace after shebang.
                                 } else {
                                     // End of shebang.
-                                    String shebangExecutable = builder.toString();
-                                    if (shebangExecutable.startsWith("/usr") || shebangExecutable.startsWith("/bin")) {
+                                    String shebangExecutable = builder.toString().trim();
+                                    if (shebangExecutable.startsWith("/usr") || shebangExecutable.startsWith("/bin") ||
+                                        shebangExecutable.startsWith("/data/data/") || shebangExecutable.startsWith("/data/user/") ||
+                                        shebangExecutable.contains("/bin/")) {
                                         String[] parts = shebangExecutable.split("/");
-                                        String binary = parts[parts.length - 1];
-                                        interpreter = TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH + "/" + binary;
+                                        String binary = parts[parts.length - 1].trim();
+                                        File interpCandidate = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, binary);
+                                        if (interpCandidate.exists() && interpCandidate.canExecute()) {
+                                            interpreter = interpCandidate.getAbsolutePath();
+                                        } else {
+                                            File sh = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, "sh");
+                                            File bash = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, "bash");
+                                            if (sh.exists()) {
+                                                interpreter = sh.getAbsolutePath();
+                                            } else if (bash.exists()) {
+                                                interpreter = bash.getAbsolutePath();
+                                            } else {
+                                                interpreter = "/system/bin/sh";
+                                            }
+                                        }
                                     }
                                     break;
                                 }
