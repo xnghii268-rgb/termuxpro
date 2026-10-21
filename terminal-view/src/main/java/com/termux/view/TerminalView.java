@@ -1439,6 +1439,10 @@ public final class TerminalView extends View {
         }
     }
 
+    public boolean isTextSelecting() {
+        return isSelectingText();
+    }
+
     /** Get the currently selected text if selecting. */
     public String getSelectedText() {
         if (isSelectingText() && mTextSelectionCursorController != null)

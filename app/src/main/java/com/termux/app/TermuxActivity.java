@@ -735,7 +735,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
 
         // Also hide if text selection mode is active
-        if (mTerminalView != null && mTerminalView.isTextSelecting()) {
+        if (mTerminalView != null && mTerminalView.isSelectingText()) {
             shouldHide = true;
         }
 
