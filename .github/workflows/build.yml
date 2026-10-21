@@ -1,4 +1,4 @@
-name: Build Termux Pro Release APK & Packages
+name: Build Termux Pro Release APK
 
 on:
   push:
@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: 'Danh sách các gói cần biên dịch thêm (cách nhau bởi dấu cách)'
+        description: 'Danh sách các gói cần biên dịch thêm'
         required: false
         default: 'bash coreutils curl ca-certificates openssl dpkg apt termux-tools termux-exec nano git'
+        type: string
 
 permissions:
   contents: write
-  pages: write
 
 jobs:
   build-and-sign:
