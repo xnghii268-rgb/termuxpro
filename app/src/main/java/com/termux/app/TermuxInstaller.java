@@ -102,17 +102,18 @@ final class TermuxInstaller {
             return;
         }
 
-        // If prefix directory exists and has the v2 marker, assume that it is correct and be done
-        File v2Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v2");
-        if (FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) && v2Marker.exists()) {
+        // If prefix directory exists and has the v3 marker, assume that it is correct and be done
+        File v3Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v3");
+        if (FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) && v3Marker.exists()) {
             if (TermuxFileUtils.isTermuxPrefixDirectoryEmpty()) {
                 Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" exists but is empty or only contains specific unimportant files.");
             } else {
+                setupDefaultShellConfigFiles(activity);
                 whenDone.run();
                 return;
             }
         } else if (FileUtils.fileExists(TERMUX_PREFIX_DIR_PATH, false)) {
-            Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" does not exist or lacks v2 marker; upgrading bootstrap.");
+            Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" does not exist or lacks v3 marker; upgrading bootstrap.");
         }
 
         final ProgressDialog progress = ProgressDialog.show(activity, null, activity.getString(R.string.bootstrap_installer_body), true, false);
@@ -219,6 +220,7 @@ final class TermuxInstaller {
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v2").createNewFile();
                     } catch (Exception ignored) {}
 
@@ -278,6 +280,71 @@ final class TermuxInstaller {
                     fos.write(profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 }
             }
+
+            // Ensure libtermuxpro-path.so is installed in $PREFIX/lib
+            try {
+                File nativeLibDir = new File(context.getApplicationInfo().nativeLibraryDir);
+                File apkPathLib = new File(nativeLibDir, "libtermuxpro-path.so");
+                File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
+                File destPathLib = new File(prefixLib, "libtermuxpro-path.so");
+                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length())) {
+                    if (!prefixLib.exists()) prefixLib.mkdirs();
+                    try (java.io.InputStream in = new java.io.FileInputStream(apkPathLib);
+                         FileOutputStream out = new FileOutputStream(destPathLib)) {
+                        byte[] buf = new byte[8192];
+                        int len;
+                        while ((len = in.read(buf)) > 0) {
+                            out.write(buf, 0, len);
+                        }
+                    }
+                    destPathLib.setReadable(true, false);
+                    destPathLib.setExecutable(true, false);
+                    Logger.logInfo(LOG_TAG, "Installed libtermuxpro-path.so to " + destPathLib.getAbsolutePath());
+                }
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error installing libtermuxpro-path.so: " + e.getMessage());
+            }
+
+            // Ensure $PREFIX/bin/login does not unset LD_PRELOAD and uses Termux Pro paths
+            try {
+                File loginFile = new File(TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH, "login");
+                if (loginFile.exists()) {
+                    String loginContent = new String(java.nio.file.Files.readAllBytes(loginFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                    boolean modified = false;
+                    if (loginContent.contains("/data/data/com.termux/")) {
+                        loginContent = loginContent.replace("/data/data/com.termux/", "/data/data/com.termuxpro.app/");
+                        modified = true;
+                    }
+                    if (loginContent.contains("unset LD_PRELOAD")) {
+                        loginContent = loginContent.replace("unset LD_PRELOAD", "true # keep LD_PRELOAD for termux pro");
+                        modified = true;
+                    }
+                    if (loginContent.contains("libtermux-exec.so") && !loginContent.contains("libtermuxpro-path.so")) {
+                        loginContent = loginContent.replace(
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"",
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\""
+                        );
+                        loginContent = loginContent.replace(
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\"",
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\""
+                        );
+                        modified = true;
+                    }
+                    if (modified) {
+                        try (FileOutputStream fos = new FileOutputStream(loginFile)) {
+                            fos.write(loginContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        }
+                        loginFile.setExecutable(true, false);
+                        Logger.logInfo(LOG_TAG, "Patched $PREFIX/bin/login for Termux Pro compatibility.");
+                    }
+                }
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error checking/patching login script: " + e.getMessage());
+            }
+
+            try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
+            } catch (Exception ignored) {}
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error setting up default shell config files: " + e.getMessage());
         }

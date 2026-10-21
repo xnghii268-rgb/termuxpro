@@ -267,3 +267,34 @@ int symlinkat(const char *target, int newdirfd, const char *linkpath) {
     char buf1[PATH_MAX], buf2[PATH_MAX];
     return real_symlinkat ? real_symlinkat(rewrite_path(target, buf1, sizeof(buf1)), newdirfd, rewrite_path(linkpath, buf2, sizeof(buf2))) : -1;
 }
+
+int scandir(const char *dirp, struct dirent ***namelist,
+            int (*filter)(const struct dirent *),
+            int (*compar)(const struct dirent **, const struct dirent **)) {
+    static int (*real_scandir)(const char *, struct dirent ***,
+                               int (*)(const struct dirent *),
+                               int (*)(const struct dirent **, const struct dirent **)) = NULL;
+    if (!real_scandir) real_scandir = dlsym(RTLD_NEXT, "scandir");
+    char buf[PATH_MAX];
+    return real_scandir ? real_scandir(rewrite_path(dirp, buf, sizeof(buf)), namelist, filter, compar) : -1;
+}
+
+int scandir64(const char *dirp, struct dirent64 ***namelist,
+              int (*filter)(const struct dirent64 *),
+              int (*compar)(const struct dirent64 **, const struct dirent64 **)) {
+    static int (*real_scandir64)(const char *, struct dirent64 ***,
+                                 int (*)(const struct dirent64 *),
+                                 int (*)(const struct dirent64 **, const struct dirent64 **)) = NULL;
+    if (!real_scandir64) real_scandir64 = dlsym(RTLD_NEXT, "scandir64");
+    if (!real_scandir64) real_scandir64 = (int (*)(const char *, struct dirent64 ***, int (*)(const struct dirent64 *), int (*)(const struct dirent64 **, const struct dirent64 **)))dlsym(RTLD_NEXT, "scandir");
+    char buf[PATH_MAX];
+    return real_scandir64 ? real_scandir64(rewrite_path(dirp, buf, sizeof(buf)), namelist, filter, compar) : -1;
+}
+
+char *realpath(const char *path, char *resolved_path) {
+    static char *(*real_realpath)(const char *, char *) = NULL;
+    if (!real_realpath) real_realpath = dlsym(RTLD_NEXT, "realpath");
+    char buf[PATH_MAX];
+    return real_realpath ? real_realpath(rewrite_path(path, buf, sizeof(buf)), resolved_path) : NULL;
+}
+

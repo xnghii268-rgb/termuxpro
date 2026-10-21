@@ -155,6 +155,7 @@ jobs:
 
           # Patch bin/login to preserve libtermuxpro-path.so in LD_PRELOAD
           if [ -f "bin/login" ]; then
+            sed -i 's|unset LD_PRELOAD|true # keep LD_PRELOAD for termux pro|g' bin/login
             sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
             sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
           fi
@@ -229,8 +230,8 @@ jobs:
             'fi' >> etc/bash.bashrc
           fi
 
-          # Create v2 marker inside bootstrap
-          touch .termuxpro-v2
+          # Create v3 and v2 markers inside bootstrap
+          touch .termuxpro-v3 .termuxpro-v2
 
           # Comprehensive patch of remaining scripts
           find bin etc lib share var -type f -exec grep -Il "/data/data/com.termux" {} + 2>/dev/null | xargs -r sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' || true
