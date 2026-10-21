@@ -698,13 +698,6 @@ public final class ExtraKeysView extends GridLayout {
                             return true;
                     }
                 });
-                            }
-                            return true;
-
-                        default:
-                            return true;
-                    }
-                });
 
                 LayoutParams param = new GridLayout.LayoutParams();
                 param.width = 0;
