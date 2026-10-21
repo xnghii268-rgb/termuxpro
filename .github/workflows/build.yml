@@ -253,17 +253,16 @@ jobs:
 
           # Generate Release file
           cd dists/stable
-          cat << 'EOF' > Release
-Origin: Termux Pro
-Label: Termux Pro Archive
-Suite: stable
-Codename: stable
-Version: 1.0
-Architectures: aarch64 all
-Components: main
-Description: Official APT repository for Termux Pro (com.termuxpro.app)
-Date: Wed, 21 Oct 2026 12:00:00 UTC
-EOF
+          printf '%s\n' \
+          'Origin: Termux Pro' \
+          'Label: Termux Pro Archive' \
+          'Suite: stable' \
+          'Codename: stable' \
+          'Version: 1.0' \
+          'Architectures: aarch64 all' \
+          'Components: main' \
+          'Description: Official APT repository for Termux Pro (com.termuxpro.app)' \
+          'Date: Wed, 21 Oct 2026 12:00:00 UTC' > Release
 
           # Append SHA256 hashes
           echo "SHA256:" >> Release
