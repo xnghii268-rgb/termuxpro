@@ -63,10 +63,6 @@ jobs:
           git clone --depth 1 https://github.com/termux/termux-packages.git $HOME/termux-packages
           cd $HOME/termux-packages
 
-          echo "Configuring termux-packages for com.termuxpro.app..."
-          sed -i 's|TERMUX_APP__PACKAGE_NAME="com.termux"|TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"|g' scripts/properties.sh
-          sed -i 's|TERMUX_APP_PACKAGE="$TERMUX_APP__PACKAGE_NAME"|TERMUX_APP_PACKAGE="com.termuxpro.app"|g' scripts/properties.sh || true
-
           echo "Generating base bootstrap-aarch64..."
           ./scripts/generate-bootstraps.sh --architectures aarch64 --pm apt
 
