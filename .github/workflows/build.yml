@@ -63,10 +63,6 @@ jobs:
           git clone --depth 1 https://github.com/termux/termux-packages.git $HOME/termux-packages
           cd $HOME/termux-packages
 
-          echo "Configuring termux-packages properties for com.termuxpro.app..."
-          sed -i 's/TERMUX_APP__PACKAGE_NAME="com.termux"/TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"/g' scripts/properties.sh
-          sed -i 's/TERMUX_APP__NAMESPACE="com.termux"/TERMUX_APP__NAMESPACE="com.termuxpro.app"/g' scripts/properties.sh
-
           echo "Generating base bootstrap-aarch64..."
           ./scripts/generate-bootstraps.sh --architectures aarch64 --pm apt
 
@@ -83,6 +79,9 @@ jobs:
           echo "Patching all /data/data/com.termux paths to /data/data/com.termuxpro.app with boundary checks..."
           find . -type f -exec sed -i \
             -e 's|/data/data/com\.termux/|/data/data/com.termuxpro.app/|g' \
+            -e 's|/data/data/com\.termux:|/data/data/com.termuxpro.app:|g' \
+            -e 's|/data/data/com\.termux;|/data/data/com.termuxpro.app;|g' \
+            -e 's|/data/data/com\.termux=|/data/data/com.termuxpro.app=|g' \
             -e 's|/data/data/com\.termux"|/data/data/com.termuxpro.app"|g' \
             -e 's|/data/data/com\.termux'\''|/data/data/com.termuxpro.app'\''|g' \
             -e 's|/data/data/com\.termux |/data/data/com.termuxpro.app |g' \
