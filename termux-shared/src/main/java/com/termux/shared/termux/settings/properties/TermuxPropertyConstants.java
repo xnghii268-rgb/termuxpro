@@ -325,7 +325,7 @@ public final class TermuxPropertyConstants {
 
     /** Defines the key for extra keys */
     public static final String KEY_EXTRA_KEYS =  "extra-keys"; // Default: "extra-keys"
-    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[{'key':'ESC'},{'key':'/'},{'key':'-','popup':'|'},{'key':'HOME'},{'key':'UP'},{'key':'END'},{'key':'CLIP_IMAGE','display':'DÁN ẢNH'},{'key':'PALETTE','display':'LỆNH'}],[{'key':'TAB'},{'key':'CTRL'},{'key':'ALT'},{'key':'LEFT'},{'key':'DOWN'},{'key':'RIGHT'},{'key':'RECENT_IMAGE','display':'ẢNH MỚI'},{'key':'THEME','display':'GIAO DIỆN'}]]";
+    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[{'key':'ESC'},{'key':'TAB','display':'⇥'},{'key':'UP','display':'↑'},{'key':'HOME'},{'key':'END'},{'key':'CLIP_IMAGE','display':'Dán ảnh'},{'key':'RECENT_IMAGE','display':'Ảnh mới'}],[{'key':'CTRL'},{'key':'ALT'},{'key':'LEFT','display':'←'},{'key':'DOWN','display':'↓'},{'key':'RIGHT','display':'→'},{'key':'/','popup':'|'},{'key':'PALETTE','display':'Lệnh','popup':{'key':'THEME','display':'Giao diện'}}]]";
 
     /** Defines the key for extra keys style */
     public static final String KEY_EXTRA_KEYS_STYLE =  "extra-keys-style"; // Default: "extra-keys-style"

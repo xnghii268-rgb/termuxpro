@@ -1,10 +1,19 @@
-name: Build Termux Pro Release APK
+name: Build Termux Pro Release APK & Packages
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Danh sách các gói cần biên dịch thêm (cách nhau bởi dấu cách)'
+        required: false
+        default: 'bash coreutils curl ca-certificates openssl dpkg apt termux-tools termux-exec nano git'
+
+permissions:
+  contents: write
+  pages: write
 
 jobs:
   build-and-sign:
@@ -14,6 +23,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -29,17 +40,32 @@ jobs:
           echo "Ensuring required platform and build tools..."
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-28" "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1 || true
 
-      - name: Install bootstrap build dependencies
+      - name: Install build & packaging dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl tar xz-utils zip jq coreutils
+          sudo apt-get install -y curl tar xz-utils zip jq coreutils dpkg-dev apt-utils gnupg
 
-      - name: Clone termux-packages & generate bootstrap aarch64
+      - name: Import GPG APT signing key
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          if [ -n "$GPG_KEY" ]; then
+            echo "$GPG_KEY" | gpg --batch --import
+            echo "GPG signing key imported successfully."
+          else
+            echo "Warning: GPG_PRIVATE_KEY secret is not set."
+          fi
+
+      - name: Clone termux-packages & generate custom bootstrap
         run: |
           set -e
           echo "Cloning termux-packages..."
           git clone --depth 1 https://github.com/termux/termux-packages.git $HOME/termux-packages
           cd $HOME/termux-packages
+
+          echo "Configuring termux-packages for com.termuxpro.app..."
+          sed -i 's|TERMUX_APP__PACKAGE_NAME="com.termux"|TERMUX_APP__PACKAGE_NAME="com.termuxpro.app"|g' scripts/properties.sh
+          sed -i 's|TERMUX_APP_PACKAGE="$TERMUX_APP__PACKAGE_NAME"|TERMUX_APP_PACKAGE="com.termuxpro.app"|g' scripts/properties.sh || true
 
           echo "Generating base bootstrap-aarch64..."
           ./scripts/generate-bootstraps.sh --architectures aarch64 --pm apt
@@ -55,15 +81,12 @@ jobs:
           unzip -q "$HOME/termux-packages/$BS_FILE"
 
           echo "Patching all /data/data/com.termux paths to /data/data/com.termuxpro.app..."
-          # Replace paths in all text files, configs, scripts, shebangs
           grep -Irl "/data/data/com.termux" . | xargs -r sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' || true
 
-          # Patch SYMLINKS.txt if present
           if [ -f "SYMLINKS.txt" ]; then
             sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' SYMLINKS.txt
           fi
 
-          # Patch dpkg files and apt configs
           if [ -d "var/lib/dpkg" ]; then
             find var/lib/dpkg/ -type f -exec sed -i 's|/data/data/com.termux|/data/data/com.termuxpro.app|g' {} + 2>/dev/null || true
           fi
@@ -92,7 +115,7 @@ jobs:
 
           # Configure etc/apt/apt.conf for Termux Pro prefix compatibility
           echo "Configuring etc/apt/apt.conf for Termux Pro prefix compatibility..."
-          mkdir -p etc/apt/apt.conf.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg
+          mkdir -p etc/apt/apt.conf.d etc/apt/trusted.gpg.d var/lib/apt/lists var/cache/apt/archives var/log/apt etc/dpkg
           printf '%s\n' \
           'Dir "/data/data/com.termuxpro.app/files/usr";' \
           'Dir::State "var/lib/apt";' \
@@ -112,31 +135,18 @@ jobs:
           '   "--instdir=/data/data/com.termuxpro.app/files/usr";' \
           '};' > etc/apt/apt.conf
 
-          echo "Injecting compatibility exports into etc/profile and etc/bash.bashrc..."
-          printf '%s\n' \
-          'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
-          'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
-          'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
-          'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
-          'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
-          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-          '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
-          'fi' >> etc/profile
-
-          if [ -f "etc/bash.bashrc" ]; then
-            printf '%s\n' \
-            'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
-            'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
-            'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
-            'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
-            'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
-            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-            '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
-            'fi' >> etc/bash.bashrc
+          # Apply Bootstrap Overlay files
+          echo "Applying Termux Pro bootstrap overlay..."
+          if [ -d "$GITHUB_WORKSPACE/app/src/main/assets/bootstrap-overlay" ]; then
+            cp -rf "$GITHUB_WORKSPACE/app/src/main/assets/bootstrap-overlay"/* .
           fi
 
-          # Add Phase 8 shell helpers: clipimg and lastshot
+          # Ensure shell scripts have correct permissions
           mkdir -p bin
+          chmod 755 etc/motd.sh bin/tp || true
+          ln -sf tp bin/menu
+
+          # Add Phase 8 shell helpers: clipimg and lastshot
           printf '%s\n' \
           '#!/data/data/com.termuxpro.app/files/usr/bin/bash' \
           'LATEST=$(ls -t "$HOME/.clip"/img-*.png 2>/dev/null | head -n 1)' \
@@ -164,6 +174,43 @@ jobs:
           'fi' > bin/lastshot
           chmod 755 bin/lastshot
 
+          echo "Injecting compatibility exports and MOTD into etc/profile and etc/bash.bashrc..."
+          printf '%s\n' \
+          'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
+          'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
+          'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
+          'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
+          'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
+          'export SSL_CERT_FILE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+          'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+          'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
+          'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
+          '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+          'fi' \
+          'if [ -f "/data/data/com.termuxpro.app/files/usr/etc/motd.sh" ]; then' \
+          '    bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh' \
+          'fi' >> etc/profile
+
+          if [ -f "etc/bash.bashrc" ]; then
+            printf '%s\n' \
+            'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
+            'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
+            'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
+            'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
+            'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
+            'export SSL_CERT_FILE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+            'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+            'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
+            'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
+            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
+            '    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
+            'fi' >> etc/bash.bashrc
+          fi
+
+          # Create v2 marker inside bootstrap
+          touch .termuxpro-v2
+
           echo "GATE 2: Auditing bootstrap contents for hardcoded com.termux..."
           LEFTOVERS=$(grep -rnI "/data/data/com.termux\b" etc/ var/ SYMLINKS.txt bin/clipimg bin/lastshot 2>/dev/null || true)
           if [ -n "$LEFTOVERS" ]; then
@@ -183,6 +230,87 @@ jobs:
           cp -f "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-aarch64.zip" "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-i686.zip"
           cp -f "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-aarch64.zip" "$GITHUB_WORKSPACE/app/src/main/cpp/bootstrap-x86_64.zip"
           echo "Embedded custom bootstrap into app/src/main/cpp/."
+
+      - name: Generate and Sign APT Repository
+        run: |
+          set -e
+          echo "Setting up APT repository tree..."
+          mkdir -p $HOME/apt-repo/dists/stable/main/binary-aarch64
+          mkdir -p $HOME/apt-repo/dists/stable/main/binary-all
+          mkdir -p $HOME/apt-repo/pool/main
+
+          # Collect debs if built from termux-packages output
+          if [ -d "$HOME/termux-packages/output" ]; then
+            find "$HOME/termux-packages/output" -name "*.deb" -exec cp -t $HOME/apt-repo/pool/main/ {} + || true
+          fi
+
+          cd $HOME/apt-repo
+          # Generate Packages metadata
+          dpkg-scanpackages pool/main /dev/null > dists/stable/main/binary-aarch64/Packages || touch dists/stable/main/binary-aarch64/Packages
+          gzip -9c dists/stable/main/binary-aarch64/Packages > dists/stable/main/binary-aarch64/Packages.gz
+          cp -f dists/stable/main/binary-aarch64/Packages dists/stable/main/binary-all/Packages
+          cp -f dists/stable/main/binary-aarch64/Packages.gz dists/stable/main/binary-all/Packages.gz
+
+          # Generate Release file
+          cd dists/stable
+          cat << 'EOF' > Release
+Origin: Termux Pro
+Label: Termux Pro Archive
+Suite: stable
+Codename: stable
+Version: 1.0
+Architectures: aarch64 all
+Components: main
+Description: Official APT repository for Termux Pro (com.termuxpro.app)
+Date: Wed, 21 Oct 2026 12:00:00 UTC
+EOF
+
+          # Append SHA256 hashes
+          echo "SHA256:" >> Release
+          find main -type f | while read -r f; do
+            HASH=$(sha256sum "$f" | awk '{print $1}')
+            SIZE=$(stat -c%s "$f")
+            printf " %s %s %s\n" "$HASH" "$SIZE" "$f" >> Release
+          done
+
+          # Sign Release with GPG
+          if gpg --list-secret-keys "apt@termuxpro.app" > /dev/null 2>&1; then
+            echo "Signing Release with GPG key..."
+            gpg --batch --yes --default-key "apt@termuxpro.app" -abs -o Release.gpg Release
+            gpg --batch --yes --default-key "apt@termuxpro.app" --clearsign -o InRelease Release
+            echo "Successfully generated Release.gpg and InRelease."
+          else
+            echo "GPG key not available; skipping Release signature."
+          fi
+
+          # Copy public keyrings
+          cd $HOME/apt-repo
+          if [ -f "$GITHUB_WORKSPACE/app/src/main/assets/keys/termuxpro-archive-keyring.gpg" ]; then
+            cp -f "$GITHUB_WORKSPACE/app/src/main/assets/keys/termuxpro-archive-keyring.gpg" .
+            cp -f "$GITHUB_WORKSPACE/app/src/main/assets/keys/termuxpro-archive-keyring.asc" . || true
+          fi
+
+      - name: Deploy APT repository to GitHub Pages
+        run: |
+          set -e
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p $HOME/gh-pages-deploy
+          cd $HOME/gh-pages-deploy
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" .
+
+          # Copy new repo files
+          cp -rf $HOME/apt-repo/* .
+
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes in APT repository metadata."
+          else
+            git commit -m "deploy: update Termux Pro APT repository [skip ci]"
+            git push origin gh-pages
+            echo "APT repository published to GitHub Pages."
+          fi
 
       - name: Prepare signing keystore from secrets
         env:
@@ -205,7 +333,6 @@ jobs:
           chmod +x ./gradlew
           ./gradlew assembleRelease --stacktrace
 
-          # Verify release APK existence
           RELEASE_DIR="app/build/outputs/apk/release"
           if [ ! -d "$RELEASE_DIR" ]; then
             echo "GATE 3 FAILED: Release output directory $RELEASE_DIR not found!" >&2

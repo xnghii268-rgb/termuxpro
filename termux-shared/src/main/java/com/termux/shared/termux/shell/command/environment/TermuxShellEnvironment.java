@@ -96,6 +96,10 @@ public class TermuxShellEnvironment extends AndroidShellEnvironment {
             environment.put("TERMUX__PREFIX", TermuxConstants.TERMUX_PREFIX_DIR_PATH);
             environment.put("TERMUX_APP__DATA_DIR", "/data/data/com.termuxpro.app");
             environment.put("TERMUX_APP__LEGACY_DATA_DIR", "/data/data/com.termuxpro.app");
+            environment.put("SSL_CERT_FILE", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
+            environment.put("CURL_CA_BUNDLE", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
+            environment.put("OPENSSL_CONF", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/openssl.cnf");
+            environment.put("GIT_SSL_CAINFO", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
             environment.put("LD_PRELOAD", TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermuxpro-path.so:" + TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH + "/libtermux-exec.so");
         }
 

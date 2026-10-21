@@ -25,6 +25,14 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
+import androidx.core.view.GravityCompat;
+import java.util.List;
 
 import com.termux.R;
 import com.termux.app.api.file.FileReceiverActivity;
@@ -251,6 +259,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         setToggleKeyboardView();
 
+        setFloatingBottomNavBar();
+
+        setTopSessionChipsBar();
+
         registerForContextMenu(mTerminalView);
 
         FileReceiverActivity.updateFileReceiverActivityComponentsState(this);
@@ -390,6 +402,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         mTermuxService = ((TermuxService.LocalBinder) service).service;
 
         setTermuxSessionsListView();
+        updateTopSessionChips();
 
         final Intent intent = getIntent();
         setIntent(null);
@@ -591,6 +604,171 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         findViewById(R.id.toggle_keyboard_button).setOnLongClickListener(v -> {
             toggleTerminalToolbar();
             return true;
+        });
+    }
+
+    private View mFloatingBottomNavBar;
+    private LinearLayout mSessionChipsContainer;
+
+    private void setFloatingBottomNavBar() {
+        mFloatingBottomNavBar = findViewById(R.id.floating_bottom_nav_bar);
+        if (mFloatingBottomNavBar == null) return;
+
+        View navTerminal = findViewById(R.id.nav_item_terminal);
+        if (navTerminal != null) {
+            navTerminal.setOnClickListener(v -> {
+                if (mTerminalView != null) {
+                    mTerminalView.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(mTerminalView, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            });
+        }
+
+        View navSessions = findViewById(R.id.nav_item_sessions);
+        if (navSessions != null) {
+            navSessions.setOnClickListener(v -> {
+                if (getDrawer() != null) {
+                    if (getDrawer().isDrawerOpen(GravityCompat.START)) {
+                        getDrawer().closeDrawer(GravityCompat.START);
+                    } else {
+                        getDrawer().openDrawer(GravityCompat.START);
+                    }
+                }
+            });
+        }
+
+        View navCommand = findViewById(R.id.nav_item_command);
+        if (navCommand != null) {
+            navCommand.setOnClickListener(v -> {
+                com.termux.app.features.TermuxProPaletteManager.showCommandPalette(TermuxActivity.this);
+            });
+        }
+
+        View navImage = findViewById(R.id.nav_item_image);
+        if (navImage != null) {
+            navImage.setOnClickListener(v -> {
+                com.termux.app.image.TermuxProImageHelper.pasteImageFromClipboard(TermuxActivity.this);
+            });
+            navImage.setOnLongClickListener(v -> {
+                com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
+                return true;
+            });
+        }
+
+        View navSettings = findViewById(R.id.nav_item_settings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v -> {
+                ActivityUtils.startActivity(this, new Intent(this, SettingsActivity.class));
+            });
+        }
+    }
+
+    public void onKeyboardVisibilityChanged(boolean isVisible) {
+        runOnUiThread(() -> {
+            if (mFloatingBottomNavBar != null) {
+                mFloatingBottomNavBar.setVisibility(isVisible ? View.GONE : View.VISIBLE);
+            }
+        });
+    }
+
+    private void setTopSessionChipsBar() {
+        mSessionChipsContainer = findViewById(R.id.session_chips_container);
+        updateTopSessionChips();
+    }
+
+    public void updateTopSessionChips() {
+        runOnUiThread(() -> {
+            if (mSessionChipsContainer == null || mTermuxService == null) return;
+            mSessionChipsContainer.removeAllViews();
+
+            List<TermuxSession> sessions = mTermuxService.getTermuxSessions();
+            if (sessions == null || sessions.isEmpty()) return;
+
+            TerminalSession currentSession = getCurrentSession();
+            float density = getResources().getDisplayMetrics().density;
+            int paddingHoriz = (int) (10 * density + 0.5f);
+            int paddingVert = (int) (4 * density + 0.5f);
+            int marginEnd = (int) (6 * density + 0.5f);
+
+            for (int i = 0; i < sessions.size(); i++) {
+                TermuxSession termuxSession = sessions.get(i);
+                TerminalSession session = termuxSession.getTerminalSession();
+                boolean isSelected = session == currentSession;
+
+                LinearLayout chip = new LinearLayout(TermuxActivity.this);
+                chip.setOrientation(LinearLayout.HORIZONTAL);
+                chip.setGravity(Gravity.CENTER_VERTICAL);
+                chip.setPadding(paddingHoriz, paddingVert, paddingHoriz, paddingVert);
+                chip.setBackgroundResource(isSelected ? R.drawable.bg_glass_session_item_selected : R.drawable.bg_glass_session_item);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    (int) (28 * density + 0.5f)
+                );
+                params.setMargins(0, 0, marginEnd, 0);
+                chip.setLayoutParams(params);
+
+                View dot = new View(TermuxActivity.this);
+                int dotSize = (int) (8 * density + 0.5f);
+                LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dotSize, dotSize);
+                dotParams.setMargins(0, 0, (int) (6 * density + 0.5f), 0);
+                dot.setLayoutParams(dotParams);
+                GradientDrawable dotDrawable = new GradientDrawable();
+                dotDrawable.setShape(GradientDrawable.OVAL);
+                dotDrawable.setColor(TermuxSessionsListViewController.TAG_COLORS[i % TermuxSessionsListViewController.TAG_COLORS.length]);
+                dot.setBackground(dotDrawable);
+                chip.addView(dot);
+
+                TextView label = new TextView(TermuxActivity.this);
+                String title = session.getTitle();
+                if (TextUtils.isEmpty(title)) {
+                    title = "Phiên " + (i + 1);
+                }
+                label.setText(title);
+                label.setTextSize(11);
+                label.setTextColor(isSelected ? Color.parseColor("#2DD4BF") : Color.parseColor("#E5E7EB"));
+                if (isSelected) label.setTypeface(null, android.graphics.Typeface.BOLD);
+                chip.addView(label);
+
+                final TerminalSession targetSession = session;
+                chip.setOnClickListener(v -> {
+                    if (mTermuxTerminalSessionActivityClient != null) {
+                        mTermuxTerminalSessionActivityClient.setCurrentSession(targetSession);
+                        updateTopSessionChips();
+                    }
+                });
+
+                mSessionChipsContainer.addView(chip);
+            }
+
+            LinearLayout addChip = new LinearLayout(TermuxActivity.this);
+            addChip.setOrientation(LinearLayout.HORIZONTAL);
+            addChip.setGravity(Gravity.CENTER);
+            addChip.setPadding((int) (8 * density + 0.5f), paddingVert, (int) (8 * density + 0.5f), paddingVert);
+            addChip.setBackgroundResource(R.drawable.bg_glass_session_item);
+            LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(
+                (int) (28 * density + 0.5f),
+                (int) (28 * density + 0.5f)
+            );
+            addChip.setLayoutParams(addParams);
+
+            TextView addText = new TextView(TermuxActivity.this);
+            addText.setText("+");
+            addText.setTextSize(14);
+            addText.setTextColor(Color.parseColor("#2DD4BF"));
+            addText.setTypeface(null, android.graphics.Typeface.BOLD);
+            addChip.addView(addText);
+
+            addChip.setOnClickListener(v -> {
+                if (mTermuxTerminalSessionActivityClient != null) {
+                    mTermuxTerminalSessionActivityClient.addNewSession(false, null);
+                }
+            });
+
+            mSessionChipsContainer.addView(addChip);
         });
     }
 
@@ -871,7 +1049,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
 
     public void termuxSessionListNotifyUpdated() {
-        mTermuxSessionListViewController.notifyDataSetChanged();
+        if (mTermuxSessionListViewController != null)
+            mTermuxSessionListViewController.notifyDataSetChanged();
+        updateTopSessionChips();
     }
 
     public boolean isVisible() {

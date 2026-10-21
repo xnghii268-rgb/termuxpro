@@ -102,8 +102,9 @@ final class TermuxInstaller {
             return;
         }
 
-        // If prefix directory exists, even if its a symlink to a valid directory and symlink is not broken/dangling
-        if (FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true)) {
+        // If prefix directory exists and has the v2 marker, assume that it is correct and be done
+        File v2Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v2");
+        if (FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) && v2Marker.exists()) {
             if (TermuxFileUtils.isTermuxPrefixDirectoryEmpty()) {
                 Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" exists but is empty or only contains specific unimportant files.");
             } else {
@@ -111,7 +112,7 @@ final class TermuxInstaller {
                 return;
             }
         } else if (FileUtils.fileExists(TERMUX_PREFIX_DIR_PATH, false)) {
-            Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" does not exist but another file exists at its destination.");
+            Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" does not exist or lacks v2 marker; upgrading bootstrap.");
         }
 
         final ProgressDialog progress = ProgressDialog.show(activity, null, activity.getString(R.string.bootstrap_installer_body), true, false);
@@ -215,6 +216,10 @@ final class TermuxInstaller {
                     if (!TERMUX_STAGING_PREFIX_DIR.renameTo(TERMUX_PREFIX_DIR)) {
                         throw new RuntimeException("Moving termux prefix staging to prefix directory failed");
                     }
+
+                    try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v2").createNewFile();
+                    } catch (Exception ignored) {}
 
                     Logger.logInfo(LOG_TAG, "Bootstrap packages installed successfully.");
 

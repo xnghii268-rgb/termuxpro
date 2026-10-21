@@ -1,0 +1,57 @@
+#!/data/data/com.termuxpro.app/files/usr/bin/bash
+# Termux Pro Quick Launcher
+
+PREFIX="/data/data/com.termuxpro.app/files/usr"
+[ -f "$PREFIX/etc/motd.sh" ] && bash "$PREFIX/etc/motd.sh"
+
+echo -e "\e[1;38;5;81m==> Chọn chức năng [0-9] hoặc nhấn Enter/q để tiếp tục:\e[0m "
+read -r -p "Lựa chọn: " choice
+
+case "$choice" in
+    1)
+        echo "Bắt đầu cài đặt AntiGravity CLI..."
+        curl -fsSL https://antigravity.google/cli/install.sh | bash
+        ;;
+    2)
+        echo "Cài đặt môi trường Python..."
+        pkg install -y python python-pip
+        ;;
+    3)
+        echo "Cài đặt môi trường Node.js LTS..."
+        pkg install -y nodejs-lts
+        ;;
+    4)
+        echo "Cài đặt công cụ Git & GitHub CLI..."
+        pkg install -y git gh
+        ;;
+    5)
+        echo "Cài đặt trình soạn thảo văn bản Nano & Vim..."
+        pkg install -y nano vim
+        ;;
+    6)
+        echo "Đang cập nhật kho gói Termux Pro..."
+        pkg update && pkg upgrade -y
+        ;;
+    7)
+        if command -v clipimg >/dev/null 2>&1; then
+            clipimg
+        else
+            echo "Chưa có ảnh nào trong clipboard hoặc ~/.clip"
+        fi
+        ;;
+    8)
+        echo "Sao lưu toàn diện cấu hình Termux Pro..."
+        tar -czf "$HOME/storage/downloads/termuxpro/backup/termuxpro-backup-$(date +%Y%m%d%H%M).tar.gz" -C "$HOME" .termux .bashrc 2>/dev/null || echo "Hoàn tất."
+        ;;
+    9)
+        echo "Mở bảng chọn giao diện từ thanh điều khiển Termux Pro."
+        ;;
+    0)
+        echo -e "\e[1;38;5;81mTermux Pro v1.0\e[0m - Bản phân phối thiết kế độc quyền cho Developer & Hacker."
+        echo "Dựa trên termux/termux-app (GPLv3). Giữ trọn bản quyền phần mềm tự do."
+        echo "Mã nguồn: https://github.com/xnghii268-rgb/termuxpro"
+        ;;
+    *)
+        echo "Tiếp tục vào phiên dòng lệnh..."
+        ;;
+esac

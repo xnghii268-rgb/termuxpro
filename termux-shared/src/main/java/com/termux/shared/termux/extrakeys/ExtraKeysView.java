@@ -418,6 +418,9 @@ public final class ExtraKeysView extends GridLayout {
                 button.setTextColor(mButtonTextColor);
                 button.setAllCaps(mButtonTextAllCaps);
                 button.setPadding(0, 0, 0, 0);
+                int minHeightPx = (int)(44 * getContext().getResources().getDisplayMetrics().density + 0.5f);
+                button.setMinHeight(minHeightPx);
+                button.setMinimumHeight(minHeightPx);
 
                 button.setOnClickListener(view -> {
                     performExtraKeyButtonHapticFeedback(view, buttonInfo, button);
