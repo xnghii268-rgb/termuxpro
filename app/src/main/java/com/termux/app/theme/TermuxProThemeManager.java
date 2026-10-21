@@ -136,7 +136,7 @@ public class TermuxProThemeManager {
             }
 
             // Update window and activity background
-            int bgColor = TerminalColors.parse(theme.background);
+            int bgColor = android.graphics.Color.parseColor(theme.background);
             Window window = activity.getWindow();
             if (window != null && window.getDecorView() != null) {
                 window.getDecorView().setBackgroundColor(bgColor);
