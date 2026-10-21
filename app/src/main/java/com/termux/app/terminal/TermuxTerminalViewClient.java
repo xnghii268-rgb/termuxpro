@@ -735,8 +735,6 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
                 ShareUtils.copyTextToClipboard(mActivity, url, mActivity.getString(R.string.msg_select_url_copied_to_clipboard));
             }
         );
-
-        dialog.show();
     }
 
     public void reportIssueFromTranscript() {
