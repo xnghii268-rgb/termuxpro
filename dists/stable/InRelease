@@ -1,0 +1,28 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: Termux Pro
+Label: Termux Pro Archive
+Suite: stable
+Codename: stable
+Version: 1.0
+Architectures: aarch64 all
+Components: main
+Description: Official APT repository for Termux Pro (com.termuxpro.app)
+Date: Wed, 21 Oct 2026 12:00:00 UTC
+SHA256:
+ 80da5d2b6d9403cb47248dd4cc7cb6f237fe5ddbae3dc52bd74e94ba3312e7ce 29 main/binary-aarch64/Packages.gz
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
+ 80da5d2b6d9403cb47248dd4cc7cb6f237fe5ddbae3dc52bd74e94ba3312e7ce 29 main/binary-all/Packages.gz
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrYjRQSHGFwdEB0ZXJt
+dXhwcm8uYXBwAAoJEHN/SDR5E+C7lj8H+wf3K9zpvlHbtLjRRteenouNozGiivuy
+IOso2KjlNo0J2c1utOMdvEVcAZcpxatlXqoBwGWlV5LD80D2vc7PBGjl65t/l2Ki
+WTOS8YlPuyQmD5yoaLbYzBgX87xKhoMQWhtQBLUnqF/oNjTf/2z8VD/fbBRAbqlh
+h6P2vDxxYyogGLptoEJlJ0MDUCnNY0xvdUiioEW48AGrz3KTmtgOcJKCpind5s4t
+4NkvTsSSHGhO+g9zIDB8k/WRgRhzQB6hVgYH7rAEdYrtJGXuIsbn7k394dyFUrDp
+X+whsUezNLjWel0oaVgbEnMz2JxkaidhRzXMLpBDDicLDQpIfM5uO98=
+=PrWT
+-----END PGP SIGNATURE-----
