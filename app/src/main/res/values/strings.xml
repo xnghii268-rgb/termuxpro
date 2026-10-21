@@ -148,6 +148,22 @@
     <string name="termux_terminal_view_terminal_margin_adjustment_off">Tắt tính năng căn lề tự động.</string>
     <string name="termux_terminal_view_terminal_margin_adjustment_on">Tự động nâng màn hình lệnh khi bàn phím ảo mở ra. (Mặc định)</string>
 
+    <!-- Termux:API App Preferences -->
+    <string name="termux_api_preferences_title">&TERMUX_API_APP_NAME;</string>
+    <string name="termux_api_preferences_summary">Tùy biến tiện ích &TERMUX_API_APP_NAME;</string>
+
+    <!-- Termux:Float App Preferences -->
+    <string name="termux_float_preferences_title">&TERMUX_FLOAT_APP_NAME;</string>
+    <string name="termux_float_preferences_summary">Tùy biến tiện ích &TERMUX_FLOAT_APP_NAME;</string>
+
+    <!-- Termux:Tasker App Preferences -->
+    <string name="termux_tasker_preferences_title">&TERMUX_TASKER_APP_NAME;</string>
+    <string name="termux_tasker_preferences_summary">Tùy biến tiện ích &TERMUX_TASKER_APP_NAME;</string>
+
+    <!-- Termux:Widget App Preferences -->
+    <string name="termux_widget_preferences_title">&TERMUX_WIDGET_APP_NAME;</string>
+    <string name="termux_widget_preferences_summary">Tùy biến tiện ích &TERMUX_WIDGET_APP_NAME;</string>
+
     <!-- About & Legal -->
     <string name="about_preference_title">Giới thiệu</string>
     <string name="about_preference_summary">Bản quyền, mã nguồn mở và tri ân nhóm phát triển upstream</string>

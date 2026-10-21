@@ -1,38 +1,40 @@
 # Termux Pro Context & Architecture
 
-Termux Pro là ứng dụng terminal Linux mã nguồn mở (GPLv3) phân nhánh từ termux-app, độc lập và chuyên biệt cho thiết bị Android di động.
+Termux Pro là ứng dụng terminal Linux mã nguồn mở (GPLv3) phân nhánh độc lập từ upstream termux-app và termux-packages.
 
 ## 1. Bố cục Thư mục Chuẩn (Target Folder Layout)
-- `~/storage/downloads/termuxpro/src`: Mã nguồn chính (Source of truth).
-- `~/storage/downloads/termuxpro/apk`: Thư mục chứa tệp APK phát hành duy nhất (`termuxpro-v<version>.apk`).
+- `~/storage/downloads/termuxpro/src`: Mã nguồn chính (Source of truth, Git repo kết nối GitHub).
+- `~/storage/downloads/termuxpro/apk`: Thư mục lưu trữ bản APK phát hành duy nhất (`termuxpro-v<version>.apk`).
 - `~/storage/downloads/termuxpro/backup`: Thư mục lưu trữ bản sao lưu `.tar.gz` của terminal home.
 - `~/.build/termuxpro`: Build mirror và vùng nháp cục bộ (local scratch).
-- `~/.secrets/termuxpro`: Chứng chỉ ký số (`termuxpro-release.keystore`, `keystore.env`), bảo mật 100%, quyền 600.
+- `~/.secrets/termuxpro`: Chứng chỉ ký số (`termuxpro-release.keystore`, `keystore.env`), quyền 600, không bao giờ vào git/Downloads.
 - `~/pull-termuxpro.sh`: Tập lệnh tự động tải APK phát hành mới nhất từ GitHub Actions qua `gh`.
 
 ## 2. Thông số Kỹ thuật & Môi trường
-- **Mã định danh gói (applicationId)**: `com.termuxpro.app`
+- **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr`
 - **Thư mục Home**: `/data/data/com.termuxpro.app/files/home`
-- **targetSdkVersion**: 28 (giữ nguyên để hỗ trợ W^X trên Android 10+).
+- **targetSdkVersion**: 28 (giữ nguyên để thực thi nhị phân từ thư mục dữ liệu trên Android 10+).
 - **Môi trường build**: GitHub Actions (aarch64 bootstrap & APK build).
 
 ## 3. Hệ thống Tokens Thiết kế (Design Tokens Summary)
-- **Bảng màu**: 6 chủ đề gốc (2 sáng, 4 tối) đạt chuẩn tương phản WCAG 2.1 >= 4.5:1.
-- **Bề mặt kính (Glass Surface)**: Mờ nền thích ứng 18px, viền 0.5px hairline, hỗ trợ fallback mờ đục trên thiết bị cấu hình thấp.
-- **Thanh phím tắt (Extra Keys)**: Vùng chạm công thái học >= 44dp, tích hợp rung phản hồi haptic.
-- **Typography**: Nhúng cục bộ 100% phông chữ hỗ trợ đầy đủ tiếng Việt ("Ắ Ử Ỡ ệ ợ ẫ").
+- **6 chủ đề giao diện nguyên bản**: Obsidian Pro (#141517), Mocha Warm (#1E1B18), Nordic Pine (#121A1A), Slate Steel (#181B20), Paper Silk (#FBF9F5), Alabaster Frost (#F3F4F6).
+- **Tương phản WCAG AA**: Tỷ lệ tương phản văn bản/nền đều đạt >= 13.3:1 (vượt chuẩn 4.5:1).
+- **Bề mặt kính (Glass Session Bar)**: Translucent #EB141517, viền hairline 0.5px #26FFFFFF, bo góc chuẩn 14dp/20dp, thanh trượt trạng thái với spring animation.
+- **Thanh phím tắt (Extra Keys)**: Vùng chạm >= 44dp (chiều cao 48dp), phản hồi xúc giác Haptic Feedback có graceful fallback.
+- **Phông chữ**: Nhúng cục bộ `termuxpro-mono.ttf` (JetBrains Mono) và `termuxpro-ui.ttf` hỗ trợ 100% tiếng Việt ("Ắ Ử Ỡ ệ ợ ẫ").
+- **Ngôn ngữ UI**: 100% tiếng Việt, định dạng vi-VN.
 
 ## 4. Tính năng Cốt lõi
-- Thanh phiên làm việc (Session Bar) dạng kính thay thế drawer phẳng truyền thống.
-- Command Palette tìm kiếm lịch sử lệnh và snippet có sẵn.
-- Trình quản lý sao lưu / khôi phục tar.gz loại trừ các thư mục bí mật.
-- Tính năng Dán ảnh thông minh (Image Paste) dành cho CLI AI Agents: nút "Dán ảnh" (tự động lưu vào `~/.clip/` và chèn đường dẫn), "Ảnh mới nhất" (truy vấn MediaStore), helper `clipimg`, `lastshot`.
+- **Thanh phiên làm việc dạng kính**: Quản lý thẻ phiên, đổi tên, gắn 5 màu thẻ (Emerald, Sapphire, Amber, Coral, Lavender), vuốt/đóng có xác nhận.
+- **Bảng lệnh nhanh (Command Palette)**: Tìm kiếm lịch sử lệnh shell và lệnh mẫu, chạm để chèn không tự chạy.
+- **Quản lý lệnh mẫu (Snippets)**: Thêm/lưu/chèn lệnh mẫu thường dùng.
+- **Sao lưu & Khôi phục**: Đóng gói tar.gz ra Downloads/termuxpro/backup, loại trừ tự động toàn bộ secret/keystore/env/key/token.
+- **Dán ảnh cho AI Agent**: Nút "Dán ảnh" (tự lưu vào ~/.clip và chèn đường dẫn), "Ảnh mới nhất" (truy vấn MediaStore), nhấn giữ mở bộ chọn ảnh hệ thống, helper `clipimg` và `lastshot`, tùy chọn nén cạnh 1568px, giới hạn 30 ảnh cục bộ.
 
 ## 5. Trạng thái Các Giai đoạn (Phase Status)
-- [x] **Phase 0 - Prep**: Thiết lập thư mục, cài đặt gh/jq, sinh keystore phát hành mới, tạo `pull-termuxpro.sh`.
-- [ ] **Gate 0**: Đang chờ nạp `GITHUB_TOKEN` để kết nối kho lưu trữ từ xa và thiết lập GitHub Actions.
-- [ ] **Phase 1**: Fork & Đổi tên package sang `com.termuxpro.app`.
-- [ ] **Phase 2**: CI Bootstrap aarch64 workflow.
-- [ ] **Phase 3**: CI Build & Sign APK workflow.
-- [ ] **Phase 4 - 10**: Verify, Theme, UI, Features, Image Paste, QA & Release.
+- [x] **Phase 0 - Prep (Gate 0: Passed)**: Khởi tạo thư mục, gh auth login, keystore phát hành mới, secrets đưa lên GitHub repo.
+- [x] **Phase 1 - Fork + Rename (Gate 1: Passed)**: Đổi toàn bộ sang com.termuxpro.app, kiểm tra sạch vết.
+- [ ] **Phase 2 - Bootstrap CI (Gate 2: Đang chạy CI)**: Tự động tải, patch prefix com.termuxpro.app, kiểm tra zero com.termux leftover.
+- [ ] **Phase 3 - Build + Sign CI (Gate 3: Đang chạy CI)**: Biên dịch APK release, ký số tự động bằng secret Actions, upload artifact.
+- [ ] **Phase 4 - 10**: Verify, QA và Kéo APK qua pull-termuxpro.sh.
