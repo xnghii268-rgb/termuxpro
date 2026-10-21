@@ -32,6 +32,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **Quản lý lệnh mẫu (Snippets)**: Thêm/lưu/chèn lệnh mẫu thường dùng.
 - **Sao lưu & Khôi phục**: Đóng gói tar.gz ra Downloads/termuxpro/backup, loại trừ tự động toàn bộ secret/keystore/env/key/token.
 - **Dán ảnh cho AI Agent**: Nút "Dán ảnh" (tự lưu vào ~/.clip và chèn đường dẫn), "Ảnh mới nhất" (truy vấn MediaStore), nhấn giữ mở bộ chọn ảnh hệ thống, helper `clipimg` và `lastshot`, tùy chọn nén cạnh 1568px, giới hạn 30 ảnh cục bộ.
+- **Tương thích Gói Upstream**: Nhúng `libtermuxpro-path.so` và cấu hình `etc/apt/apt.conf` định tuyến trong suốt đường dẫn Linux, giúp `apt` và `dpkg` hoạt động hoàn hảo trên định danh `com.termuxpro.app`.
 
 ## 5. Trạng thái Các Giai đoạn (Phase Status)
 - [x] **Phase 0 - Prep (Gate 0: Passed)**: Khởi tạo thư mục, cấu hình gh, sinh keystore phát hành mới, secrets đưa lên GitHub Actions.
