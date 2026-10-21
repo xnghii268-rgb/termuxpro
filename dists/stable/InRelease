@@ -11,18 +11,18 @@ Components: main
 Description: Official APT repository for Termux Pro (com.termuxpro.app)
 Date: Wed, 21 Oct 2026 12:00:00 UTC
 SHA256:
- 571a03e2665d7f12810408fd52d81f24e7979475153115bfbaf5c5e4715ddc3e 29 main/binary-aarch64/Packages.gz
+ fd636f33311ae6e88ccd3881a32f3f67b26b1a9aa48910ee514ef9fc18f7b09e 29 main/binary-aarch64/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
- 571a03e2665d7f12810408fd52d81f24e7979475153115bfbaf5c5e4715ddc3e 29 main/binary-all/Packages.gz
+ fd636f33311ae6e88ccd3881a32f3f67b26b1a9aa48910ee514ef9fc18f7b09e 29 main/binary-all/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrY7uMSHGFwdEB0ZXJt
-dXhwcm8uYXBwAAoJEHN/SDR5E+C7YGEIAMMg8irjvh4oomUoFmOkhr+OEXMH78Nn
-zmOTECUfi5KhTnERxWUfNx1h/a1PZrq3szz1uTthduO0CtQk8sG60DcFimmmfU3K
-XVrPQaSIk6YDyZkpzucIyQmBF+6n1+yBN89LEXX4lCOJiuOOzs9j4X+xkTMCZFg+
-y1tQlNccAjl5yTU6zD3QZJLSb1LvgVuNoiWDJ+YZrNxbOa5rmLkKe8ZmNcUPi8V4
-rw68ZExsqkA/s2rVPyDCPsMofPRG6qaPSpyLacEsoafiTnamijR6NM/I49iQhDx2
-vt34uneSyuDScetP/3BoXzQnwhvveVMzvl1Md65/1o4bmNcplAg9ZMI=
-=seSf
+iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrY9PISHGFwdEB0ZXJt
+dXhwcm8uYXBwAAoJEHN/SDR5E+C75k0H/jxVqV3IiOqv0ord9Mii0LunA2Ktv6pb
+XgMpDByxCnHs3dv3Lv5GaQkdyLHx7lq8SFxw1JkWP0M9YToP5WynkvYH0XK1qta3
+l1OaHtNzwWfVhPKApApxrzVUJbgys7+F6/tbPJ4GoX/btXkJsvk5SeIvAuaInTL6
+4JUyGc2moM6hNHZbZwnHcWpmOXzly36vNbaMCMkrSoL/ANVxCAksuCKI7or0VuSL
+OVVuQC833F4m9Ll+ZairwujB+PlbHi2tlYKyspS3sz8GOqZMtK5zEB+6pIZ5ZQhs
+mlkSI5ggXDHk1c/LkgOvFdfLUefnV6UMeVH2P5Jt8ETQ2GqrBJA82qI=
+=7USB
 -----END PGP SIGNATURE-----
