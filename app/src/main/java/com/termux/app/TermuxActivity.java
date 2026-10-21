@@ -32,6 +32,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
 import androidx.core.view.GravityCompat;
+import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import java.util.List;
 
 import com.termux.R;
