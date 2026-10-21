@@ -321,8 +321,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (mTermuxTerminalViewClient != null)
             mTermuxTerminalViewClient.onStart();
 
-        if (mPreferences.isTerminalMarginAdjustmentEnabled())
-            addTermuxActivityRootViewGlobalLayoutListener();
+        // Legacy margin adjustment disabled to eliminate screen bouncing
+        // if (mPreferences.isTerminalMarginAdjustmentEnabled())
+        //     addTermuxActivityRootViewGlobalLayoutListener();
 
         registerTermuxActivityBroadcastReceiver();
     }
@@ -714,20 +715,20 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         public void run() {
             if (mTerminalView != null) {
                 float density = getResources().getDisplayMetrics().density;
+                int targetPadding;
                 if (mIsKeyboardOpen) {
-                    mTerminalView.setPadding(0, 0, 0, 0);
+                    targetPadding = 0;
                 } else {
                     int navMarginBottom = (int)(12 * density + 0.5f);
                     if (mMeasuredFloatingNavHeight <= 0 && mFloatingBottomNavBar != null) {
                         mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
                             mFloatingBottomNavBar.getHeight() : (int)(52 * density + 0.5f);
                     }
-                    int totalBottomPadding = mMeasuredFloatingNavHeight + navMarginBottom + mSystemNavBottomInset;
-                    mTerminalView.setPadding(0, 0, 0, totalBottomPadding);
+                    targetPadding = mMeasuredFloatingNavHeight + navMarginBottom + mSystemNavBottomInset;
                 }
-                mTerminalView.updateSize();
-                if (mTerminalView.mEmulator != null) {
-                    mTerminalView.setTopRow(0, false);
+                if (mTerminalView.getPaddingBottom() != targetPadding) {
+                    mTerminalView.setPadding(0, 0, 0, targetPadding);
+                    mTerminalView.updateSize();
                 }
             }
         }
@@ -744,7 +745,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 float density = getResources().getDisplayMetrics().density;
                 int basePad = (int)(4 * density + 0.5f);
                 int sidePad = (int)(6 * density + 0.5f);
-                sessionScroll.setPadding(sidePad, statusBarTop + basePad, sidePad, basePad);
+                int targetTop = statusBarTop + basePad;
+                if (sessionScroll.getPaddingTop() != targetTop) {
+                    sessionScroll.setPadding(sidePad, targetTop, sidePad, basePad);
+                }
             }
 
             boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
@@ -803,13 +807,14 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             shouldHide = true;
         }
 
-        if (mIsKeyboardOpen == shouldHide && mFloatingBottomNavBar.getVisibility() == (shouldHide ? View.GONE : View.VISIBLE)) {
+        if (mIsKeyboardOpen == shouldHide) {
             return;
         }
 
         mIsKeyboardOpen = shouldHide;
 
         runOnUiThread(() -> {
+            mFloatingBottomNavBar.animate().cancel();
             float density = getResources().getDisplayMetrics().density;
             if (mMeasuredFloatingNavHeight <= 0) {
                 mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
@@ -846,7 +851,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     public void onKeyboardVisibilityChanged(boolean isVisible) {
-        handleKeyboardVisibilityChanged(isVisible, 0, 0);
+        // No-op: insets are handled cleanly by WindowInsetsCompat
     }
 
     public void checkHardwareKeyboardAndSelection() {
