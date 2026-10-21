@@ -11,18 +11,18 @@ Components: main
 Description: Official APT repository for Termux Pro (com.termuxpro.app)
 Date: Wed, 21 Oct 2026 12:00:00 UTC
 SHA256:
- 43904d465a99b541e628a11951dc50dbe54c920d2c5bfcc271959b71cdeaaaa4 29 main/binary-aarch64/Packages.gz
- e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
- 43904d465a99b541e628a11951dc50dbe54c920d2c5bfcc271959b71cdeaaaa4 29 main/binary-all/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
+ 4a4e2aff175d8b2efdc0c8d525753294c672da06faed53c3900624d5dff5918b 29 main/binary-all/Packages.gz
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
+ 4a4e2aff175d8b2efdc0c8d525753294c672da06faed53c3900624d5dff5918b 29 main/binary-aarch64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrYxbcSHGFwdEB0ZXJt
-dXhwcm8uYXBwAAoJEHN/SDR5E+C7/rQIALmCBJRAT9qo/sDerpYw4PfXLvAaLIek
-c0piPLUN5pU1IU59bHaclx2mTEbJS4vFrDc0W3aA/bKGDJMpIIfu8emweL/snyYa
-rIntkcJBbCRuzTfZ/kb3r0Va3RYlH9H6HAUJcALQ5BAc67w5KCEL6vsNK/8cVkQg
-v+acxPGvEBwB2H6ZprxyS6zv9kE1z+gSBEvlLxq6mHsgR7Z0NpP1ux+JHn7iZvWG
-HVif607bI+L2nJF1Mo5l8AtwtrS35aq1hR5/XnH0QVRe5jbsVG2je1KxEfdNsZzq
-oLE7U9B+YfIQBvjdKkztlcfFWTMOUrq4xWnK0X0RkQT9SD7pRBAyt7Q=
-=3jEP
+iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrYydcSHGFwdEB0ZXJt
+dXhwcm8uYXBwAAoJEHN/SDR5E+C72eMIAMGw7EigQd+fWpF/Y1ZrxvevLKaKiTWH
+XKg/AzP7WLQartdZYFtLpMsI6fZBdnRp1mkGBphlqpDvfKLgjd2+Zw+uXa6Jxr/I
+wmleANHhSTpuYNPh9n83ntpf5PCmSSfOc9xXMM5JoSqmn2aU7TvF6U+DJuZ9BEU4
+4P32atQmwaWqOC/V3+TsVkldn9fcd4VofszAPDDZH8/WuVIPiPK6vkULOr7z34aP
+u2vQJ0o8oBnNIuX5WnfQHvL13767pnkAIOHyQWJ7wZN7k3Ms6eRHRv4q4LmLTyNa
+E7ql0ffL801r44rN/Uqbe4b+Ok+h7N2JLHKYiUuKgSsmtqE5ZU/jdYI=
+=LB+k
 -----END PGP SIGNATURE-----
