@@ -66,8 +66,8 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
                 // 2. Check termux.properties
                 java.io.File propFile = new java.io.File(com.termux.shared.termux.TermuxConstants.TERMUX_PROPERTIES_PRIMARY_FILE_PATH);
                 if (propFile.exists() && propFile.canRead()) {
-                    String content = com.termux.shared.file.FileUtils.readStringFromFile("termux.properties", propFile.getAbsolutePath(), null);
-                    if (content != null && (content.contains("PALETTE") || content.contains("LỆNH") || content.contains("Lệnh"))) {
+                    String content = new String(java.nio.file.Files.readAllBytes(propFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                    if (content.contains("PALETTE") || content.contains("LỆNH") || content.contains("Lệnh")) {
                         String[] lines = content.split("\n");
                         StringBuilder sb = new StringBuilder();
                         for (String line : lines) {
@@ -83,9 +83,9 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
                                 sb.append(line).append("\n");
                             }
                         }
-                        com.termux.shared.file.FileUtils.writeStringToFile("termux.properties", propFile.getAbsolutePath(), null, sb.toString(), false);
+                        java.nio.file.Files.write(propFile.toPath(), sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
                         if (mActivity.getProperties() != null) {
-                            mActivity.getProperties().loadPropertiesFromDisk();
+                            mActivity.getProperties().loadTermuxPropertiesFromDisk();
                         }
                     }
                 }
