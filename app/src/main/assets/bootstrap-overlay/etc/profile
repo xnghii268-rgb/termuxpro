@@ -41,8 +41,3 @@ fi
 if [ -n "$BASH_VERSION" ] && [ -f "/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc" ]; then
     . "/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc"
 fi
-
-# Run dynamic Termux Pro MOTD banner
-if [ -f "/data/data/com.termuxpro.app/files/usr/etc/motd.sh" ]; then
-    bash "/data/data/com.termuxpro.app/files/usr/etc/motd.sh"
-fi

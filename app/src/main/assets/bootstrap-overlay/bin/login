@@ -43,6 +43,11 @@ if [ -f /data/data/com.termuxpro.app/files/usr/etc/termux-login.sh ]; then
 	. /data/data/com.termuxpro.app/files/usr/etc/termux-login.sh
 fi
 
+# Guard against recursive login invocations
+while [ "$1" = "login" ] || [ "$1" = "-login" ] || [ "$1" = "/data/data/com.termuxpro.app/files/usr/bin/login" ] || [ "$1" = "-sh" ]; do
+	shift
+done
+
 if [ -n "$TERM" ]; then
 	exec "$SHELL" -l "$@"
 else

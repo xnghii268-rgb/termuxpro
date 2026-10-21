@@ -12,7 +12,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 125).
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 126).
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
 ## 3. Hệ thống Tokens Thiết kế (Design Tokens)

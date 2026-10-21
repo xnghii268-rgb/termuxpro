@@ -103,8 +103,8 @@ final class TermuxInstaller {
             return;
         }
 
-        // If prefix directory exists and has the v5 marker, and key binaries exist, assume that it is correct and be done
-        File v5Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v5");
+        // If prefix directory exists and has the v6 marker, and key binaries exist, assume that it is correct and be done
+        File v6Marker = new File(TERMUX_PREFIX_DIR_PATH, ".termuxpro-v6");
         File loginBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/login");
         File bashBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/bash");
         File dashBin = new File(TERMUX_PREFIX_DIR_PATH, "bin/dash");
@@ -113,7 +113,7 @@ final class TermuxInstaller {
         File etcDir = new File(TERMUX_PREFIX_DIR_PATH, "etc");
 
         boolean prefixHealthy = FileUtils.directoryFileExists(TERMUX_PREFIX_DIR_PATH, true) &&
-            v5Marker.exists() &&
+            v6Marker.exists() &&
             loginBin.exists() && loginBin.canExecute() &&
             bashBin.exists() && bashBin.canExecute() &&
             (dashBin.exists() || shBin.exists()) &&
@@ -126,7 +126,7 @@ final class TermuxInstaller {
             return;
         }
 
-        Logger.logInfo(LOG_TAG, "Prefix not healthy (v5Marker=" + v5Marker.exists() +
+        Logger.logInfo(LOG_TAG, "Prefix not healthy (v6Marker=" + v6Marker.exists() +
             ", login=" + loginBin.exists() + ", bash=" + bashBin.exists() + ", dash=" + dashBin.exists() + ", sh=" + shBin.exists() +
             "), (re-)installing bootstrap packages.");
 
@@ -292,6 +292,7 @@ final class TermuxInstaller {
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v3").createNewFile();
@@ -520,6 +521,21 @@ final class TermuxInstaller {
             }
 
             try {
+                File profileFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/profile");
+                if (profileFile.exists()) {
+                    String profileContent = new String(java.nio.file.Files.readAllBytes(profileFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                    if (profileContent.contains("etc/motd.sh")) {
+                        profileContent = profileContent.replace("bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh", "true")
+                                                       .replace("bash \"/data/data/com.termuxpro.app/files/usr/etc/motd.sh\"", "true");
+                        java.nio.file.Files.write(profileFile.toPath(), profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        Logger.logInfo(LOG_TAG, "Cleaned redundant motd call from etc/profile.");
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
             } catch (Exception ignored) {}
         } catch (Exception e) {

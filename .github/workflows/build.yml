@@ -235,9 +235,6 @@ jobs:
           'fi' \
           'if [ -n "$PRELOAD" ]; then' \
           '    export LD_PRELOAD="$PRELOAD"' \
-          'fi' \
-          'if [ -f "/data/data/com.termuxpro.app/files/usr/etc/motd.sh" ]; then' \
-          '    bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh' \
           'fi' >> etc/profile
 
           if [ -f "etc/bash.bashrc" ]; then
@@ -271,8 +268,8 @@ jobs:
             'fi' >> etc/bash.bashrc
           fi
 
-          # Create v5, v4, v3 and v2 markers inside bootstrap
-          touch .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
+          # Create v6, v5, v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
           echo "GATE 2: Auditing bootstrap contents for binary safety and path correctness..."
           python3 -c "
