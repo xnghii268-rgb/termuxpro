@@ -79,5 +79,7 @@ public interface TerminalViewClient {
     void logStackTraceWithMessage(String tag, String message, Exception e);
 
     void logStackTrace(String tag, Exception e);
-
+    default boolean onImageCommit(android.net.Uri uri, android.content.ClipDescription description) {
+        return false;
+    }
 }

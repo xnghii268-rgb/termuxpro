@@ -32,6 +32,11 @@ import android.view.autofill.AutofillValue;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.content.ClipDescription;
+import android.net.Uri;
+import androidx.core.view.inputmethod.EditorInfoCompat;
+import androidx.core.view.inputmethod.InputConnectionCompat;
+import androidx.core.view.inputmethod.InputContentInfoCompat;
 import android.widget.Scroller;
 
 import androidx.annotation.Nullable;
@@ -340,7 +345,12 @@ public final class TerminalView extends View {
         // keyboard on Android TV (see https://github.com/termux/termux-app/issues/221).
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN;
 
-        return new BaseInputConnection(this, true) {
+        String[] mimeTypes = new String[]{
+            "image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif", "image/*"
+        };
+        EditorInfoCompat.setContentMimeTypes(outAttrs, mimeTypes);
+
+        InputConnection baseInputConnection = new BaseInputConnection(this, true) {
 
             @Override
             public boolean finishComposingText() {
@@ -435,6 +445,36 @@ public final class TerminalView extends View {
             }
 
         };
+
+        InputConnectionCompat.OnCommitContentListener callback = (inputContentInfo, flags, opts) -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 &&
+                (flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+                try {
+                    inputContentInfo.requestPermission();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            boolean handled = false;
+            try {
+                Uri contentUri = inputContentInfo.getContentUri();
+                ClipDescription desc = inputContentInfo.getDescription();
+                if (contentUri != null && mClient != null) {
+                    handled = mClient.onImageCommit(contentUri, desc);
+                }
+            } finally {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 &&
+                    (flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+                    try {
+                        inputContentInfo.releasePermission();
+                    } catch (Exception ignored) {}
+                }
+            }
+            return handled;
+        };
+
+        return InputConnectionCompat.createWrapper(baseInputConnection, outAttrs, callback);
     }
 
     @Override

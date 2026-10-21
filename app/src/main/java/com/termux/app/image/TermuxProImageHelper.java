@@ -93,51 +93,81 @@ public class TermuxProImageHelper {
         }
     }
 
+    public static boolean handleCommittedImageUri(TermuxActivity activity, Uri uri) {
+        if (activity == null || uri == null) return false;
+        try {
+            String savedPath = saveImageFromUri(activity, uri);
+            if (savedPath != null) {
+                insertPathToTerminal(activity, savedPath);
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Đã dán ảnh", Toast.LENGTH_SHORT).show());
+                return true;
+            } else {
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Không thể đọc hoặc xử lý ảnh đã chọn", Toast.LENGTH_SHORT).show());
+                return false;
+            }
+        } catch (SecurityException se) {
+            Logger.logError(LOG_TAG, "SecurityException reading committed image: " + se.getMessage());
+            activity.runOnUiThread(() -> Toast.makeText(activity, "Lỗi quyền truy cập tệp ảnh", Toast.LENGTH_SHORT).show());
+            return false;
+        } catch (Exception e) {
+            Logger.logError(LOG_TAG, "Error handling committed image: " + e.getMessage());
+            activity.runOnUiThread(() -> Toast.makeText(activity, "Lỗi dán ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            return false;
+        }
+    }
+
     public static void pasteImageFromClipboard(TermuxActivity activity) {
         try {
             ClipboardManager cm = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm == null || !cm.hasPrimaryClip()) {
-                Toast.makeText(activity, R.string.image_clipboard_empty, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Bảng nhớ tạm không có ảnh", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             ClipData clip = cm.getPrimaryClip();
             if (clip == null || clip.getItemCount() == 0) {
-                Toast.makeText(activity, R.string.image_clipboard_empty, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Bảng nhớ tạm không có ảnh", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            ClipData.Item item = clip.getItemAt(0);
-            Uri uri = item.getUri();
+            for (int i = 0; i < clip.getItemCount(); i++) {
+                ClipData.Item item = clip.getItemAt(i);
+                Uri uri = item.getUri();
 
-            if (uri != null) {
-                String savedPath = saveImageFromUri(activity, uri);
-                if (savedPath != null) {
-                    insertPathToTerminal(activity, savedPath);
-                    Toast.makeText(activity, R.string.image_saved_inserted, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-
-            // Check if clip contains text that is an image URI or path
-            CharSequence text = item.getText();
-            if (text != null) {
-                String str = text.toString().trim();
-                if (str.startsWith("content://") || str.startsWith("file://")) {
-                    Uri parsedUri = Uri.parse(str);
-                    String savedPath = saveImageFromUri(activity, parsedUri);
+                if (uri != null) {
+                    String savedPath = saveImageFromUri(activity, uri);
                     if (savedPath != null) {
                         insertPathToTerminal(activity, savedPath);
-                        Toast.makeText(activity, R.string.image_saved_inserted, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Đã dán ảnh", Toast.LENGTH_SHORT).show();
                         return;
+                    }
+                }
+
+                // Check if clip contains text that is an image URI or path
+                CharSequence text = item.getText();
+                if (text != null) {
+                    String str = text.toString().trim();
+                    if (str.startsWith("content://") || str.startsWith("file://")) {
+                        try {
+                            Uri parsedUri = Uri.parse(str);
+                            String savedPath = saveImageFromUri(activity, parsedUri);
+                            if (savedPath != null) {
+                                insertPathToTerminal(activity, savedPath);
+                                Toast.makeText(activity, "Đã dán ảnh", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        } catch (Exception ignored) {}
                     }
                 }
             }
 
-            Toast.makeText(activity, R.string.image_clipboard_empty, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Bảng nhớ tạm không có ảnh", Toast.LENGTH_SHORT).show();
+        } catch (SecurityException se) {
+            Logger.logError(LOG_TAG, "SecurityException reading clipboard: " + se.getMessage());
+            Toast.makeText(activity, "Lỗi bảo mật khi đọc bảng nhớ tạm", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error pasting image from clipboard: " + e.getMessage());
-            Toast.makeText(activity, R.string.image_clipboard_empty, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Bảng nhớ tạm không có ảnh", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -226,6 +226,8 @@ final class TermuxInstaller {
                     // Recreate env file since termux prefix was wiped earlier
                     TermuxShellEnvironment.writeEnvironmentToFile(activity);
 
+                    setupDefaultShellConfigFiles(activity);
+
                     activity.runOnUiThread(whenDone);
 
                 } catch (final Exception e) {
@@ -242,6 +244,42 @@ final class TermuxInstaller {
                 }
             }
         }.start();
+    }
+
+    public static void setupDefaultShellConfigFiles(Context context) {
+        try {
+            File homeDir = new File(TermuxConstants.TERMUX_HOME_DIR_PATH);
+            if (!homeDir.exists()) {
+                homeDir.mkdirs();
+            }
+
+            File bashrcFile = new File(homeDir, ".bashrc");
+            if (!bashrcFile.exists()) {
+                String bashrcContent = "# ~/.bashrc for Termux Pro\n" +
+                    "if [ -f \"" + TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/bash.bashrc\" ]; then\n" +
+                    "    . \"" + TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/bash.bashrc\"\n" +
+                    "fi\n";
+                try (FileOutputStream fos = new FileOutputStream(bashrcFile)) {
+                    fos.write(bashrcContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+            }
+
+            File profileFile = new File(homeDir, ".profile");
+            if (!profileFile.exists()) {
+                String profileContent = "# ~/.profile for Termux Pro\n" +
+                    "if [ -f \"" + TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/profile\" ]; then\n" +
+                    "    . \"" + TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/profile\"\n" +
+                    "fi\n" +
+                    "if [ -f \"$HOME/.bashrc\" ]; then\n" +
+                    "    . \"$HOME/.bashrc\"\n" +
+                    "fi\n";
+                try (FileOutputStream fos = new FileOutputStream(profileFile)) {
+                    fos.write(profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+            }
+        } catch (Exception e) {
+            Logger.logError(LOG_TAG, "Error setting up default shell config files: " + e.getMessage());
+        }
     }
 
     public static void showBootstrapErrorDialog(Activity activity, Runnable whenDone, String message) {

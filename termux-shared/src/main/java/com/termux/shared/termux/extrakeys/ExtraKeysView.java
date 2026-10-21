@@ -2,14 +2,18 @@ package com.termux.shared.termux.extrakeys;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +34,8 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
+import androidx.core.widget.TextViewCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.termux.shared.R;
@@ -181,8 +187,17 @@ public final class ExtraKeysView extends GridLayout {
      * {@link #DEFAULT_BUTTON_ACTIVE_BACKGROUND_COLOR}. */
     protected int mButtonActiveBackgroundColor;
 
+    protected int mBarBackgroundColor = 0xDE0D1117;
+    protected int mKeyNormalBackgroundColor = 0x24FFFFFF;
+    protected int mKeyPressedBackgroundColor = 0x40FFFFFF;
+    protected int mKeyStrokeColor = 0x26FFFFFF;
+    protected int mAccentColor = 0xFF2DD4BF;
+    protected int mAccentBgColor = 0x332DD4BF;
+    protected int mAccentStrokeColor = 0x802DD4BF;
+    protected boolean mIsDarkTheme = true;
+
     /** Defines whether text for the extra keys button should be all capitalized automatically. */
-    protected boolean mButtonTextAllCaps = true;
+    protected boolean mButtonTextAllCaps = false;
 
 
     /**
@@ -380,6 +395,136 @@ public final class ExtraKeysView extends GridLayout {
 
 
 
+    public void setSemanticTheme(int terminalBg, int terminalFg, int accent, boolean isDark) {
+        mIsDarkTheme = isDark;
+        mAccentColor = accent != 0 ? accent : (isDark ? 0xFF2DD4BF : 0xFF0D9488);
+        mButtonTextColor = terminalFg != 0 ? terminalFg : (isDark ? 0xFFF3F4F6 : 0xFF111827);
+        mButtonActiveTextColor = mAccentColor;
+
+        if (isDark) {
+            mBarBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.08f);
+            mBarBackgroundColor = ColorUtils.setAlphaComponent(mBarBackgroundColor, 0xEE);
+
+            mKeyNormalBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.12f);
+            mKeyPressedBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.22f);
+            mKeyStrokeColor = 0x26FFFFFF;
+            mAccentBgColor = ColorUtils.setAlphaComponent(mAccentColor, 0x2E);
+            mAccentStrokeColor = ColorUtils.setAlphaComponent(mAccentColor, 0x66);
+        } else {
+            mBarBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.08f);
+            mBarBackgroundColor = ColorUtils.setAlphaComponent(mBarBackgroundColor, 0xEE);
+
+            mKeyNormalBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.06f);
+            mKeyPressedBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.15f);
+            mKeyStrokeColor = 0x1F000000;
+            mAccentBgColor = ColorUtils.setAlphaComponent(mAccentColor, 0x22);
+            mAccentStrokeColor = ColorUtils.setAlphaComponent(mAccentColor, 0x55);
+        }
+
+        mButtonBackgroundColor = mKeyNormalBackgroundColor;
+        mButtonActiveBackgroundColor = mKeyPressedBackgroundColor;
+        setBackgroundColor(mBarBackgroundColor);
+    }
+
+    public Drawable createKeyDrawable(int bgColor, int strokeColor) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setShape(GradientDrawable.RECTANGLE);
+        gd.setCornerRadius(10 * getResources().getDisplayMetrics().density);
+        gd.setColor(bgColor);
+        if (strokeColor != 0) {
+            int strokeWidth = Math.max(1, (int)(0.5f * getResources().getDisplayMetrics().density + 0.5f));
+            gd.setStroke(strokeWidth, strokeColor);
+        }
+        return gd;
+    }
+
+    public String formatKeyDisplay(ExtraKeyButton buttonInfo) {
+        if (buttonInfo == null) return "";
+        String display = buttonInfo.getDisplay();
+        String key = buttonInfo.getKey();
+        if (display == null) display = key != null ? key : "";
+
+        if ("ESC".equalsIgnoreCase(display) || "ESC".equalsIgnoreCase(key)) return "Esc";
+        if ("CTRL".equalsIgnoreCase(display) || "CTRL".equalsIgnoreCase(key)) return "Ctrl";
+        if ("ALT".equalsIgnoreCase(display) || "ALT".equalsIgnoreCase(key)) return "Alt";
+        if ("TAB".equalsIgnoreCase(display) || "TAB".equalsIgnoreCase(key)) return "⇥";
+        if ("HOME".equalsIgnoreCase(display) || "HOME".equalsIgnoreCase(key)) return "Home";
+        if ("END".equalsIgnoreCase(display) || "END".equalsIgnoreCase(key)) return "End";
+        if ("UP".equalsIgnoreCase(display) || "UP".equalsIgnoreCase(key)) return "↑";
+        if ("LEFT".equalsIgnoreCase(display) || "LEFT".equalsIgnoreCase(key)) return "←";
+        if ("DOWN".equalsIgnoreCase(display) || "DOWN".equalsIgnoreCase(key)) return "↓";
+        if ("RIGHT".equalsIgnoreCase(display) || "RIGHT".equalsIgnoreCase(key)) return "→";
+        if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(display)) return "Dán ảnh";
+        if ("RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(display)) return "Ảnh mới";
+        if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(display)) return "Lệnh";
+        if ("THEME".equalsIgnoreCase(key) || "GIAO DIỆN".equalsIgnoreCase(display)) return "Giao diện";
+
+        if (display.length() <= 1) return display;
+
+        if (display.equals(display.toUpperCase(Locale.ROOT)) && display.matches("^[A-Z0-9_]+$")) {
+            return display.substring(0, 1).toUpperCase(Locale.ROOT) + display.substring(1).toLowerCase(Locale.ROOT);
+        }
+        return display;
+    }
+
+    public boolean isSpecialActionButton(String key, String display) {
+        return "CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(key) || "Dán ảnh".equals(display) ||
+               "RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(key) || "Ảnh mới".equals(display) ||
+               "PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(key) || "Lệnh".equals(display);
+    }
+
+    public void applyButtonDefaultState(MaterialButton button, ExtraKeyButton buttonInfo) {
+        if (button == null) return;
+        String key = buttonInfo != null ? buttonInfo.getKey() : null;
+        if (isSpecialButton(buttonInfo)) {
+            SpecialButtonState state = mSpecialButtons.get(SpecialButton.valueOf(key));
+            boolean active = state != null && state.isActive;
+            if (active) {
+                button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
+                button.setTextColor(mAccentColor);
+            } else {
+                button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
+                button.setTextColor(mButtonTextColor);
+            }
+        } else if (isSpecialActionButton(key, buttonInfo != null ? buttonInfo.getDisplay() : null)) {
+            button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
+            button.setTextColor(mAccentColor);
+        } else {
+            button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
+            button.setTextColor(mButtonTextColor);
+        }
+    }
+
+    public void updateSpecialButtonAppearance(MaterialButton button, boolean active) {
+        if (button == null) return;
+        if (active) {
+            button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
+            button.setTextColor(mAccentColor);
+        } else {
+            button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
+            button.setTextColor(mButtonTextColor);
+        }
+    }
+
+    public void resetExtraKeysState() {
+        stopScheduledExecutors();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            if (child instanceof MaterialButton) {
+                child.animate().cancel();
+                child.setScaleX(1.0f);
+                child.setScaleY(1.0f);
+                Object tag = child.getTag();
+                if (tag instanceof ExtraKeyButton) {
+                    applyButtonDefaultState((MaterialButton) child, (ExtraKeyButton) tag);
+                }
+            }
+        }
+    }
+
     /**
      * Reload this instance of {@link ExtraKeysView} with the info passed in {@code extraKeysInfo}.
      *
@@ -402,11 +547,15 @@ public final class ExtraKeysView extends GridLayout {
         setRowCount(buttons.length);
         setColumnCount(maximumLength(buttons));
 
+        float density = getContext().getResources().getDisplayMetrics().density;
+        int minHeightPx = (int)(44 * density + 0.5f);
+        int marginPx = Math.max(1, (int)(2 * density + 0.5f));
+
         for (int row = 0; row < buttons.length; row++) {
             for (int col = 0; col < buttons[row].length; col++) {
                 final ExtraKeyButton buttonInfo = buttons[row][col];
 
-                MaterialButton button;
+                final MaterialButton button;
                 if (isSpecialButton(buttonInfo)) {
                     button = createSpecialButton(buttonInfo.getKey(), true);
                     if (button == null) return;
@@ -414,13 +563,20 @@ public final class ExtraKeysView extends GridLayout {
                     button = new MaterialButton(getContext(), null, android.R.attr.buttonBarButtonStyle);
                 }
 
-                button.setText(buttonInfo.getDisplay());
-                button.setTextColor(mButtonTextColor);
-                button.setAllCaps(mButtonTextAllCaps);
+                button.setTag(buttonInfo);
+                String label = formatKeyDisplay(buttonInfo);
+                button.setText(label);
+                button.setAllCaps(false);
+                button.setLetterSpacing(0f);
+                button.setMaxLines(1);
+                button.setSingleLine(true);
+                button.setEllipsize(null);
                 button.setPadding(0, 0, 0, 0);
-                int minHeightPx = (int)(44 * getContext().getResources().getDisplayMetrics().density + 0.5f);
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(button, 10, 14, 1, TypedValue.COMPLEX_UNIT_SP);
                 button.setMinHeight(minHeightPx);
                 button.setMinimumHeight(minHeightPx);
+
+                applyButtonDefaultState(button, buttonInfo);
 
                 button.setOnClickListener(view -> {
                     performExtraKeyButtonHapticFeedback(view, buttonInfo, button);
@@ -430,37 +586,38 @@ public final class ExtraKeysView extends GridLayout {
                 button.setOnTouchListener((view, event) -> {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            view.setBackgroundColor(mButtonActiveBackgroundColor);
-                            // Start long press scheduled executors which will be stopped in next MotionEvent
+                            view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                            button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                             startScheduledExecutors(view, buttonInfo, button);
                             return true;
 
                         case MotionEvent.ACTION_MOVE:
                             if (buttonInfo.getPopup() != null) {
-                                // Show popup on swipe up
                                 if (mPopupWindow == null && event.getY() < 0) {
                                     stopScheduledExecutors();
-                                    view.setBackgroundColor(mButtonBackgroundColor);
+                                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                    applyButtonDefaultState(button, buttonInfo);
                                     showPopup(view, buttonInfo.getPopup());
                                 }
                                 if (mPopupWindow != null && event.getY() > 0) {
-                                    view.setBackgroundColor(mButtonActiveBackgroundColor);
+                                    view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                                    button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                                     dismissPopup();
                                 }
                             }
                             return true;
 
                         case MotionEvent.ACTION_CANCEL:
-                            view.setBackgroundColor(mButtonBackgroundColor);
+                            view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
                             return true;
 
                         case MotionEvent.ACTION_UP:
-                            view.setBackgroundColor(mButtonBackgroundColor);
+                            view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                            applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
-                            // If ACTION_UP up was not from a repetitive key or was with a key with a popup button
                             if (mLongPressCount == 0 || mPopupWindow != null) {
-                                // Trigger popup button click if swipe up complete
                                 if (mPopupWindow != null) {
                                     dismissPopup();
                                     if (buttonInfo.getPopup() != null) {
@@ -484,7 +641,7 @@ public final class ExtraKeysView extends GridLayout {
                 } else {
                     param.height = 0;
                 }
-                param.setMargins(0, 0, 0, 0);
+                param.setMargins(marginPx, marginPx, marginPx, marginPx);
                 param.columnSpec = GridLayout.spec(col, GridLayout.FILL, 1.f);
                 param.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1.f);
                 button.setLayoutParams(param);
@@ -621,10 +778,13 @@ public final class ExtraKeysView extends GridLayout {
             if (button == null) return;
         } else {
             button = new MaterialButton(getContext(), null, android.R.attr.buttonBarButtonStyle);
-            button.setTextColor(mButtonTextColor);
         }
-        button.setText(extraButton.getDisplay());
-        button.setAllCaps(mButtonTextAllCaps);
+        button.setText(formatKeyDisplay(extraButton));
+        button.setAllCaps(false);
+        button.setLetterSpacing(0f);
+        button.setMaxLines(1);
+        button.setSingleLine(true);
+        button.setEllipsize(null);
         button.setPadding(0, 0, 0, 0);
         button.setMinHeight(0);
         button.setMinWidth(0);
@@ -632,7 +792,8 @@ public final class ExtraKeysView extends GridLayout {
         button.setMinimumHeight(0);
         button.setWidth(width);
         button.setHeight(height);
-        button.setBackgroundColor(mButtonActiveBackgroundColor);
+        button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
+        button.setTextColor(mButtonTextColor);
         mPopupWindow = new PopupWindow(this);
         mPopupWindow.setWidth(LayoutParams.WRAP_CONTENT);
         mPopupWindow.setHeight(LayoutParams.WRAP_CONTENT);

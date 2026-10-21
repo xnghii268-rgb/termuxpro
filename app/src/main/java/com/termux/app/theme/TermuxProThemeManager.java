@@ -137,6 +137,8 @@ public class TermuxProThemeManager {
 
             // Update window and activity background
             int bgColor = android.graphics.Color.parseColor(theme.background);
+            int fgColor = android.graphics.Color.parseColor(theme.foreground);
+            int cursorColor = android.graphics.Color.parseColor(theme.cursor);
             Window window = activity.getWindow();
             if (window != null && window.getDecorView() != null) {
                 window.getDecorView().setBackgroundColor(bgColor);
@@ -146,11 +148,35 @@ public class TermuxProThemeManager {
                 activity.getTerminalView().invalidate();
             }
 
+            if (activity.getExtraKeysView() != null) {
+                activity.getExtraKeysView().setSemanticTheme(bgColor, fgColor, cursorColor, theme.isDark);
+                if (activity.getTermuxTerminalExtraKeys() != null) {
+                    activity.getExtraKeysView().reload(activity.getTermuxTerminalExtraKeys().getExtraKeysInfo(),
+                        activity.getTerminalToolbarDefaultHeight());
+                }
+            }
+
             setCurrentThemeId(activity, theme.id);
             return true;
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error applying theme " + themeId + ": " + e.getMessage());
             return false;
+        }
+    }
+
+    public static void updateExtraKeysTheme(TermuxActivity activity, com.termux.shared.termux.extrakeys.ExtraKeysView extraKeysView) {
+        if (activity == null || extraKeysView == null) return;
+        init(activity);
+        String currentId = getCurrentThemeId(activity);
+        ThemeItem theme = sThemes.get(currentId);
+        if (theme == null) theme = sThemes.get(DEFAULT_THEME_ID);
+        if (theme != null) {
+            try {
+                int bgColor = android.graphics.Color.parseColor(theme.background);
+                int fgColor = android.graphics.Color.parseColor(theme.foreground);
+                int cursorColor = android.graphics.Color.parseColor(theme.cursor);
+                extraKeysView.setSemanticTheme(bgColor, fgColor, cursorColor, theme.isDark);
+            } catch (Exception ignored) {}
         }
     }
 

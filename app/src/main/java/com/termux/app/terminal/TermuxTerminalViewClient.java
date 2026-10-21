@@ -355,6 +355,12 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
         return false;
     }
 
+    @Override
+    public boolean onImageCommit(android.net.Uri uri, android.content.ClipDescription description) {
+        if (uri == null || mActivity == null) return false;
+        return com.termux.app.image.TermuxProImageHelper.handleCommittedImageUri(mActivity, uri);
+    }
+
 
 
     @Override

@@ -142,6 +142,12 @@ jobs:
           chmod 755 etc/motd.sh bin/tp || true
           ln -sf tp bin/menu
 
+          # Patch bin/login to preserve libtermuxpro-path.so in LD_PRELOAD
+          if [ -f "bin/login" ]; then
+            sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
+            sed -i 's|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"|export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"|g' bin/login
+          fi
+
           # Add Phase 8 shell helpers: clipimg and lastshot
           printf '%s\n' \
           '#!/data/data/com.termuxpro.app/files/usr/bin/bash' \

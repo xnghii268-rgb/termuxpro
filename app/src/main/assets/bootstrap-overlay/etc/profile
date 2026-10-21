@@ -1,0 +1,31 @@
+# System-wide profile for login shells in Termux Pro.
+# Configured for prefix: /data/data/com.termuxpro.app/files/usr
+
+export PREFIX="/data/data/com.termuxpro.app/files/usr"
+export HOME="/data/data/com.termuxpro.app/files/home"
+export PATH="/data/data/com.termuxpro.app/files/usr/bin"
+export LD_LIBRARY_PATH="/data/data/com.termuxpro.app/files/usr/lib"
+export TMPDIR="/data/data/com.termuxpro.app/files/usr/tmp"
+export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"
+export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"
+export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"
+export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"
+export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"
+export SSL_CERT_FILE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"
+export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"
+export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"
+export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"
+
+if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then
+    export LD_PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"
+fi
+
+# Source bash.bashrc for bash login shells
+if [ -n "$BASH_VERSION" ] && [ -f "/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc" ]; then
+    . "/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc"
+fi
+
+# Run dynamic Termux Pro MOTD banner
+if [ -f "/data/data/com.termuxpro.app/files/usr/etc/motd.sh" ]; then
+    bash "/data/data/com.termuxpro.app/files/usr/etc/motd.sh"
+fi

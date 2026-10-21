@@ -31,7 +31,12 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.content.res.Configuration;
+import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import java.util.List;
 
@@ -264,6 +269,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         setTopSessionChipsBar();
 
+        setupWindowInsetsAndFloatingNav();
+
+        TermuxInstaller.setupDefaultShellConfigFiles(this);
+
         registerForContextMenu(mTerminalView);
 
         FileReceiverActivity.updateFileReceiverActivityComponentsState(this);
@@ -328,11 +337,30 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (mTermuxTerminalViewClient != null)
             mTermuxTerminalViewClient.onResume();
 
+        if (mExtraKeysView != null) {
+            mExtraKeysView.resetExtraKeysState();
+        }
+        checkHardwareKeyboardAndSelection();
+
         // Check if a crash happened on last run of the app or if a plugin crashed and show a
         // notification with the crash details if it did
         TermuxCrashUtils.notifyAppCrashFromCrashLogFile(this, LOG_TAG);
 
         mIsOnResumeAfterOnCreate = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mExtraKeysView != null) {
+            mExtraKeysView.resetExtraKeysState();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        checkHardwareKeyboardAndSelection();
     }
 
     @Override
@@ -667,12 +695,113 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
     }
 
-    public void onKeyboardVisibilityChanged(boolean isVisible) {
+    private boolean mIsKeyboardOpen = false;
+    private int mMeasuredFloatingNavHeight = 0;
+
+    private void setupWindowInsetsAndFloatingNav() {
+        if (mTermuxActivityRootView == null) return;
+
+        ViewCompat.setOnApplyWindowInsetsListener(mTermuxActivityRootView, (v, insets) -> {
+            boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+            int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+            int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            handleKeyboardVisibilityChanged(imeVisible, imeHeight, navBarHeight);
+            return insets;
+        });
+
+        ViewCompat.setWindowInsetsAnimationCallback(mTermuxActivityRootView,
+            new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+                @NonNull
+                @Override
+                public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                    boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+                    int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+                    int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+                    handleKeyboardVisibilityChanged(imeVisible, imeHeight, navBarHeight);
+                    return insets;
+                }
+            });
+    }
+
+    public void handleKeyboardVisibilityChanged(boolean isVisible, int imeHeight, int navBarHeight) {
+        if (mFloatingBottomNavBar == null) return;
+
+        boolean shouldHide = isVisible;
+
+        // Also hide if hardware keyboard is attached and terminal has focus
+        Configuration config = getResources().getConfiguration();
+        if (config != null && config.keyboard != Configuration.KEYBOARD_NOKEYS && mTerminalView != null && mTerminalView.hasFocus()) {
+            shouldHide = true;
+        }
+
+        // Also hide if text selection mode is active
+        if (mTerminalView != null && mTerminalView.isTextSelecting()) {
+            shouldHide = true;
+        }
+
+        if (mIsKeyboardOpen == shouldHide && mFloatingBottomNavBar.getVisibility() == (shouldHide ? View.GONE : View.VISIBLE)) {
+            return;
+        }
+
+        mIsKeyboardOpen = shouldHide;
+
         runOnUiThread(() -> {
-            if (mFloatingBottomNavBar != null) {
-                mFloatingBottomNavBar.setVisibility(isVisible ? View.GONE : View.VISIBLE);
+            float density = getResources().getDisplayMetrics().density;
+            if (mMeasuredFloatingNavHeight <= 0) {
+                mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
+                    mFloatingBottomNavBar.getHeight() : (int)(52 * density + 0.5f);
+            }
+            int navMarginBottom = (int)(12 * density + 0.5f);
+
+            if (mIsKeyboardOpen) {
+                // Animate bottom nav out smoothly (200ms)
+                mFloatingBottomNavBar.animate()
+                    .translationY(mMeasuredFloatingNavHeight + navMarginBottom + 20)
+                    .alpha(0f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        mFloatingBottomNavBar.setVisibility(View.GONE);
+                        mFloatingBottomNavBar.setEnabled(false);
+                    })
+                    .start();
+
+                // Remove bottom padding from terminal so terminal is flush above extra keys
+                if (mTerminalView != null) {
+                    mTerminalView.setPadding(0, 0, 0, 0);
+                    mTerminalView.updateSize();
+                    if (mTerminalView.mEmulator != null) {
+                        mTerminalView.setTopRow(0, false);
+                    }
+                }
+            } else {
+                // Animate bottom nav in
+                mFloatingBottomNavBar.setVisibility(View.VISIBLE);
+                mFloatingBottomNavBar.setEnabled(true);
+                mFloatingBottomNavBar.animate()
+                    .translationY(0)
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start();
+
+                // Set terminal bottom padding = measured nav height + margin + safe-area insets
+                if (mTerminalView != null) {
+                    int totalBottomPadding = mMeasuredFloatingNavHeight + navMarginBottom;
+                    mTerminalView.setPadding(0, 0, 0, totalBottomPadding);
+                    mTerminalView.updateSize();
+                    if (mTerminalView.mEmulator != null) {
+                        mTerminalView.setTopRow(0, false);
+                    }
+                }
             }
         });
+    }
+
+    public void onKeyboardVisibilityChanged(boolean isVisible) {
+        handleKeyboardVisibilityChanged(isVisible, 0, 0);
+    }
+
+    public void checkHardwareKeyboardAndSelection() {
+        handleKeyboardVisibilityChanged(mIsKeyboardOpen, 0, 0);
     }
 
     private void setTopSessionChipsBar() {
