@@ -247,7 +247,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         mTermuxActivityRootView = findViewById(R.id.activity_termux_root_view);
         mTermuxActivityRootView.setActivity(this);
         mTermuxActivityBottomSpaceView = findViewById(R.id.activity_termux_bottom_space_view);
-        mTermuxActivityRootView.setOnApplyWindowInsetsListener(new TermuxActivityRootView.WindowInsetsListener());
 
         View content = findViewById(android.R.id.content);
         content.setOnApplyWindowInsetsListener((v, insets) -> {
@@ -724,12 +723,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                         mMeasuredFloatingNavHeight = mFloatingBottomNavBar.getHeight() > 0 ?
                             mFloatingBottomNavBar.getHeight() : (int)(52 * density + 0.5f);
                     }
-                    targetPadding = mMeasuredFloatingNavHeight + navMarginBottom + mSystemNavBottomInset;
+                    targetPadding = mMeasuredFloatingNavHeight + navMarginBottom;
                 }
                 if (mTerminalView.getPaddingBottom() != targetPadding) {
                     mTerminalView.setPadding(0, 0, 0, targetPadding);
-                    mTerminalView.updateSize();
                 }
+                mTerminalView.updateSize();
             }
         }
     };
@@ -751,11 +750,30 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 }
             }
 
-            boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-            int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+            int imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            int sideLeft = insets.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.navigationBars()).left;
+            int sideRight = insets.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.navigationBars()).right;
             mSystemNavBottomInset = navBarHeight;
-            handleKeyboardVisibilityChanged(imeVisible, imeHeight, navBarHeight);
+
+            boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime()) || imeBottom > 0;
+            int targetBottomPadding = imeVisible ? Math.max(imeBottom, navBarHeight) : navBarHeight;
+
+            boolean paddingChanged = false;
+            if (mTermuxActivityRootView.getPaddingBottom() != targetBottomPadding
+                || mTermuxActivityRootView.getPaddingLeft() != sideLeft
+                || mTermuxActivityRootView.getPaddingRight() != sideRight) {
+                mTermuxActivityRootView.setPadding(sideLeft, 0, sideRight, targetBottomPadding);
+                paddingChanged = true;
+            }
+
+            handleKeyboardVisibilityChanged(imeVisible, imeBottom, navBarHeight);
+
+            if (paddingChanged) {
+                mImeResizeHandler.removeCallbacks(mDebouncedImeResizeRunnable);
+                mImeResizeHandler.postDelayed(mDebouncedImeResizeRunnable, 50);
+            }
+
             return insets;
         });
 
@@ -764,8 +782,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 @NonNull
                 @Override
                 public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
-                    // Translation-only tracking during animation; do NOT recompute terminal size per frame!
-                    boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+                    boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime()) || insets.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
                     if (mFloatingBottomNavBar != null) {
                         float density = getResources().getDisplayMetrics().density;
                         if (mMeasuredFloatingNavHeight <= 0) {
@@ -823,16 +840,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             int navMarginBottom = (int)(12 * density + 0.5f);
 
             if (mIsKeyboardOpen) {
-                // Animate bottom nav out smoothly (200ms)
-                mFloatingBottomNavBar.animate()
-                    .translationY(mMeasuredFloatingNavHeight + navMarginBottom + 20)
-                    .alpha(0f)
-                    .setDuration(200)
-                    .withEndAction(() -> {
-                        mFloatingBottomNavBar.setVisibility(View.GONE);
-                        mFloatingBottomNavBar.setEnabled(false);
-                    })
-                    .start();
+                // When keyboard is open, immediately hide the floating bottom nav bar
+                // so it cannot obscure the terminal or extra keys
+                mFloatingBottomNavBar.setVisibility(View.GONE);
+                mFloatingBottomNavBar.setEnabled(false);
+                mFloatingBottomNavBar.setAlpha(0f);
             } else {
                 // Animate bottom nav in
                 mFloatingBottomNavBar.setVisibility(View.VISIBLE);
