@@ -17,6 +17,7 @@ import android.os.Looper;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -743,9 +745,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             -1,
             which -> {
                 if (which == 0) {
-                    com.termux.app.image.TermuxProImageHelper.handleLatestImageAction(TermuxActivity.this);
+                    com.termux.app.image.TermuxProImageHelper.fetchLatestImage(TermuxActivity.this);
                 } else if (which == 1) {
-                    com.termux.app.image.TermuxProImageHelper.handleClipImageAction(TermuxActivity.this);
+                    com.termux.app.image.TermuxProImageHelper.pasteImageFromClipboard(TermuxActivity.this);
                 } else if (which == 2) {
                     com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
                 }
