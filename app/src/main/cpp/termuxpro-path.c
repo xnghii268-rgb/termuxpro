@@ -511,3 +511,25 @@ char *realpath(const char *path, char *resolved_path) {
     return real_realpath ? real_realpath(rewrite_path(path, buf, sizeof(buf)), resolved_path) : NULL;
 }
 
+int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags) {
+    static int (*real_utimensat)(int, const char *, const struct timespec[2], int) = NULL;
+    if (!real_utimensat) real_utimensat = dlsym(RTLD_NEXT, "utimensat");
+    char buf[PATH_MAX];
+    return real_utimensat ? real_utimensat(dirfd, rewrite_path(pathname, buf, sizeof(buf)), times, flags) : -1;
+}
+
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz) {
+    static ssize_t (*real_readlink)(const char *, char *, size_t) = NULL;
+    if (!real_readlink) real_readlink = dlsym(RTLD_NEXT, "readlink");
+    char pbuf[PATH_MAX];
+    return real_readlink ? real_readlink(rewrite_path(pathname, pbuf, sizeof(pbuf)), buf, bufsiz) : -1;
+}
+
+ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
+    static ssize_t (*real_readlinkat)(int, const char *, char *, size_t) = NULL;
+    if (!real_readlinkat) real_readlinkat = dlsym(RTLD_NEXT, "readlinkat");
+    char pbuf[PATH_MAX];
+    return real_readlinkat ? real_readlinkat(dirfd, rewrite_path(pathname, pbuf, sizeof(pbuf)), buf, bufsiz) : -1;
+}
+
+

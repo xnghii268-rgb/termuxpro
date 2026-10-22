@@ -211,8 +211,8 @@ jobs:
           'fi' > bin/lastshot
           chmod 755 bin/lastshot
 
-          # Create v8, v7, v6, v5, v4, v3 and v2 markers inside bootstrap
-          touch .termuxpro-v8 .termuxpro-v7 .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
+          # Create v10, v9, v8, v7, v6, v5, v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v10 .termuxpro-v9 .termuxpro-v8 .termuxpro-v7 .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
           echo "GATE 2: Auditing bootstrap contents for binary safety and path correctness..."
           python3 -c "

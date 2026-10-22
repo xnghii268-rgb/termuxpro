@@ -379,8 +379,8 @@ final class TermuxInstaller {
                 File apkPathLib = new File(nativeLibDir, "libtermuxpro-path.so");
                 File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
                 File destPathLib = new File(prefixLib, "libtermuxpro-path.so");
-                File v8Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v8");
-                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v8Marker.exists())) {
+                File v10Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v10");
+                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v10Marker.exists())) {
                     if (!prefixLib.exists()) prefixLib.mkdirs();
                     try (java.io.InputStream in = new java.io.FileInputStream(apkPathLib);
                          FileOutputStream out = new FileOutputStream(destPathLib)) {
@@ -633,6 +633,7 @@ final class TermuxInstaller {
             patchDpkgMaintainerScripts(context);
 
             try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v10").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v9").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v8").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
