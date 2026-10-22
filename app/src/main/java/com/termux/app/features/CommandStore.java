@@ -419,4 +419,3 @@ public class CommandStore {
         return str == null || str.length() == 0;
     }
 }
-}
