@@ -593,7 +593,47 @@ final class TermuxInstaller {
                 Logger.logError(LOG_TAG, "Error ensuring etc/bash.bashrc: " + e.getMessage());
             }
 
+            // Ensure $PREFIX/etc/apt/apt.conf is properly configured without problematic --instdir
             try {
+                File aptConfDir = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/apt");
+                if (!aptConfDir.exists()) aptConfDir.mkdirs();
+                File aptConfFile = new File(aptConfDir, "apt.conf");
+                String aptConfContent = "Dir \"/data/data/com.termuxpro.app/files/usr\";\n" +
+                    "Dir::State \"var/lib/apt\";\n" +
+                    "Dir::State::status \"/data/data/com.termuxpro.app/files/usr/var/lib/dpkg/status\";\n" +
+                    "Dir::Cache \"/data/data/com.termuxpro.app/cache/apt\";\n" +
+                    "Dir::Cache::archives \"archives/\";\n" +
+                    "Dir::Etc \"etc/apt\";\n" +
+                    "Dir::Etc::parts \"apt.conf.d\";\n" +
+                    "Dir::Etc::sourcelist \"sources.list\";\n" +
+                    "Dir::Etc::sourceparts \"sources.list.d\";\n" +
+                    "Dir::Bin::methods \"/data/data/com.termuxpro.app/files/usr/lib/apt/methods\";\n" +
+                    "Dir::Bin::dpkg \"/data/data/com.termuxpro.app/files/usr/bin/dpkg\";\n" +
+                    "Dir::Log \"var/log/apt\";\n" +
+                    "DPkg::Path \"/data/data/com.termuxpro.app/files/usr/bin\";\n" +
+                    "DPkg::Options {\n" +
+                    "   \"--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg\";\n" +
+                    "};\n";
+                java.nio.file.Files.write(aptConfFile.toPath(), aptConfContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                aptConfFile.setReadable(true, false);
+
+                // Add apt.conf.d hook to automatically rewrite maintainer scripts after deb unpack
+                File aptConfPartsDir = new File(aptConfDir, "apt.conf.d");
+                if (!aptConfPartsDir.exists()) aptConfPartsDir.mkdirs();
+                File hookFile = new File(aptConfPartsDir, "01termuxpro-shebang-fix");
+                String hookContent = "DPkg::Pre-Install-Pkgs { \"sed -i 's|/data/data/com.termux/|/data/data/com.termuxpro.app/|g; s|/data/user/0/com.termux/|/data/data/com.termuxpro.app/|g' /data/data/com.termuxpro.app/files/usr/var/lib/dpkg/info/* 2>/dev/null || true\"; };\n" +
+                    "DPkg::Post-Invoke { \"sed -i 's|/data/data/com.termux/|/data/data/com.termuxpro.app/|g; s|/data/user/0/com.termux/|/data/data/com.termuxpro.app/|g' /data/data/com.termuxpro.app/files/usr/var/lib/dpkg/info/* 2>/dev/null || true\"; };\n";
+                java.nio.file.Files.write(hookFile.toPath(), hookContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                hookFile.setReadable(true, false);
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error ensuring apt.conf: " + e.getMessage());
+            }
+
+            // Auto-patch any dpkg maintainer scripts that may contain legacy package prefix
+            patchDpkgMaintainerScripts(context);
+
+            try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v9").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v8").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
@@ -602,6 +642,52 @@ final class TermuxInstaller {
             } catch (Exception ignored) {}
         } catch (Exception e) {
             Logger.logError(LOG_TAG, "Error setting up default shell config files: " + e.getMessage());
+        }
+    }
+
+    public static void patchDpkgMaintainerScripts(Context context) {
+        try {
+            File dpkgInfoDir = new File(TermuxConstants.TERMUX_PREFIX_DIR, "var/lib/dpkg/info");
+            if (dpkgInfoDir.exists() && dpkgInfoDir.isDirectory()) {
+                File[] files = dpkgInfoDir.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        if (!f.isFile()) continue;
+                        String name = f.getName();
+                        if (name.endsWith(".postinst") || name.endsWith(".preinst") ||
+                            name.endsWith(".prerm") || name.endsWith(".postrm") ||
+                            name.endsWith(".config")) {
+                            try {
+                                byte[] bytes = java.nio.file.Files.readAllBytes(f.toPath());
+                                String content = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                                boolean changed = false;
+                                if (content.contains("com.termuxpro.apppro.app")) {
+                                    content = content.replace("com.termuxpro.apppro.app", "com.termuxpro.app");
+                                    changed = true;
+                                }
+                                if (content.contains("/data/data/com.termux/")) {
+                                    content = content.replace("/data/data/com.termux/", "/data/data/com.termuxpro.app/");
+                                    changed = true;
+                                }
+                                if (content.contains("/data/user/0/com.termux/")) {
+                                    content = content.replace("/data/user/0/com.termux/", "/data/data/com.termuxpro.app/");
+                                    changed = true;
+                                }
+                                if (changed) {
+                                    java.nio.file.Files.write(f.toPath(), content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                                    Logger.logInfo(LOG_TAG, "Auto-patched dpkg maintainer script: " + name);
+                                }
+                                f.setReadable(true, false);
+                                f.setExecutable(true, false);
+                            } catch (Exception e) {
+                                Logger.logError(LOG_TAG, "Error patching script " + name + ": " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logger.logError(LOG_TAG, "Error in patchDpkgMaintainerScripts: " + e.getMessage());
         }
     }
 

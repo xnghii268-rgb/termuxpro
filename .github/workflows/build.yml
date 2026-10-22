@@ -154,7 +154,6 @@ jobs:
           'DPkg::Path "/data/data/com.termuxpro.app/files/usr/bin";' \
           'DPkg::Options {' \
           '   "--admindir=/data/data/com.termuxpro.app/files/usr/var/lib/dpkg";' \
-          '   "--instdir=/data/data/com.termuxpro.app/files/usr";' \
           '};' > etc/apt/apt.conf
 
           # Mark packages as installed in dpkg status

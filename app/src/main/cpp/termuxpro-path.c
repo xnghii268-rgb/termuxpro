@@ -321,6 +321,89 @@ int execvp(const char *file, char *const argv[]) {
     return handle_shebang_exec(p, argv, NULL, call_execvp);
 }
 
+int execl(const char *pathname, const char *arg, ...) {
+    if (!arg) {
+        char *const argv[] = { NULL };
+        return execv(pathname, argv);
+    }
+    va_list args;
+    va_start(args, arg);
+    int count = 1;
+    while (va_arg(args, const char *)) count++;
+    va_end(args);
+
+    char **argv = (char **)malloc((count + 1) * sizeof(char *));
+    if (!argv) return -1;
+    argv[0] = (char *)arg;
+    va_start(args, arg);
+    for (int i = 1; i < count; i++) {
+        argv[i] = va_arg(args, char *);
+    }
+    argv[count] = NULL;
+    va_end(args);
+
+    int ret = execv(pathname, argv);
+    free(argv);
+    return ret;
+}
+
+int execlp(const char *file, const char *arg, ...) {
+    if (!arg) {
+        char *const argv[] = { NULL };
+        return execvp(file, argv);
+    }
+    va_list args;
+    va_start(args, arg);
+    int count = 1;
+    while (va_arg(args, const char *)) count++;
+    va_end(args);
+
+    char **argv = (char **)malloc((count + 1) * sizeof(char *));
+    if (!argv) return -1;
+    argv[0] = (char *)arg;
+    va_start(args, arg);
+    for (int i = 1; i < count; i++) {
+        argv[i] = va_arg(args, char *);
+    }
+    argv[count] = NULL;
+    va_end(args);
+
+    int ret = execvp(file, argv);
+    free(argv);
+    return ret;
+}
+
+int execle(const char *pathname, const char *arg, ...) {
+    if (!arg) {
+        va_list args;
+        va_start(args, arg);
+        char *const *envp = va_arg(args, char *const *);
+        va_end(args);
+        char *const argv[] = { NULL };
+        return execve(pathname, argv, (char *const *)envp);
+    }
+    va_list args;
+    va_start(args, arg);
+    int count = 1;
+    while (va_arg(args, const char *)) count++;
+    char *const *envp = va_arg(args, char *const *);
+    va_end(args);
+
+    char **argv = (char **)malloc((count + 1) * sizeof(char *));
+    if (!argv) return -1;
+    argv[0] = (char *)arg;
+    va_start(args, arg);
+    for (int i = 1; i < count; i++) {
+        argv[i] = va_arg(args, char *);
+    }
+    argv[count] = NULL;
+    va_end(args);
+
+    int ret = execve(pathname, argv, (char *const *)envp);
+    free(argv);
+    return ret;
+}
+
 int rename(const char *oldpath, const char *newpath) {
     static int (*real_rename)(const char *, const char *) = NULL;
     if (!real_rename) real_rename = dlsym(RTLD_NEXT, "rename");
