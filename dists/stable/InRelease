@@ -12,17 +12,17 @@ Description: Official APT repository for Termux Pro (com.termuxpro.app)
 Date: Wed, 21 Oct 2026 12:00:00 UTC
 SHA256:
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
- 5ab2c07fa801ec672f279d6c1bdfe3774d88836b06498ff57c542d53c7ed8fd5 29 main/binary-all/Packages.gz
+ 50edfe3f8ab2afeacf2a61ceaa65285033c272f8e59d3a2a273e2e1f1f0062ca 29 main/binary-all/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
- 5ab2c07fa801ec672f279d6c1bdfe3774d88836b06498ff57c542d53c7ed8fd5 29 main/binary-aarch64/Packages.gz
+ 50edfe3f8ab2afeacf2a61ceaa65285033c272f8e59d3a2a273e2e1f1f0062ca 29 main/binary-aarch64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrZdAgSHGFwdEB0ZXJt
-dXhwcm8uYXBwAAoJEHN/SDR5E+C7yhMH/0qvTWRbOvlEpfaLaJJRpG+Gx8m7BgDR
-yz+01iSNrFI4NUVqRdQQrIQuuGXE4WUrgsGe/4+mca1t2op8ab3VkCgYDX+m1bTZ
-yML3+qfIqlVNgX7lTDGnojk2t26BN8A83v+COQenytOeJoK7Lv3FQ0tUy90kgyQ2
-FC7xaDMSDGMGQEKy0exKWN4WIH/PX7cG4tJmLb0HQZa9DKFiaJ24z/7bmliFq4nT
-X5fr+8vtmImwdKMxZQJN38pNA858vmPSyida8io+zCc4b2ITQs7OFxGWH8HeljdR
-uIAhBegbHdfYCxw1jf8e9+C656uUhcCC6tfnrEt/d2ELkeooPmDABxg=
-=gqGr
+iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmrZd1ESHGFwdEB0ZXJt
+dXhwcm8uYXBwAAoJEHN/SDR5E+C75RUH/0tPhDpvofd+I+IXbgjh6fOi+02TQaOs
+P7DAk1seCT4sJwniNVDYkjzaCR5I9mm3j68KNDa6rATRQvySZn+ArPQabRW3hDqh
+LiYo++Bxp/NFbOImN9t7/hImANxTPCn4zSq0JuJa0rpt9nKjtqpJFxZZb/vusWR9
+CKGthsASlLpCUryWjqKnjPMEcA6zletLgtT5+kiRVywspccxbv00IJzfSz9hOUna
+GIQgqkMpD+Y09eEwi8TxpNII7yp4+btm1e2Yo1VjEtR7lt2m8bp+cSG6NApuFDi4
+vk4gv3gTkBsixglpNhEeEJP5BHASI2kaUdc3AoikkfNuHecTOlSyhNw=
+=nWhS
 -----END PGP SIGNATURE-----
