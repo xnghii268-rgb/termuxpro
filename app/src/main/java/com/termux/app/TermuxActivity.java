@@ -660,6 +660,14 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private View mFloatingBottomNavBar;
     private LinearLayout mSessionChipsContainer;
 
+    private void applyTouchFeedback(View view) {
+        if (view == null) return;
+        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+        view.animate().scaleX(0.92f).scaleY(0.92f).setDuration(70).withEndAction(() -> {
+            view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
+        }).start();
+    }
+
     private void setFloatingBottomNavBar() {
         mFloatingBottomNavBar = findViewById(R.id.floating_bottom_nav_bar);
         if (mFloatingBottomNavBar == null) return;
@@ -667,6 +675,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navTerminal = findViewById(R.id.nav_item_terminal);
         if (navTerminal != null) {
             navTerminal.setOnClickListener(v -> {
+                applyTouchFeedback(v);
                 if (mTerminalView != null) {
                     mTerminalView.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -680,6 +689,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navSessions = findViewById(R.id.nav_item_sessions);
         if (navSessions != null) {
             navSessions.setOnClickListener(v -> {
+                applyTouchFeedback(v);
                 if (getDrawer() != null) {
                     if (getDrawer().isDrawerOpen(GravityCompat.START)) {
                         getDrawer().closeDrawer(GravityCompat.START);
@@ -693,6 +703,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navCommand = findViewById(R.id.nav_item_command);
         if (navCommand != null) {
             navCommand.setOnClickListener(v -> {
+                applyTouchFeedback(v);
                 com.termux.app.features.TermuxProPaletteManager.showCommandPalette(TermuxActivity.this);
             });
         }
@@ -700,10 +711,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navImage = findViewById(R.id.nav_item_image);
         if (navImage != null) {
             navImage.setOnClickListener(v -> {
-                com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
+                applyTouchFeedback(v);
+                showImageActionSheet();
             });
             navImage.setOnLongClickListener(v -> {
-                com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
+                applyTouchFeedback(v);
+                showImageActionSheet();
                 return true;
             });
         }
@@ -711,9 +724,33 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         View navSettings = findViewById(R.id.nav_item_settings);
         if (navSettings != null) {
             navSettings.setOnClickListener(v -> {
+                applyTouchFeedback(v);
                 ActivityUtils.startActivity(this, new Intent(this, SettingsActivity.class));
             });
         }
+    }
+
+    private void showImageActionSheet() {
+        List<String> options = java.util.Arrays.asList(
+            "Ảnh chụp màn hình mới nhất (lastshot)",
+            "Dán ảnh từ bộ nhớ tạm (clipimg)",
+            "Chọn ảnh từ thư viện thiết bị..."
+        );
+        com.termux.app.ui.GlassSheet.showListSheet(
+            this,
+            "Thao tác xử lý ảnh",
+            options,
+            -1,
+            which -> {
+                if (which == 0) {
+                    com.termux.app.image.TermuxProImageHelper.handleLatestImageAction(TermuxActivity.this);
+                } else if (which == 1) {
+                    com.termux.app.image.TermuxProImageHelper.handleClipImageAction(TermuxActivity.this);
+                } else if (which == 2) {
+                    com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(TermuxActivity.this);
+                }
+            }
+        );
     }
 
     private boolean mIsKeyboardOpen = false;
@@ -897,11 +934,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
             TerminalSession currentSession = getCurrentSession();
             float density = getResources().getDisplayMetrics().density;
-            int paddingHoriz = (int) (10 * density + 0.5f);
+            int paddingHoriz = (int) (12 * density + 0.5f);
             int paddingVert = (int) (4 * density + 0.5f);
-            int marginEnd = (int) (6 * density + 0.5f);
+            int marginEnd = (int) (8 * density + 0.5f);
 
             for (int i = 0; i < sessions.size(); i++) {
+                final int sessionIndex = i;
                 TermuxSession termuxSession = sessions.get(i);
                 TerminalSession session = termuxSession.getTerminalSession();
                 boolean isSelected = session == currentSession;
@@ -914,39 +952,104 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    (int) (28 * density + 0.5f)
+                    (int) (32 * density + 0.5f)
                 );
                 params.setMargins(0, 0, marginEnd, 0);
                 chip.setLayoutParams(params);
 
+                // Status Indicator Dot
                 View dot = new View(TermuxActivity.this);
-                int dotSize = (int) (8 * density + 0.5f);
+                int dotSize = (int) (7 * density + 0.5f);
                 LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dotSize, dotSize);
                 dotParams.setMargins(0, 0, (int) (6 * density + 0.5f), 0);
                 dot.setLayoutParams(dotParams);
                 GradientDrawable dotDrawable = new GradientDrawable();
                 dotDrawable.setShape(GradientDrawable.OVAL);
-                dotDrawable.setColor(TermuxSessionsListViewController.TAG_COLORS[i % TermuxSessionsListViewController.TAG_COLORS.length]);
+                boolean isRunning = session.isRunning();
+                int tagColor = isRunning ?
+                    TermuxSessionsListViewController.TAG_COLORS[i % TermuxSessionsListViewController.TAG_COLORS.length] :
+                    Color.parseColor("#EF4444");
+                dotDrawable.setColor(tagColor);
                 dot.setBackground(dotDrawable);
                 chip.addView(dot);
 
+                // Title label
                 TextView label = new TextView(TermuxActivity.this);
-                String title = session.getTitle();
+                String title = session.mSessionName;
+                if (TextUtils.isEmpty(title)) {
+                    title = session.getTitle();
+                }
                 if (TextUtils.isEmpty(title)) {
                     title = "Phiên " + (i + 1);
                 }
                 label.setText(title);
-                label.setTextSize(11);
-                label.setTextColor(isSelected ? Color.parseColor("#FF3C70") : Color.parseColor("#E5E7EB"));
+                label.setTextSize(11.5f);
+                label.setTextColor(isSelected ? Color.WHITE : Color.parseColor("#94A3B8"));
                 if (isSelected) label.setTypeface(null, android.graphics.Typeface.BOLD);
                 chip.addView(label);
 
+                // Quick close button on active session when multiple sessions exist
+                if (isSelected && sessions.size() > 1) {
+                    ImageView closeBtn = new ImageView(TermuxActivity.this);
+                    closeBtn.setImageResource(R.drawable.ic_close);
+                    closeBtn.setColorFilter(Color.parseColor("#D1D5DB"));
+                    int closeSize = (int) (16 * density + 0.5f);
+                    LinearLayout.LayoutParams closeParams = new LinearLayout.LayoutParams(closeSize, closeSize);
+                    closeParams.setMargins((int) (6 * density + 0.5f), 0, 0, 0);
+                    closeBtn.setLayoutParams(closeParams);
+                    closeBtn.setPadding((int) (2 * density), (int) (2 * density), (int) (2 * density), (int) (2 * density));
+                    closeBtn.setBackground(null);
+
+                    final TerminalSession targetSession = session;
+                    closeBtn.setOnClickListener(closeV -> {
+                        closeV.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                        com.termux.app.ui.GlassSheet.showConfirmationSheet(
+                            TermuxActivity.this,
+                            getString(R.string.title_confirm_kill_process),
+                            "Đóng phiên này sẽ dừng các tiến trình đang chạy trong phiên.",
+                            "Đóng phiên",
+                            () -> {
+                                targetSession.finishIfRunning();
+                                getTermuxTerminalSessionClient().removeFinishedSession(targetSession);
+                                updateTopSessionChips();
+                            },
+                            "Hủy",
+                            null
+                        );
+                    });
+                    chip.addView(closeBtn);
+                }
+
                 final TerminalSession targetSession = session;
                 chip.setOnClickListener(v -> {
+                    applyTouchFeedback(v);
                     if (mTermuxTerminalSessionActivityClient != null) {
                         mTermuxTerminalSessionActivityClient.setCurrentSession(targetSession);
                         updateTopSessionChips();
                     }
+                });
+
+                chip.setOnLongClickListener(v -> {
+                    v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    String sessionDisplayName = !TextUtils.isEmpty(targetSession.mSessionName) ?
+                        targetSession.mSessionName : ("Phiên " + (sessionIndex + 1));
+                    List<String> options = java.util.Arrays.asList("Đổi tên phiên", "Đóng phiên");
+                    com.termux.app.ui.GlassSheet.showListSheet(
+                        TermuxActivity.this,
+                        "Tùy chọn: " + sessionDisplayName,
+                        options,
+                        -1,
+                        which -> {
+                            if (which == 0) {
+                                getTermuxTerminalSessionClient().renameSession(targetSession);
+                            } else if (which == 1) {
+                                targetSession.finishIfRunning();
+                                getTermuxTerminalSessionClient().removeFinishedSession(targetSession);
+                                updateTopSessionChips();
+                            }
+                        }
+                    );
+                    return true;
                 });
 
                 mSessionChipsContainer.addView(chip);
@@ -958,19 +1061,20 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             addChip.setPadding((int) (8 * density + 0.5f), paddingVert, (int) (8 * density + 0.5f), paddingVert);
             addChip.setBackgroundResource(R.drawable.bg_glass_session_item);
             LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(
-                (int) (28 * density + 0.5f),
-                (int) (28 * density + 0.5f)
+                (int) (32 * density + 0.5f),
+                (int) (32 * density + 0.5f)
             );
             addChip.setLayoutParams(addParams);
 
             TextView addText = new TextView(TermuxActivity.this);
             addText.setText("+");
-            addText.setTextSize(14);
+            addText.setTextSize(16);
             addText.setTextColor(Color.parseColor("#FF3C70"));
             addText.setTypeface(null, android.graphics.Typeface.BOLD);
             addChip.addView(addText);
 
             addChip.setOnClickListener(v -> {
+                applyTouchFeedback(v);
                 if (mTermuxTerminalSessionActivityClient != null) {
                     mTermuxTerminalSessionActivityClient.addNewSession(false, null);
                 }
@@ -978,6 +1082,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
             mSessionChipsContainer.addView(addChip);
         });
+    }
     }
 
 

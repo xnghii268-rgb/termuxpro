@@ -12,15 +12,15 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 131).
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 132).
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
 ## 3. Hệ thống Giao diện & Trải nghiệm Người dùng
 - **Màu thương hiệu chủ đạo**: `#FF3C70` (brand accent). Chữ trên nền accent: `on-accent` `#1A0A10` (5.60:1 WCAG AA).
 - **6 chủ đề tiếng Việt**: Than đêm (`than_dem`), Mực (`muc`), Rượu vang (`ruou_vang`), Rêu đêm (`reu_dem`), Giấy (`giay`), Sương (`suong`).
-- **Thanh điều hướng nổi & Bottom Inset**: 5 mục (Terminal, Phiên, Lệnh, Ảnh, Cài đặt). Ẩn mượt khi IME mở. Terminal bottom padding = runtime `mSystemNavBottomInset + navTotalHeight` (bàn phím đóng) và `0` (bàn phím mở).
-- **Thanh phiên đỉnh (Session Chips)**: Thụt top padding = runtime `max(statusBars, displayCutout)` chống chạm tai thỏ.
-- **Thanh phím phụ (Extra Keys)**: Chuẩn 14 phím Termux gốc, 2 kiểu "Pro" và "Cổ điển", tùy biến trong Cài đặt.
+- **Thanh điều hướng nổi & Bottom Inset**: 5 mục (Terminal, Phiên, Lệnh, Ảnh, Cài đặt). Ẩn mượt khi IME mở, phản hồi xúc giác haptics và hoạt cảnh spring khi chạm. Tab Ảnh tích hợp bộ ba thao tác: lastshot, clipimg, và thư viện.
+- **Thanh phiên đỉnh (Session Chips)**: Safari-style pill 16dp, vạch hairline ngăn cách, dot trạng thái tiến trình (running/idle/exit), nút đóng nhanh `×` trên phiên active và menu nhấn giữ.
+- **Drawer Phiên làm việc**: Bề mặt kính tối bo góc 22dp, header thống kê số phiên thời gian thực, inset-card 14dp hiển thị PID và trạng thái, nút hành động pill thuận tiện.
 - **Bảng lệnh tương tác (Command Palette)**: Chuẩn iOS-27 cao cấp với RecyclerView nested scrolling, segmented control (Lịch sử | Mẫu lệnh), ghim tối đa 5 lệnh, lịch sử giới hạn 100 mục có bảo lưu lệnh ghim, cử chỉ vuốt xoá/ghim và tìm kiếm thời gian thực.
 
 ## 4. Tối ưu Hiệu năng, Bộ gõ & Tương thích Linux
@@ -32,7 +32,6 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **Bảng chào đón Clean Rule**: MOTD kẻ 2 đường ngang `─` trên và dưới, hiển thị thông tin thực tế.
 
 ## 5. Trạng thái Dự án
-- [x] **Phase 0 (Regression Gates)**: Sửa status bar, che prompt, MOTD lệch viền, bug prefix C, terminfo.
-- [x] **Phase 1 (Brand Redesign)**: Điểm nhấn `#FF3C70`, 6 bộ giao diện tiếng Việt đạt chuẩn WCAG AA >= 4.5:1.
-- [x] **Phase 2 & 3 (Sheets & Motion)**: Tích hợp GlassSheet, IME animation, tối ưu Choreographer vsync.
-- [x] **Phase 4 (Telex & Command Palette)**: Khắc phục bộ gõ tiếng Việt Telex, tái cấu trúc Bảng lệnh tương tác iOS-27, unit test 100% pass, bump versionCode 131.
+- [x] **Phase 0 - 3**: Sửa status bar, brand redesign, GlassSheet, IME animation, tối ưu Vsync.
+- [x] **Phase 4 (Telex & Command Palette)**: Khắc phục bộ gõ tiếng Việt Telex, tái cấu trúc Bảng lệnh tương tác iOS-27, unit test 100% pass (code 131).
+- [x] **Phase 5 (Core UI Redesign)**: Nâng cấp Dock nổi Liquid Glass, Safari-style Session Chips, Drawer quản lý phiên cao cấp, tactile micro-haptics (code 132).

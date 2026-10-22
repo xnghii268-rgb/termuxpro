@@ -91,11 +91,12 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
             sessionTitleView.setText(numberPart);
         }
 
+        sessionSubtitleView.setVisibility(View.VISIBLE);
         if (!TextUtils.isEmpty(sessionTitle)) {
-            sessionSubtitleView.setVisibility(View.VISIBLE);
             sessionSubtitleView.setText(sessionTitle);
         } else {
-            sessionSubtitleView.setVisibility(View.GONE);
+            boolean isRunning = sessionAtRow.isRunning();
+            sessionSubtitleView.setText("PID " + sessionAtRow.getPid() + " • " + (isRunning ? "Đang chạy" : "Đã kết thúc"));
         }
 
         // Color tag
@@ -103,23 +104,49 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
         GradientDrawable dot = new GradientDrawable();
         dot.setShape(GradientDrawable.OVAL);
         dot.setColor(tagColor);
-        dot.setSize(20, 20);
+        dot.setSize(22, 22);
         colorTagView.setBackground(dot);
 
         // Strike through if stopped
         boolean sessionRunning = sessionAtRow.isRunning();
         if (sessionRunning) {
             sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-            sessionTitleView.setTextColor(Color.WHITE);
+            sessionTitleView.setTextColor(isActive ? Color.WHITE : Color.parseColor("#E2E8F0"));
+            sessionSubtitleView.setTextColor(isActive ? Color.parseColor("#CBD5E1") : Color.parseColor("#94A3B8"));
         } else {
             sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            sessionTitleView.setTextColor(Color.RED);
+            sessionTitleView.setTextColor(Color.parseColor("#EF4444"));
+            sessionSubtitleView.setTextColor(Color.parseColor("#F87171"));
         }
 
         // Close button action
         closeButton.setOnClickListener(v -> promptCloseSession(sessionAtRow));
 
         return sessionRowView;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        updateDrawerHeaderCount();
+    }
+
+    public void updateDrawerHeaderCount() {
+        if (mActivity == null) return;
+        mActivity.runOnUiThread(() -> {
+            TextView countText = mActivity.findViewById(R.id.drawer_session_count_text);
+            if (countText != null) {
+                int count = getCount();
+                int running = 0;
+                for (int i = 0; i < count; i++) {
+                    TermuxSession ts = getItem(i);
+                    if (ts != null && ts.getTerminalSession() != null && ts.getTerminalSession().isRunning()) {
+                        running++;
+                    }
+                }
+                countText.setText(count + " phiên đang mở • " + running + " đang chạy");
+            }
+        });
     }
 
     private void promptCloseSession(final TerminalSession session) {
