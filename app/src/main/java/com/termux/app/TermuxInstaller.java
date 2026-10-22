@@ -542,12 +542,12 @@ final class TermuxInstaller {
             } catch (Exception ignored) {}
 
             try {
-                File bashrcFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/bash.bashrc");
-                if (bashrcFile.exists()) {
-                    String bashrcContent = new String(java.nio.file.Files.readAllBytes(bashrcFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                File etcBashrcFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/bash.bashrc");
+                if (etcBashrcFile.exists()) {
+                    String bashrcContent = new String(java.nio.file.Files.readAllBytes(etcBashrcFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
                     if (bashrcContent.contains("libtermux-exec")) {
                         bashrcContent = bashrcContent.replaceAll("(?m)^.*libtermux-exec.*$\\n?", "");
-                        java.nio.file.Files.write(bashrcFile.toPath(), bashrcContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        java.nio.file.Files.write(etcBashrcFile.toPath(), bashrcContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                         Logger.logInfo(LOG_TAG, "Cleaned etc/bash.bashrc.");
                     }
                 }
