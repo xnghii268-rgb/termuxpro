@@ -126,6 +126,11 @@ jobs:
             mkdir -p lib
             $NDK_CLANG -shared -fPIC -O2 -Wall "$GITHUB_WORKSPACE/app/src/main/cpp/termuxpro-path.c" -o lib/libtermuxpro-path.so -ldl
             echo "Successfully compiled lib/libtermuxpro-path.so"
+            rm -f lib/libtermux-exec*.so
+            ln -sf libtermuxpro-path.so lib/libtermux-exec.so
+            ln -sf libtermuxpro-path.so lib/libtermux-exec-ld-preload.so
+            ln -sf libtermuxpro-path.so lib/libtermux-exec-direct-ld-preload.so
+            ln -sf libtermuxpro-path.so lib/libtermux-exec-linker-ld-preload.so
           else
             echo "Warning: NDK clang not found during bootstrap generation step"
           fi
@@ -226,13 +231,6 @@ jobs:
           'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
           '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
           'fi' \
-          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then' \
-          '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
-          '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
-          'elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so" ]; then' \
-          '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
-          '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"' \
-          'fi' \
           'if [ -n "$PRELOAD" ]; then' \
           '    export LD_PRELOAD="$PRELOAD"' \
           'fi' >> etc/profile
@@ -256,20 +254,13 @@ jobs:
             'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
             '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
             'fi' \
-            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so" ]; then' \
-            '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
-            '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so"' \
-            'elif [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so" ]; then' \
-            '    [ -n "$PRELOAD" ] && PRELOAD="${PRELOAD}:"' \
-            '    PRELOAD="${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so"' \
-            'fi' \
             'if [ -n "$PRELOAD" ]; then' \
             '    export LD_PRELOAD="$PRELOAD"' \
             'fi' >> etc/bash.bashrc
           fi
 
-          # Create v6, v5, v4, v3 and v2 markers inside bootstrap
-          touch .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
+          # Create v7, v6, v5, v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v7 .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
           echo "GATE 2: Auditing bootstrap contents for binary safety and path correctness..."
           python3 -c "

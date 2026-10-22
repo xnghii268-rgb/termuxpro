@@ -292,6 +292,7 @@ final class TermuxInstaller {
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();
@@ -377,8 +378,8 @@ final class TermuxInstaller {
                 File apkPathLib = new File(nativeLibDir, "libtermuxpro-path.so");
                 File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
                 File destPathLib = new File(prefixLib, "libtermuxpro-path.so");
-                File v4Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v4");
-                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v4Marker.exists())) {
+                File v7Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7");
+                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v7Marker.exists())) {
                     if (!prefixLib.exists()) prefixLib.mkdirs();
                     try (java.io.InputStream in = new java.io.FileInputStream(apkPathLib);
                          FileOutputStream out = new FileOutputStream(destPathLib)) {
@@ -396,37 +397,37 @@ final class TermuxInstaller {
                 Logger.logError(LOG_TAG, "Error installing libtermuxpro-path.so: " + e.getMessage());
             }
 
-            // Ensure libtermux-exec.so is linked if any termux-exec library is present
+            // Ensure libtermux-exec.so and all its variants are symlinks pointing directly to libtermuxpro-path.so
             try {
                 File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
-                File execLib = new File(prefixLib, "libtermux-exec.so");
-                if (!execLib.exists()) {
-                    File[] execCandidates = new File[] {
-                        new File(prefixLib, "libtermux-exec-ld-preload.so"),
-                        new File(prefixLib, "libtermux-exec-direct-ld-preload.so"),
-                        new File(prefixLib, "libtermux-exec-linker-ld-preload.so")
+                File pathLib = new File(prefixLib, "libtermuxpro-path.so");
+                if (pathLib.exists()) {
+                    String[] execNames = new String[] {
+                        "libtermux-exec.so",
+                        "libtermux-exec-ld-preload.so",
+                        "libtermux-exec-direct-ld-preload.so",
+                        "libtermux-exec-linker-ld-preload.so"
                     };
-                    for (File cand : execCandidates) {
-                        if (cand.exists()) {
-                            try {
-                                android.system.Os.symlink(cand.getName(), execLib.getAbsolutePath());
-                            } catch (Exception e) {
-                                try (java.io.InputStream in = new java.io.FileInputStream(cand);
-                                     FileOutputStream out = new FileOutputStream(execLib)) {
-                                    byte[] buf = new byte[8192];
-                                    int len;
-                                    while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
-                                } catch (Exception ignored) {}
-                            }
-                            execLib.setReadable(true, false);
-                            execLib.setExecutable(true, false);
-                            Logger.logInfo(LOG_TAG, "Created missing libtermux-exec.so link to " + cand.getName());
-                            break;
+                    for (String name : execNames) {
+                        File targetFile = new File(prefixLib, name);
+                        try {
+                            targetFile.delete();
+                            android.system.Os.symlink("libtermuxpro-path.so", targetFile.getAbsolutePath());
+                        } catch (Exception e) {
+                            try (java.io.InputStream in = new java.io.FileInputStream(pathLib);
+                                 FileOutputStream out = new FileOutputStream(targetFile)) {
+                                byte[] buf = new byte[8192];
+                                int len;
+                                while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+                            } catch (Exception ignored) {}
                         }
+                        targetFile.setReadable(true, false);
+                        targetFile.setExecutable(true, false);
                     }
+                    Logger.logInfo(LOG_TAG, "Redirected libtermux-exec variants to libtermuxpro-path.so");
                 }
             } catch (Exception e) {
-                Logger.logError(LOG_TAG, "Error ensuring libtermux-exec.so: " + e.getMessage());
+                Logger.logError(LOG_TAG, "Error ensuring libtermux-exec links: " + e.getMessage());
             }
 
             // Ensure $PREFIX/bin/login exists, is executable, does not unset LD_PRELOAD and uses Termux Pro paths
@@ -446,13 +447,6 @@ final class TermuxInstaller {
                         "PRELOAD=\"\"\n" +
                         "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\" ]; then\n" +
                         "    PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\"\n" +
-                        "fi\n" +
-                        "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\" ]; then\n" +
-                        "    [ -n \"$PRELOAD\" ] && PRELOAD=\"${PRELOAD}:\"\n" +
-                        "    PRELOAD=\"${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"\n" +
-                        "elif [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\" ]; then\n" +
-                        "    [ -n \"$PRELOAD\" ] && PRELOAD=\"${PRELOAD}:\"\n" +
-                        "    PRELOAD=\"${PRELOAD}/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\"\n" +
                         "fi\n" +
                         "if [ -n \"$PRELOAD\" ]; then\n" +
                         "    export LD_PRELOAD=\"$PRELOAD\"\n" +
@@ -496,15 +490,21 @@ final class TermuxInstaller {
                         loginContent = loginContent.replace("unset LD_PRELOAD", "true # keep LD_PRELOAD for termux pro");
                         modified = true;
                     }
-                    if (loginContent.contains("libtermux-exec.so") && !loginContent.contains("libtermuxpro-path.so")) {
+                    if (loginContent.contains("libtermux-exec.so") || loginContent.contains("libtermux-exec-ld-preload.so")) {
+                        loginContent = loginContent.replace(
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"",
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\""
+                        );
                         loginContent = loginContent.replace(
                             "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\"",
-                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\""
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\""
                         );
                         loginContent = loginContent.replace(
                             "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec-ld-preload.so\"",
-                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so:/data/data/com.termuxpro.app/files/usr/lib/libtermux-exec.so\""
+                            "export LD_PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\""
                         );
+                        loginContent = loginContent.replaceAll(":[^\"]*libtermux-exec[^\"]*\\.so", "");
+                        loginContent = loginContent.replaceAll("[^\"]*libtermux-exec[^\"]*\\.so:?", "");
                         modified = true;
                     }
                     if (modified) {
@@ -524,16 +524,37 @@ final class TermuxInstaller {
                 File etcProfileFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/profile");
                 if (etcProfileFile.exists()) {
                     String profileContent = new String(java.nio.file.Files.readAllBytes(etcProfileFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                    boolean profileModified = false;
                     if (profileContent.contains("etc/motd.sh")) {
                         profileContent = profileContent.replace("bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh", "true")
                                                        .replace("bash \"/data/data/com.termuxpro.app/files/usr/etc/motd.sh\"", "true");
+                        profileModified = true;
+                    }
+                    if (profileContent.contains("libtermux-exec")) {
+                        profileContent = profileContent.replaceAll("(?m)^.*libtermux-exec.*$\\n?", "");
+                        profileModified = true;
+                    }
+                    if (profileModified) {
                         java.nio.file.Files.write(etcProfileFile.toPath(), profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                        Logger.logInfo(LOG_TAG, "Cleaned redundant motd call from etc/profile.");
+                        Logger.logInfo(LOG_TAG, "Cleaned etc/profile.");
                     }
                 }
             } catch (Exception ignored) {}
 
             try {
+                File bashrcFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/bash.bashrc");
+                if (bashrcFile.exists()) {
+                    String bashrcContent = new String(java.nio.file.Files.readAllBytes(bashrcFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                    if (bashrcContent.contains("libtermux-exec")) {
+                        bashrcContent = bashrcContent.replaceAll("(?m)^.*libtermux-exec.*$\\n?", "");
+                        java.nio.file.Files.write(bashrcFile.toPath(), bashrcContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        Logger.logInfo(LOG_TAG, "Cleaned etc/bash.bashrc.");
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v4").createNewFile();

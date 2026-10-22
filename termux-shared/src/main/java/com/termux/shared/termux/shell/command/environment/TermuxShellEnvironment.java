@@ -101,24 +101,10 @@ public class TermuxShellEnvironment extends AndroidShellEnvironment {
             environment.put("CURL_CA_BUNDLE", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
             environment.put("OPENSSL_CONF", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/openssl.cnf");
             environment.put("GIT_SSL_CAINFO", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/etc/tls/cert.pem");
-            // Safe LD_PRELOAD configuration: only add libraries that actually exist on disk
-            String preload = null;
+            // Safe LD_PRELOAD configuration: exclusively use libtermuxpro-path.so
             File pathLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH, "libtermuxpro-path.so");
             if (pathLib.exists()) {
-                preload = pathLib.getAbsolutePath();
-            }
-            File execLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH, "libtermux-exec.so");
-            if (!execLib.exists()) {
-                File altLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH, "libtermux-exec-ld-preload.so");
-                if (altLib.exists()) {
-                    execLib = altLib;
-                }
-            }
-            if (execLib.exists()) {
-                preload = (preload == null) ? execLib.getAbsolutePath() : (preload + ":" + execLib.getAbsolutePath());
-            }
-            if (preload != null) {
-                environment.put("LD_PRELOAD", preload);
+                environment.put("LD_PRELOAD", pathLib.getAbsolutePath());
             }
 
             // Terminfo and UTF-8 locale configuration

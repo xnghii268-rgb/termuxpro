@@ -66,7 +66,28 @@ static inline const char* rewrite_path(const char* path, char* buf, size_t bufsi
                 return buf;
             }
         }
+    } else if (strncmp(path, "/bin/", 5) == 0) {
+        int ret = snprintf(buf, bufsiz, "%s/files/usr/bin/%s", NEW_PREFIX, path + 5);
+        if (ret > 0 && (size_t)ret < bufsiz) {
+            return buf;
+        }
+    } else if (strcmp(path, "/bin") == 0) {
+        int ret = snprintf(buf, bufsiz, "%s/files/usr/bin", NEW_PREFIX);
+        if (ret > 0 && (size_t)ret < bufsiz) {
+            return buf;
+        }
+    } else if (strncmp(path, "/usr/bin/", 9) == 0) {
+        int ret = snprintf(buf, bufsiz, "%s/files/usr/bin/%s", NEW_PREFIX, path + 9);
+        if (ret > 0 && (size_t)ret < bufsiz) {
+            return buf;
+        }
+    } else if (strcmp(path, "/usr/bin") == 0) {
+        int ret = snprintf(buf, bufsiz, "%s/files/usr/bin", NEW_PREFIX);
+        if (ret > 0 && (size_t)ret < bufsiz) {
+            return buf;
+        }
     }
+    return path;
     return path;
 }
 
@@ -230,24 +251,24 @@ static inline int handle_shebang_exec(const char *p, char *const argv[], char *c
             bool need_rewrite = (new_interp != interp) || (strncmp(interp, "/bin/", 5) == 0) || (strncmp(interp, "/usr/bin/", 9) == 0);
             if (need_rewrite) {
                 if (strncmp(interp, "/bin/", 5) == 0) {
-                    snprintf(interp_buf, sizeof(interp_buf), "%s/bin/%s", NEW_PREFIX, interp + 5);
+                    snprintf(interp_buf, sizeof(interp_buf), "%s/files/usr/bin/%s", NEW_PREFIX, interp + 5);
                     new_interp = interp_buf;
                 } else if (strncmp(interp, "/usr/bin/", 9) == 0) {
-                    snprintf(interp_buf, sizeof(interp_buf), "%s/bin/%s", NEW_PREFIX, interp + 9);
+                    snprintf(interp_buf, sizeof(interp_buf), "%s/files/usr/bin/%s", NEW_PREFIX, interp + 9);
                     new_interp = interp_buf;
                 }
                 int argc = 0;
                 while (argv && argv[argc]) argc++;
-                int extra = (arg ? 1 : 0);
-                char **new_argv = (char **)malloc((argc + extra + 2) * sizeof(char *));
+                char **new_argv = (char **)malloc((argc + (arg ? 1 : 0) + 4) * sizeof(char *));
                 if (new_argv) {
                     int idx = 0;
                     new_argv[idx++] = (char *)new_interp;
                     if (arg) new_argv[idx++] = arg;
                     new_argv[idx++] = (char *)p;
-                    for (int i = 1; i <= argc; i++) {
+                    for (int i = 1; i < argc; i++) {
                         new_argv[idx++] = argv[i];
                     }
+                    new_argv[idx++] = NULL;
                     int ret = real_fn ? real_fn(new_interp, new_argv, envp) : -1;
                     free(new_argv);
                     return ret;
@@ -264,6 +285,14 @@ int execve(const char *pathname, char *const argv[], char *const envp[]) {
     char buf[PATH_MAX];
     const char *p = rewrite_path(pathname, buf, sizeof(buf));
     return handle_shebang_exec(p, argv, envp, real_execve);
+}
+
+int execvpe(const char *file, char *const argv[], char *const envp[]) {
+    static int (*real_execvpe)(const char *, char *const[], char *const[]) = NULL;
+    if (!real_execvpe) real_execvpe = dlsym(RTLD_NEXT, "execvpe");
+    char buf[PATH_MAX];
+    const char *p = rewrite_path(file, buf, sizeof(buf));
+    return handle_shebang_exec(p, argv, envp, real_execvpe);
 }
 
 static inline int call_execv(const char *p, char *const argv[], char *const envp[]) {
