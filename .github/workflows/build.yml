@@ -212,55 +212,8 @@ jobs:
           'fi' > bin/lastshot
           chmod 755 bin/lastshot
 
-          echo "Injecting compatibility exports and MOTD into etc/profile and etc/bash.bashrc..."
-          printf '%s\n' \
-          'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
-          'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
-          'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
-          'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
-          'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
-          'export SSL_CERT_FILE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-          'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-          'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
-          'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-          'export TERMINFO="/data/data/com.termuxpro.app/files/usr/share/terminfo"' \
-          'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
-          'export LANG="C.UTF-8"' \
-          'export LC_ALL="C.UTF-8"' \
-          'PRELOAD=""' \
-          'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-          '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
-          'fi' \
-          'if [ -n "$PRELOAD" ]; then' \
-          '    export LD_PRELOAD="$PRELOAD"' \
-          'fi' >> etc/profile
-
-          if [ -f "etc/bash.bashrc" ]; then
-            printf '%s\n' \
-            'export APT_CONFIG="/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf"' \
-            'export DPKG_ADMINDIR="/data/data/com.termuxpro.app/files/usr/var/lib/dpkg"' \
-            'export TERMUX__PREFIX="/data/data/com.termuxpro.app/files/usr"' \
-            'export TERMUX_APP__DATA_DIR="/data/data/com.termuxpro.app"' \
-            'export TERMUX_APP__LEGACY_DATA_DIR="/data/data/com.termuxpro.app"' \
-            'export SSL_CERT_FILE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-            'export CURL_CA_BUNDLE="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-            'export OPENSSL_CONF="/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf"' \
-            'export GIT_SSL_CAINFO="/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem"' \
-            'export TERMINFO="/data/data/com.termuxpro.app/files/usr/share/terminfo"' \
-            'export TERMINFO_DIRS="/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo"' \
-            '[ -z "$LANG" ] && export LANG="C.UTF-8"' \
-            '[ -z "$LC_ALL" ] && export LC_ALL="C.UTF-8"' \
-            'PRELOAD=""' \
-            'if [ -f "/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so" ]; then' \
-            '    PRELOAD="/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so"' \
-            'fi' \
-            'if [ -n "$PRELOAD" ]; then' \
-            '    export LD_PRELOAD="$PRELOAD"' \
-            'fi' >> etc/bash.bashrc
-          fi
-
-          # Create v7, v6, v5, v4, v3 and v2 markers inside bootstrap
-          touch .termuxpro-v7 .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
+          # Create v8, v7, v6, v5, v4, v3 and v2 markers inside bootstrap
+          touch .termuxpro-v8 .termuxpro-v7 .termuxpro-v6 .termuxpro-v5 .termuxpro-v4 .termuxpro-v3 .termuxpro-v2
 
           echo "GATE 2: Auditing bootstrap contents for binary safety and path correctness..."
           python3 -c "

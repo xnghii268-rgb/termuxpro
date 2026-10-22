@@ -292,6 +292,7 @@ final class TermuxInstaller {
                     }
 
                     try {
+                        new File(TERMUX_PREFIX_DIR, ".termuxpro-v8").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
                         new File(TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
@@ -378,8 +379,8 @@ final class TermuxInstaller {
                 File apkPathLib = new File(nativeLibDir, "libtermuxpro-path.so");
                 File prefixLib = new File(TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
                 File destPathLib = new File(prefixLib, "libtermuxpro-path.so");
-                File v7Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7");
-                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v7Marker.exists())) {
+                File v8Marker = new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v8");
+                if (apkPathLib.exists() && (!destPathLib.exists() || destPathLib.length() != apkPathLib.length() || !v8Marker.exists())) {
                     if (!prefixLib.exists()) prefixLib.mkdirs();
                     try (java.io.InputStream in = new java.io.FileInputStream(apkPathLib);
                          FileOutputStream out = new FileOutputStream(destPathLib)) {
@@ -520,40 +521,80 @@ final class TermuxInstaller {
                 Logger.logError(LOG_TAG, "Error checking/patching login script: " + e.getMessage());
             }
 
+            // Ensure $PREFIX/etc/profile is clean, valid and uses Termux Pro configuration
             try {
                 File etcProfileFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/profile");
-                if (etcProfileFile.exists()) {
-                    String profileContent = new String(java.nio.file.Files.readAllBytes(etcProfileFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
-                    boolean profileModified = false;
-                    if (profileContent.contains("etc/motd.sh")) {
-                        profileContent = profileContent.replace("bash /data/data/com.termuxpro.app/files/usr/etc/motd.sh", "true")
-                                                       .replace("bash \"/data/data/com.termuxpro.app/files/usr/etc/motd.sh\"", "true");
-                        profileModified = true;
-                    }
-                    if (profileContent.contains("libtermux-exec")) {
-                        profileContent = profileContent.replaceAll("(?m)^.*libtermux-exec.*$\\n?", "");
-                        profileModified = true;
-                    }
-                    if (profileModified) {
-                        java.nio.file.Files.write(etcProfileFile.toPath(), profileContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                        Logger.logInfo(LOG_TAG, "Cleaned etc/profile.");
-                    }
-                }
-            } catch (Exception ignored) {}
+                String masterProfile = "# System-wide profile for login shells in Termux Pro.\n" +
+                    "# Configured for prefix: /data/data/com.termuxpro.app/files/usr\n\n" +
+                    "export PREFIX=\"/data/data/com.termuxpro.app/files/usr\"\n" +
+                    "export HOME=\"/data/data/com.termuxpro.app/files/home\"\n" +
+                    "export PATH=\"/data/data/com.termuxpro.app/files/usr/bin\"\n" +
+                    "export LD_LIBRARY_PATH=\"/data/data/com.termuxpro.app/files/usr/lib\"\n" +
+                    "export TMPDIR=\"/data/data/com.termuxpro.app/files/usr/tmp\"\n" +
+                    "export APT_CONFIG=\"/data/data/com.termuxpro.app/files/usr/etc/apt/apt.conf\"\n" +
+                    "export DPKG_ADMINDIR=\"/data/data/com.termuxpro.app/files/usr/var/lib/dpkg\"\n" +
+                    "export TERMUX__PREFIX=\"/data/data/com.termuxpro.app/files/usr\"\n" +
+                    "export TERMUX_APP__DATA_DIR=\"/data/data/com.termuxpro.app\"\n" +
+                    "export TERMUX_APP__LEGACY_DATA_DIR=\"/data/data/com.termuxpro.app\"\n" +
+                    "export SSL_CERT_FILE=\"/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem\"\n" +
+                    "export CURL_CA_BUNDLE=\"/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem\"\n" +
+                    "export OPENSSL_CONF=\"/data/data/com.termuxpro.app/files/usr/etc/tls/openssl.cnf\"\n" +
+                    "export GIT_SSL_CAINFO=\"/data/data/com.termuxpro.app/files/usr/etc/tls/cert.pem\"\n\n" +
+                    "# Terminfo and locale configuration\n" +
+                    "export TERMINFO=\"/data/data/com.termuxpro.app/files/usr/share/terminfo\"\n" +
+                    "export TERMINFO_DIRS=\"/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo\"\n" +
+                    "export LANG=\"C.UTF-8\"\n" +
+                    "export LC_ALL=\"C.UTF-8\"\n\n" +
+                    "PRELOAD=\"\"\n" +
+                    "if [ -f \"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\" ]; then\n" +
+                    "    PRELOAD=\"/data/data/com.termuxpro.app/files/usr/lib/libtermuxpro-path.so\"\n" +
+                    "fi\n" +
+                    "if [ -n \"$PRELOAD\" ]; then\n" +
+                    "    export LD_PRELOAD=\"$PRELOAD\"\n" +
+                    "fi\n\n" +
+                    "# Source bash.bashrc for bash login shells\n" +
+                    "if [ -n \"$BASH_VERSION\" ] && [ -f \"/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc\" ]; then\n" +
+                    "    . \"/data/data/com.termuxpro.app/files/usr/etc/bash.bashrc\"\n" +
+                    "fi\n";
+                File etcDir = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc");
+                if (!etcDir.exists()) etcDir.mkdirs();
+                java.nio.file.Files.write(etcProfileFile.toPath(), masterProfile.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                etcProfileFile.setReadable(true, false);
+                Logger.logInfo(LOG_TAG, "Ensured clean $PREFIX/etc/profile.");
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error ensuring etc/profile: " + e.getMessage());
+            }
 
+            // Ensure $PREFIX/etc/bash.bashrc is clean and free from duplicate/broken PRELOAD blocks
             try {
                 File etcBashrcFile = new File(TermuxConstants.TERMUX_PREFIX_DIR, "etc/bash.bashrc");
-                if (etcBashrcFile.exists()) {
-                    String bashrcContent = new String(java.nio.file.Files.readAllBytes(etcBashrcFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
-                    if (bashrcContent.contains("libtermux-exec")) {
-                        bashrcContent = bashrcContent.replaceAll("(?m)^.*libtermux-exec.*$\\n?", "");
-                        java.nio.file.Files.write(etcBashrcFile.toPath(), bashrcContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                        Logger.logInfo(LOG_TAG, "Cleaned etc/bash.bashrc.");
-                    }
-                }
-            } catch (Exception ignored) {}
+                String masterBashrc = "# System-wide .bashrc file for interactive bash(1) shells in Termux Pro.\n" +
+                    "# Configured for prefix: /data/data/com.termuxpro.app/files/usr\n\n" +
+                    "export TERMINFO=\"/data/data/com.termuxpro.app/files/usr/share/terminfo\"\n" +
+                    "export TERMINFO_DIRS=\"/data/data/com.termuxpro.app/files/usr/share/terminfo:/data/data/com.termuxpro.app/files/home/.terminfo\"\n" +
+                    "[ -z \"$LANG\" ] && export LANG=\"C.UTF-8\"\n" +
+                    "[ -z \"$LC_ALL\" ] && export LC_ALL=\"C.UTF-8\"\n\n" +
+                    "if [ \"$TERM\" = \"dumb\" ] || [ -n \"$NO_COLOR\" ]; then\n" +
+                    "    PS1='\\w \\$ '\n" +
+                    "else\n" +
+                    "    PS1='\\[\\033[01;36m\\]\\w\\[\\033[00m\\] \\$ '\n" +
+                    "fi\n\n" +
+                    "# Source profile.d directory scripts if present\n" +
+                    "if [ -d \"/data/data/com.termuxpro.app/files/usr/etc/profile.d\" ]; then\n" +
+                    "    for f in /data/data/com.termuxpro.app/files/usr/etc/profile.d/*.sh; do\n" +
+                    "        [ -r \"$f\" ] && . \"$f\"\n" +
+                    "    done\n" +
+                    "    unset f\n" +
+                    "fi\n";
+                java.nio.file.Files.write(etcBashrcFile.toPath(), masterBashrc.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                etcBashrcFile.setReadable(true, false);
+                Logger.logInfo(LOG_TAG, "Ensured clean $PREFIX/etc/bash.bashrc.");
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "Error ensuring etc/bash.bashrc: " + e.getMessage());
+            }
 
             try {
+                new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v8").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v7").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v6").createNewFile();
                 new File(TermuxConstants.TERMUX_PREFIX_DIR, ".termuxpro-v5").createNewFile();
