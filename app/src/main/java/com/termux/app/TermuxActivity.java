@@ -1083,7 +1083,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             mSessionChipsContainer.addView(addChip);
         });
     }
-    }
 
 
 
