@@ -363,7 +363,7 @@ jobs:
         run: |
           set -e
           chmod +x ./gradlew
-          ./gradlew test assembleRelease --stacktrace
+          ./gradlew :app:testDebugUnitTest assembleRelease --stacktrace
 
           RELEASE_DIR="app/build/outputs/apk/release"
           if [ ! -d "$RELEASE_DIR" ]; then
