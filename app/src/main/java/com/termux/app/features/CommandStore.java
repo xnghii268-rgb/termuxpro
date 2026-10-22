@@ -178,7 +178,7 @@ public class CommandStore {
             }
             File file = new File(filesDir, TEMPLATES_FILE_NAME);
             try (FileOutputStream fos = new FileOutputStream(file)) {
-                fos.write(arr.toString(2).getBytes(StandardCharsets.UTF_8));
+                fos.write(arr.toString().getBytes(StandardCharsets.UTF_8));
             }
         } catch (Exception ignored) {
         }
@@ -192,7 +192,7 @@ public class CommandStore {
             }
             File file = new File(filesDir, HISTORY_FILE_NAME);
             try (FileOutputStream fos = new FileOutputStream(file)) {
-                fos.write(arr.toString(2).getBytes(StandardCharsets.UTF_8));
+                fos.write(arr.toString().getBytes(StandardCharsets.UTF_8));
             }
         } catch (Exception ignored) {
         }

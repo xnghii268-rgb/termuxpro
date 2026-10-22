@@ -5,11 +5,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+@RunWith(RobolectricTestRunner.class)
 public class CommandStoreTest {
 
     @Rule
