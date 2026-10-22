@@ -78,7 +78,7 @@ public class TermuxProPaletteManager {
         final int borderColor = isDark ? Color.parseColor("#1FFFFFFF") : Color.parseColor("#14000000");
         final int accentColor = Color.parseColor("#FF3C70");
 
-        final BottomSheetDialog sheet = new BottomSheetDialog(activity, R.style.Theme_Design_BottomSheetDialog);
+        final BottomSheetDialog sheet = new BottomSheetDialog(activity);
 
         // State variables
         final boolean[] isTemplateTab = new boolean[]{false};
