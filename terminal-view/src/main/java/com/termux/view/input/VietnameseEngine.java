@@ -113,6 +113,11 @@ public final class VietnameseEngine {
             return null;
         }
 
+        // When starting a new token from an empty buffer, clear any stale display residue
+        if (mRawBuffer.length() == 0) {
+            mLastDisplayText = "";
+        }
+
         mRawBuffer.append(c);
         Result r = process(mRawBuffer.toString(), mOptions);
 
