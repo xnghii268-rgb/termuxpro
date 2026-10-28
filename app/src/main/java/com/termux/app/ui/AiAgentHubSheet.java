@@ -1,5 +1,6 @@
 package com.termux.app.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -27,7 +28,7 @@ import com.termux.terminal.TerminalSession;
  */
 public class AiAgentHubSheet {
 
-    public static void show(@NonNull TermuxActivity activity) {
+    public static void show(@NonNull Activity activity) {
         BottomSheetDialog sheet = GlassSheet.createBaseSheet(activity);
         float density = activity.getResources().getDisplayMetrics().density;
 
@@ -210,11 +211,14 @@ public class AiAgentHubSheet {
         parent.addView(card);
     }
 
-    private static void runInTerminal(TermuxActivity activity, String command) {
-        activity.showTerminalView(true);
-        TerminalSession session = activity.getCurrentSession();
-        if (session != null && session.isRunning()) {
-            session.write(command);
+    private static void runInTerminal(Activity activity, String command) {
+        if (activity instanceof TermuxActivity) {
+            TermuxActivity ta = (TermuxActivity) activity;
+            ta.showTerminalView(true);
+            TerminalSession session = ta.getCurrentSession();
+            if (session != null && session.isRunning()) {
+                session.write(command);
+            }
         }
     }
 }

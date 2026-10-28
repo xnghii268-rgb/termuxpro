@@ -1,5 +1,6 @@
 package com.termux.app.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,7 +17,6 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.termux.R;
-import com.termux.app.TermuxActivity;
 import com.termux.app.theme.TermuxProThemeManager;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ThemePickerSheet {
 
-    public static void show(@NonNull TermuxActivity activity) {
+    public static void show(@NonNull Activity activity) {
         TermuxProThemeManager.init(activity);
         List<TermuxProThemeManager.ThemeItem> themes = TermuxProThemeManager.getAvailableThemes(activity);
         String currentId = TermuxProThemeManager.getCurrentThemeId(activity);
