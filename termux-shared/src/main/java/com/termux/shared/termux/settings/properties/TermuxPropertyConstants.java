@@ -325,7 +325,8 @@ public final class TermuxPropertyConstants {
 
     /** Defines the key for extra keys */
     public static final String KEY_EXTRA_KEYS =  "extra-keys"; // Default: "extra-keys"
-    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[\"ESC\",\"/\",\"-\",\"HOME\",\"UP\",\"END\",\"PGUP\"],[\"TAB\",\"CTRL\",\"ALT\",\"LEFT\",\"DOWN\",\"RIGHT\",\"PGDN\"]]";
+    public static final String DEFAULT_IVALUE_EXTRA_KEYS = "[[\"ESC\",\"/\",\"-\",\"HOME\",\"UP\",\"END\",\"PGUP\",\"VI_EN\"],[\"TAB\",\"CTRL\",\"ALT\",\"LEFT\",\"DOWN\",\"RIGHT\",\"PGDN\",\"CLIP_IMAGE\"]]";
+    public static final String DEFAULT_IVALUE_EXTRA_KEYS_PAGE_2 = "[[\"F1\",\"F2\",\"F3\",\"F4\",\"F5\",\"F6\",\"|\",\"~\",\"\\\"\",\"'\"],[\"F7\",\"F8\",\"F9\",\"F10\",\"F11\",\"F12\",\"{\",\"}\",\"[\",\"]\",\"<\",\">\",\"$\",\"&\"]]";
 
     /** Defines the key for extra keys style */
     public static final String KEY_EXTRA_KEYS_STYLE =  "extra-keys-style"; // Default: "extra-keys-style"

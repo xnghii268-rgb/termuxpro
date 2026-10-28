@@ -101,4 +101,24 @@ public final class MotionKit {
         }
         return anim;
     }
+
+    public static int lerpColor(int colorStart, int colorEnd, float fraction) {
+        float f = Math.max(0f, Math.min(1f, fraction));
+        int aStart = (colorStart >> 24) & 0xff;
+        int rStart = (colorStart >> 16) & 0xff;
+        int gStart = (colorStart >> 8) & 0xff;
+        int bStart = colorStart & 0xff;
+
+        int aEnd = (colorEnd >> 24) & 0xff;
+        int rEnd = (colorEnd >> 16) & 0xff;
+        int gEnd = (colorEnd >> 8) & 0xff;
+        int bEnd = colorEnd & 0xff;
+
+        int a = (int) (aStart + f * (aEnd - aStart));
+        int r = (int) (rStart + f * (rEnd - rStart));
+        int g = (int) (gStart + f * (gEnd - gStart));
+        int b = (int) (bStart + f * (bEnd - bStart));
+
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
 }

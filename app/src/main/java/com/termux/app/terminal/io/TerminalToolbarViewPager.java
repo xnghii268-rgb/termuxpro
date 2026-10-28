@@ -28,7 +28,7 @@ public class TerminalToolbarViewPager {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -41,20 +41,38 @@ public class TerminalToolbarViewPager {
         public Object instantiateItem(@NonNull ViewGroup collection, int position) {
             LayoutInflater inflater = LayoutInflater.from(mActivity);
             View layout;
-            if (position == 0) {
+            if (position == 0 || position == 1) {
                 layout = inflater.inflate(R.layout.view_terminal_toolbar_extra_keys, collection, false);
                 ExtraKeysView extraKeysView = (ExtraKeysView) layout;
                 extraKeysView.setExtraKeysViewClient(mActivity.getTermuxTerminalExtraKeys());
                 extraKeysView.setButtonTextAllCaps(false);
                 String styleMode = mActivity.getPreferences() != null ? mActivity.getPreferences().getExtraKeysStyleMode() : ExtraKeysView.STYLE_MODE_PRO;
                 extraKeysView.setStyleMode(styleMode);
-                mActivity.setExtraKeysView(extraKeysView);
+                if (position == 0) {
+                    mActivity.setExtraKeysView(extraKeysView);
+                }
                 com.termux.app.theme.TermuxProThemeManager.updateExtraKeysTheme(mActivity, extraKeysView);
-                extraKeysView.reload(mActivity.getTermuxTerminalExtraKeys().getExtraKeysInfo(),
-                    mActivity.getTerminalToolbarDefaultHeight());
+
+                if (position == 0) {
+                    extraKeysView.reload(mActivity.getTermuxTerminalExtraKeys().getExtraKeysInfo(),
+                        mActivity.getTerminalToolbarDefaultHeight());
+                } else {
+                    try {
+                        com.termux.shared.termux.extrakeys.ExtraKeysInfo page2Info =
+                            new com.termux.shared.termux.extrakeys.ExtraKeysInfo(
+                                com.termux.shared.termux.settings.properties.TermuxPropertyConstants.DEFAULT_IVALUE_EXTRA_KEYS_PAGE_2,
+                                com.termux.shared.termux.settings.properties.TermuxPropertyConstants.DEFAULT_IVALUE_EXTRA_KEYS_STYLE,
+                                com.termux.shared.termux.extrakeys.ExtraKeysConstants.CONTROL_CHARS_ALIASES
+                            );
+                        extraKeysView.reload(page2Info, mActivity.getTerminalToolbarDefaultHeight());
+                    } catch (Exception e) {
+                        extraKeysView.reload(mActivity.getTermuxTerminalExtraKeys().getExtraKeysInfo(),
+                            mActivity.getTerminalToolbarDefaultHeight());
+                    }
+                }
 
                 // apply extra keys fix if enabled in prefs
-                if (mActivity.getProperties().isUsingFullScreen() && mActivity.getProperties().isUsingFullScreenWorkAround()) {
+                if (position == 0 && mActivity.getProperties().isUsingFullScreen() && mActivity.getProperties().isUsingFullScreenWorkAround()) {
                     FullScreenWorkAround.apply(mActivity);
                 }
 
@@ -107,8 +125,10 @@ public class TerminalToolbarViewPager {
 
         @Override
         public void onPageSelected(int position) {
-            if (position == 0) {
-                mActivity.getTerminalView().requestFocus();
+            if (position == 0 || position == 1) {
+                if (mActivity.getTerminalView() != null) {
+                    mActivity.getTerminalView().requestFocus();
+                }
             } else {
                 final EditText editText = mTerminalToolbarViewPager.findViewById(R.id.terminal_toolbar_text_input);
                 if (editText != null) editText.requestFocus();

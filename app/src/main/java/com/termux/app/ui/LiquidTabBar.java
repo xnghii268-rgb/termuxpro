@@ -164,8 +164,21 @@ public class LiquidTabBar extends View {
         // 2. Liquid Glass Droplet Lens (Active Tab Indicator)
         if (mDropX < 0) mDropX = getTabCenterX(mSelectedTab);
 
-        float dropWidth = (54f * density) * mDropStretch;
-        float dropHeight = 40f * density;
+        float tabWidth = (float) w / mTabs.length;
+        TabItem activeTab = mTabs[mSelectedTab];
+        float textSize = 12f * density;
+        mTextPaint.setTextSize(textSize);
+        float activeLabelWidth = mTextPaint.measureText(activeTab.title);
+        float maxAllowedLabelWidth = tabWidth - (8f * density);
+        if (activeLabelWidth > maxAllowedLabelWidth) {
+            textSize = 11f * density;
+            mTextPaint.setTextSize(textSize);
+            activeLabelWidth = mTextPaint.measureText(activeTab.title);
+        }
+
+        float baseDropWidth = Math.max(72f * density, activeLabelWidth + 24f * density);
+        float dropWidth = baseDropWidth * mDropStretch;
+        float dropHeight = Math.min(48f * density, h - 4f * density);
         mDropBounds.set(
             mDropX - (dropWidth / 2f),
             (h - dropHeight) / 2f,
@@ -177,10 +190,7 @@ public class LiquidTabBar extends View {
         canvas.drawRoundRect(mDropBounds, dropHeight / 2f, dropHeight / 2f, mDropBorderPaint);
 
         // 3. Render Tab Icons and Vietnamese Labels
-        float tabWidth = (float) w / mTabs.length;
-        int iconSize = (int) (19 * density + 0.5f);
-
-        mTextPaint.setTextSize(10.5f * density);
+        int iconSize = (int) (18 * density + 0.5f);
 
         for (int i = 0; i < mTabs.length; i++) {
             TabItem tab = mTabs[i];
@@ -192,13 +202,14 @@ public class LiquidTabBar extends View {
             if (tab.drawable != null) {
                 tab.drawable.setTint(tintColor);
                 int left = (int) (cx - (iconSize / 2f));
-                int top = (int) (h * 0.18f);
+                int top = (int) (h * 0.16f);
                 tab.drawable.setBounds(left, top, left + iconSize, top + iconSize);
                 tab.drawable.draw(canvas);
             }
 
             mTextPaint.setColor(tintColor);
             mTextPaint.setFakeBoldText(isSelected);
+            mTextPaint.setTextSize(isSelected ? textSize : 11.5f * density);
             float textY = (h * 0.82f);
             canvas.drawText(tab.title, cx, textY, mTextPaint);
         }

@@ -12,7 +12,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.120.0 (code 133).
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.120.1 (code 134).
 - **Quy chuẩn Phiên bản**: Mỗi đợt update tính năng/giao diện mới bắt buộc nâng cả `versionCode` (+1) và `versionName` (vd: `0.120.0`, `0.121.0`...) theo chuẩn SemVer trong `app/build.gradle`.
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
@@ -38,3 +38,4 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - [x] **Phase 6 (Liquid Glass Round 1)**: Living backdrop, LiquidTabBar drop lens, Live Terminal Preview.
 - [x] **Phase 7 (Liquid Glass Round 2 & Terminal Chrome)**: SettingsActivity GlassScreen, ThemePickerSheet carousel, AiAgentHubSheet, Floating Top Bar, Extra keys Liquid Glass, MOTD dynamic cols.
 - [x] **Phase 8 (Vietnamese Input Round 2)**: Built-in pure JVM Telex/VNI engine, auto-restore English safety net, alt-screen/password bypass, VI/EN toggle, 4940 regression assertions pass.
+- [x] **Phase 9 (Round 3 Verify & Polish)**: GlassToggle thumb squash, drop width autosize, PTY margin translation, single "+" button, line-icon arrows & swipe page 2, build identity HUD.

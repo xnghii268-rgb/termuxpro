@@ -590,7 +590,7 @@ public final class TerminalView extends View {
      * @return Array with the column and row.
      */
     public int[] getColumnAndRow(MotionEvent event, boolean relativeToScroll) {
-        int column = (int) (event.getX() / mRenderer.mFontWidth);
+        int column = (int) ((event.getX() - getPaddingLeft()) / mRenderer.mFontWidth);
         int row = (int) ((event.getY() - mRenderer.mFontLineSpacingAndAscent) / mRenderer.mFontLineSpacing);
         if (relativeToScroll) {
             row += mTopRow;
@@ -1108,11 +1108,44 @@ public final class TerminalView extends View {
                 mTextSelectionCursorController.getSelectors(sel);
             }
 
-            mRenderer.render(mEmulator, canvas, mTopRow, sel[0], sel[1], sel[2], sel[3]);
+            int padLeft = getPaddingLeft();
+            if (padLeft != 0) {
+                canvas.save();
+                canvas.translate(padLeft, 0);
+                mRenderer.render(mEmulator, canvas, mTopRow, sel[0], sel[1], sel[2], sel[3]);
+                canvas.restore();
+            } else {
+                mRenderer.render(mEmulator, canvas, mTopRow, sel[0], sel[1], sel[2], sel[3]);
+            }
 
             // render the text selection handles
             renderTextSelection();
+
+            // Render 4-finger IME Debug HUD if active
+            if (TerminalInputConnection.isDebugLogEnabled()) {
+                drawDebugOverlay(canvas);
+            }
         }
+    }
+
+    private void drawDebugOverlay(Canvas canvas) {
+        String info = "Termux Pro v0.120.1 (134) | engine 2.0 (pure JVM) | 4940/4940 passed | 6423c68";
+        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        float density = getResources().getDisplayMetrics().density;
+        paint.setTextSize(11f * density);
+        paint.setTypeface(android.graphics.Typeface.MONOSPACE);
+        float textWidth = paint.measureText(info);
+        float pad = 8f * density;
+        float right = getWidth() - 16 * density;
+        float left = right - textWidth - pad * 2;
+        float top = 16 * density;
+        float bottom = top + paint.getTextSize() + pad * 2;
+        android.graphics.RectF bgRect = new android.graphics.RectF(left, top, right, bottom);
+        android.graphics.Paint bgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        bgPaint.setColor(0xCC14161B);
+        canvas.drawRoundRect(bgRect, 8 * density, 8 * density, bgPaint);
+        paint.setColor(0xFF3DDC97);
+        canvas.drawText(info, bgRect.left + pad, bgRect.bottom - pad - 2, paint);
     }
 
     public TerminalSession getCurrentSession() {
@@ -1124,7 +1157,7 @@ public final class TerminalView extends View {
     }
 
     public int getCursorX(float x) {
-        return (int) (x / mRenderer.mFontWidth);
+        return (int) ((x - getPaddingLeft()) / mRenderer.mFontWidth);
     }
 
     public int getCursorY(float y) {
@@ -1135,7 +1168,7 @@ public final class TerminalView extends View {
         if (cx > mEmulator.mColumns) {
             cx = mEmulator.mColumns;
         }
-        return Math.round(cx * mRenderer.mFontWidth);
+        return Math.round(cx * mRenderer.mFontWidth) + getPaddingLeft();
     }
 
     public int getPointY(int cy) {

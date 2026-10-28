@@ -28,7 +28,7 @@ RULE_LINE=$(printf "─%.0s" $(seq 1 "$COLS"))
 print_line() {
     local text="$1"
     local color="${2:-$C_RESET}"
-    echo -e "  ${color}${text}${C_RESET}"
+    echo -e "${color}${text}${C_RESET}"
 }
 
 # Real values only - hide field when unavailable
@@ -81,7 +81,7 @@ CHOSEN_TIP="${TIPS[$DAY_NUM]}"
 
 # Render Top Rule Edge-to-Edge
 echo -e "${C_ACCENT}${RULE_LINE}${C_RESET}"
-echo -e "  ${C_TITLE}TERMUX PRO • CONSOLE${C_RESET}"
+echo -e "${C_TITLE}TERMUX PRO • CONSOLE${C_RESET}"
 
 # Info row
 if [ -n "$USER_STR" ] || [ -n "$TIME_STR" ]; then

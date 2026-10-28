@@ -860,7 +860,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 line.startsWith("⠋") || line.startsWith("⠙") || line.startsWith("⠹") ||
                 line.startsWith("⠸") || line.startsWith("⠼") || line.startsWith("⠴") ||
                 line.startsWith("⠦") || line.startsWith("⠧") || line.startsWith("⠇") ||
-                line.startsWith("⠏") || line.startsWith("●") || line.startsWith("○")) {
+                line.startsWith("⠏") || line.startsWith("●") || line.startsWith("○") ||
+                line.startsWith("TERMUX PRO") || line.startsWith("Người dùng") || line.startsWith("Thời gian") ||
+                line.startsWith("Địa chỉ IP") || line.startsWith("Pin:") || line.startsWith("MENU NHANH") ||
+                line.startsWith("Mẹo:") || line.matches("^\\[[0-9]\\].*") ||
+                line.endsWith("…")) {
                 continue;
             }
 
@@ -879,8 +883,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         for (int i = start; i < meaningful.size(); i++) {
             if (sb.length() > 0) sb.append("\n");
             String l = meaningful.get(i);
-            if (l.length() > 60) {
-                l = l.substring(0, 58) + "…";
+            if (l.length() > 65) {
+                l = l.substring(0, 65);
             }
             sb.append(l);
         }
@@ -1061,7 +1065,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 float density = getResources().getDisplayMetrics().density;
                 int padSide = (int)(16 * density + 0.5f);
                 int padBottom = (int)(96 * density + 0.5f);
-                int targetTop = statusBarTop + (int)(12 * density + 0.5f);
+                int targetTop = statusBarTop + (int)(16 * density + 0.5f);
                 if (mMenuHubLayout.getPaddingTop() != targetTop) {
                     mMenuHubLayout.setPadding(padSide, targetTop, padSide, padBottom);
                 }
@@ -1156,14 +1160,14 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
             int navMarginBottom = (int)(12 * density + 0.5f);
 
-            if (mIsKeyboardOpen) {
-                // When keyboard is open, immediately hide the floating bottom nav bar
+            if (mIsKeyboardOpen || !mIsMenuHubVisible) {
+                // When keyboard is open or when in Terminal destination, immediately hide the floating bottom nav bar
                 // so it cannot obscure the terminal or extra keys
                 mFloatingBottomNavBar.setVisibility(View.GONE);
                 mFloatingBottomNavBar.setEnabled(false);
                 mFloatingBottomNavBar.setAlpha(0f);
             } else {
-                // Animate bottom nav in
+                // Animate bottom nav in for Menu Hub
                 mFloatingBottomNavBar.setVisibility(View.VISIBLE);
                 mFloatingBottomNavBar.setEnabled(true);
                 mFloatingBottomNavBar.animate()
@@ -1411,33 +1415,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
                 mSessionChipsContainer.addView(chip);
             }
-
-            LinearLayout addChip = new LinearLayout(TermuxActivity.this);
-            addChip.setOrientation(LinearLayout.HORIZONTAL);
-            addChip.setGravity(Gravity.CENTER);
-            addChip.setPadding((int) (8 * density + 0.5f), paddingVert, (int) (8 * density + 0.5f), paddingVert);
-            addChip.setBackgroundResource(R.drawable.bg_glass_session_item);
-            LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(
-                (int) (32 * density + 0.5f),
-                (int) (32 * density + 0.5f)
-            );
-            addChip.setLayoutParams(addParams);
-
-            TextView addText = new TextView(TermuxActivity.this);
-            addText.setText("+");
-            addText.setTextSize(16);
-            addText.setTextColor(Color.parseColor("#3DDC97"));
-            addText.setTypeface(null, android.graphics.Typeface.BOLD);
-            addChip.addView(addText);
-
-            addChip.setOnClickListener(v -> {
-                applyTouchFeedback(v);
-                if (mTermuxTerminalSessionActivityClient != null) {
-                    mTermuxTerminalSessionActivityClient.addNewSession(false, null);
-                }
-            });
-
-            mSessionChipsContainer.addView(addChip);
         });
     }
 

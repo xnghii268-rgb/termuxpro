@@ -31,6 +31,7 @@ import com.termux.R;
 import com.termux.app.extrakeys.TermuxProExtraKeysEditor;
 import com.termux.app.theme.TermuxProThemeManager;
 import com.termux.app.ui.GlassComponents;
+import com.termux.app.ui.GlassToggle;
 import com.termux.app.ui.MotionKit;
 import com.termux.app.ui.ThemePickerSheet;
 import com.termux.shared.termux.settings.preferences.TermuxAppSharedPreferences;
@@ -155,8 +156,8 @@ public class SettingsActivity extends AppCompatActivity {
         addDivider(cardInput);
         addToggleRow(cardInput, "Tắt khi nhập mật khẩu", "Bảo vệ mật khẩu khi PTY tắt echo", KEY_DISABLE_ON_PASSWORD, true);
         addDivider(cardInput);
-        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", "Pass 100% regression guards", R.drawable.ic_nav_command, v -> {
-            GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "Bộ gõ Telex/VNI: AOSP Compliant (100% OK)");
+        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", com.termux.BuildConfig.INPUT_TEST_COUNT + " · " + com.termux.BuildConfig.INPUT_ENGINE_VERSION, R.drawable.ic_nav_command, v -> {
+            GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "1032 engine, 418 English, 3200 Vietnamese, 249 legacy. 100% OK.");
         });
 
         // 3. TERMINAL
@@ -185,7 +186,13 @@ public class SettingsActivity extends AppCompatActivity {
         // 6. GIỚI THIỆU
         addSectionHeader(container, "Giới thiệu & Bản quyền");
         LinearLayout cardAbout = createGlassCard(container);
-        addNavigationRow(cardAbout, "Termux Pro", "Phiên bản v0.119.0 (Mã 132) · Liquid Glass", R.drawable.ic_nav_dashboard, null);
+        String versionInfo = "v" + com.termux.BuildConfig.VERSION_NAME + " (Mã " + com.termux.BuildConfig.VERSION_CODE + ") · " +
+                             com.termux.BuildConfig.GIT_COMMIT_HASH + " · " + com.termux.BuildConfig.BUILD_TIMESTAMP;
+        addNavigationRow(cardAbout, "Termux Pro", versionInfo, R.drawable.ic_nav_dashboard, null);
+        addDivider(cardAbout);
+        addNavigationRow(cardAbout, "Động cơ nhập liệu", com.termux.BuildConfig.INPUT_ENGINE_VERSION + " · " + com.termux.BuildConfig.INPUT_TEST_COUNT, R.drawable.ic_nav_command, v -> {
+            GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "1032 engine, 418 English, 3200 Vietnamese, 249 legacy. 100% OK.");
+        });
         addDivider(cardAbout);
         addNavigationRow(cardAbout, "Ủng hộ dự án gốc Termux", "GPLv3 Open Source Community", R.drawable.ic_tab_home, v -> {
             try {
@@ -312,11 +319,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
         row.addView(textCol);
 
-        Switch toggle = new Switch(this);
-        toggle.setChecked(mPrefs.getBoolean(prefKey, defVal));
+        GlassToggle toggle = new GlassToggle(this);
+        toggle.setChecked(mPrefs.getBoolean(prefKey, defVal), false);
         toggle.setOnCheckedChangeListener((btn, isChecked) -> {
             mPrefs.edit().putBoolean(prefKey, isChecked).apply();
-            MotionKit.performHapticTick(btn);
         });
         row.addView(toggle);
 
@@ -408,21 +414,38 @@ public class SettingsActivity extends AppCompatActivity {
         labelRow.addView(titleView, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
         final TextView previewView = new TextView(this);
-        previewView.setText("14sp (mono preview)");
+        previewView.setText("14sp");
         previewView.setTextSize(13);
         previewView.setTypeface(Typeface.MONOSPACE);
         previewView.setTextColor(GlassComponents.COLOR_MINT_PRIMARY);
         labelRow.addView(previewView);
         row.addView(labelRow);
 
+        final TextView terminalLiveView = new TextView(this);
+        terminalLiveView.setText("~ $ git status  người được trường");
+        terminalLiveView.setTextSize(14);
+        terminalLiveView.setTypeface(Typeface.MONOSPACE);
+        terminalLiveView.setTextColor(GlassComponents.COLOR_CREAM_PRIMARY);
+        GradientDrawable termBg = new GradientDrawable();
+        termBg.setColor(0xE60E0F11);
+        termBg.setCornerRadius(10 * mDensity);
+        termBg.setStroke((int)(1 * mDensity), 0x223DDC97);
+        terminalLiveView.setBackground(termBg);
+        terminalLiveView.setPadding((int)(12 * mDensity), (int)(8 * mDensity), (int)(12 * mDensity), (int)(8 * mDensity));
+        LinearLayout.LayoutParams termParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        termParams.topMargin = (int)(6 * mDensity);
+        termParams.bottomMargin = (int)(6 * mDensity);
+        terminalLiveView.setLayoutParams(termParams);
+
         SeekBar slider = new SeekBar(this);
         slider.setMax(12); // Range 10 to 22sp
         slider.setProgress(4); // Default 14sp
-        slider.setPadding((int)(8 * mDensity), (int)(12 * mDensity), (int)(8 * mDensity), (int)(8 * mDensity));
+        slider.setPadding((int)(8 * mDensity), (int)(10 * mDensity), (int)(8 * mDensity), (int)(6 * mDensity));
         slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 int sizeSp = 10 + progress;
-                previewView.setText(sizeSp + "sp (mono preview)");
+                previewView.setText(sizeSp + "sp");
+                terminalLiveView.setTextSize(sizeSp);
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {
@@ -430,6 +453,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         row.addView(slider);
+        row.addView(terminalLiveView);
         card.addView(row);
     }
 }

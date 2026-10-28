@@ -144,14 +144,14 @@ public final class ExtraKeysView extends GridLayout {
     /** Defines the maximum allowed duration in milliseconds for {@link #mLongPressTimeout}. */
     public static final int MAX_LONG_PRESS_DURATION = 3000;
     /** Defines the fallback duration in milliseconds for {@link #mLongPressTimeout}. */
-    public static final int FALLBACK_LONG_PRESS_DURATION = 400;
+    public static final int FALLBACK_LONG_PRESS_DURATION = 350;
 
     /** Defines the minimum allowed duration in milliseconds for {@link #mLongPressRepeatDelay}. */
     public static final int MIN_LONG_PRESS__REPEAT_DELAY = 5;
     /** Defines the maximum allowed duration in milliseconds for {@link #mLongPressRepeatDelay}. */
     public static final int MAX_LONG_PRESS__REPEAT_DELAY = 2000;
     /** Defines the default duration in milliseconds for {@link #mLongPressRepeatDelay}. */
-    public static final int DEFAULT_LONG_PRESS_REPEAT_DELAY = 80;
+    public static final int DEFAULT_LONG_PRESS_REPEAT_DELAY = 40;
 
 
 
@@ -463,6 +463,10 @@ public final class ExtraKeysView extends GridLayout {
     }
 
     public Drawable createKeyDrawable(int bgColor, int strokeColor) {
+        return createKeyDrawable(bgColor, strokeColor, Math.max(1, (int)(1f * getResources().getDisplayMetrics().density + 0.5f)));
+    }
+
+    public Drawable createKeyDrawable(int bgColor, int strokeColor, int strokeWidth) {
         GradientDrawable gd = new GradientDrawable();
         gd.setShape(GradientDrawable.RECTANGLE);
         if (isClassicMode()) {
@@ -472,7 +476,6 @@ public final class ExtraKeysView extends GridLayout {
             gd.setCornerRadius(10 * getResources().getDisplayMetrics().density);
             gd.setColor(bgColor);
             if (strokeColor != 0) {
-                int strokeWidth = Math.max(1, (int)(0.5f * getResources().getDisplayMetrics().density + 0.5f));
                 gd.setStroke(strokeWidth, strokeColor);
             }
         }
@@ -521,36 +524,97 @@ public final class ExtraKeysView extends GridLayout {
                "PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(key) || "Lệnh".equals(display);
     }
 
+    public void setupButtonIconOrText(MaterialButton button, ExtraKeyButton buttonInfo) {
+        if (button == null) return;
+        String key = buttonInfo != null ? buttonInfo.getKey() : null;
+        float density = getResources().getDisplayMetrics().density;
+        int iconSize = (int)(18 * density + 0.5f);
+
+        if ("UP".equalsIgnoreCase(key)) {
+            button.setIconResource(com.termux.shared.R.drawable.ic_key_arrow_up);
+            button.setText("");
+            button.setIconSize(iconSize);
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(0);
+            button.setIconTint(android.content.res.ColorStateList.valueOf(button.getCurrentTextColor()));
+        } else if ("DOWN".equalsIgnoreCase(key)) {
+            button.setIconResource(com.termux.shared.R.drawable.ic_key_arrow_down);
+            button.setText("");
+            button.setIconSize(iconSize);
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(0);
+            button.setIconTint(android.content.res.ColorStateList.valueOf(button.getCurrentTextColor()));
+        } else if ("LEFT".equalsIgnoreCase(key)) {
+            button.setIconResource(com.termux.shared.R.drawable.ic_key_arrow_left);
+            button.setText("");
+            button.setIconSize(iconSize);
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(0);
+            button.setIconTint(android.content.res.ColorStateList.valueOf(button.getCurrentTextColor()));
+        } else if ("RIGHT".equalsIgnoreCase(key)) {
+            button.setIconResource(com.termux.shared.R.drawable.ic_key_arrow_right);
+            button.setText("");
+            button.setIconSize(iconSize);
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(0);
+            button.setIconTint(android.content.res.ColorStateList.valueOf(button.getCurrentTextColor()));
+        } else if ("TAB".equalsIgnoreCase(key)) {
+            button.setIconResource(com.termux.shared.R.drawable.ic_key_tab);
+            button.setText("");
+            button.setIconSize(iconSize);
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(0);
+            button.setIconTint(android.content.res.ColorStateList.valueOf(button.getCurrentTextColor()));
+        } else {
+            button.setIcon(null);
+            String label = formatKeyDisplay(buttonInfo);
+            button.setText(label);
+        }
+    }
+
     public void applyButtonDefaultState(MaterialButton button, ExtraKeyButton buttonInfo) {
         if (button == null) return;
         String key = buttonInfo != null ? buttonInfo.getKey() : null;
         if (isSpecialButton(buttonInfo)) {
             SpecialButtonState state = mSpecialButtons.get(SpecialButton.valueOf(key));
-            boolean active = state != null && state.isActive;
-            if (active) {
-                button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
-                button.setTextColor(mAccentColor);
-            } else {
-                button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
-                button.setTextColor(mButtonTextColor);
-            }
+            boolean active = state != null && state.isActive();
+            boolean locked = state != null && state.isLocked();
+            updateSpecialButtonAppearance(button, active, locked);
         } else if (isSpecialActionButton(key, buttonInfo != null ? buttonInfo.getDisplay() : null)) {
             button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
             button.setTextColor(mAccentColor);
+            setupButtonIconOrText(button, buttonInfo);
         } else {
             button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
             button.setTextColor(mButtonTextColor);
+            setupButtonIconOrText(button, buttonInfo);
         }
     }
 
     public void updateSpecialButtonAppearance(MaterialButton button, boolean active) {
+        updateSpecialButtonAppearance(button, active, false);
+    }
+
+    public void updateSpecialButtonAppearance(MaterialButton button, boolean active, boolean locked) {
         if (button == null) return;
+        Object tag = button.getTag();
+        ExtraKeyButton info = tag instanceof ExtraKeyButton ? (ExtraKeyButton) tag : null;
+        String baseLabel = info != null ? formatKeyDisplay(info) : "";
+
         if (active) {
-            button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
-            button.setTextColor(mAccentColor);
+            if (locked) {
+                button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mAccentColor, Math.max(1, (int)(1.5f * getResources().getDisplayMetrics().density + 0.5f))));
+                button.setTextColor(mAccentColor);
+                if (!baseLabel.isEmpty()) button.setText(baseLabel + " ◉");
+            } else {
+                button.setBackground(createKeyDrawable(mAccentBgColor, mAccentStrokeColor));
+                button.setTextColor(mAccentColor);
+                if (!baseLabel.isEmpty()) button.setText(baseLabel + " •");
+            }
         } else {
             button.setBackground(createKeyDrawable(mKeyNormalBackgroundColor, mKeyStrokeColor));
             button.setTextColor(mButtonTextColor);
+            if (!baseLabel.isEmpty()) button.setText(baseLabel);
         }
     }
 
@@ -638,8 +702,9 @@ public final class ExtraKeysView extends GridLayout {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             if (!isClassicMode()) {
-                                view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                                view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(80).start();
                             }
+                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                             button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                             startScheduledExecutors(view, buttonInfo, button);
                             return true;
@@ -649,14 +714,14 @@ public final class ExtraKeysView extends GridLayout {
                                 if (mPopupWindow == null && event.getY() < 0) {
                                     stopScheduledExecutors();
                                     if (!isClassicMode()) {
-                                        view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                        view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start();
                                     }
                                     applyButtonDefaultState(button, buttonInfo);
                                     showPopup(view, buttonInfo.getPopup());
                                 }
                                 if (mPopupWindow != null && event.getY() > 0) {
                                     if (!isClassicMode()) {
-                                        view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start();
+                                        view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(80).start();
                                     }
                                     button.setBackground(createKeyDrawable(mKeyPressedBackgroundColor, mKeyStrokeColor));
                                     dismissPopup();
@@ -666,7 +731,7 @@ public final class ExtraKeysView extends GridLayout {
 
                         case MotionEvent.ACTION_CANCEL:
                             if (!isClassicMode()) {
-                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start();
                             }
                             applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
@@ -674,7 +739,7 @@ public final class ExtraKeysView extends GridLayout {
 
                         case MotionEvent.ACTION_UP:
                             if (!isClassicMode()) {
-                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                                view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start();
                             }
                             applyButtonDefaultState(button, buttonInfo);
                             stopScheduledExecutors();
