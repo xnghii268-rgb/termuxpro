@@ -96,27 +96,26 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
             sessionSubtitleView.setText(sessionTitle);
         } else {
             boolean isRunning = sessionAtRow.isRunning();
-            sessionSubtitleView.setText("PID " + sessionAtRow.getPid() + " • " + (isRunning ? "Đang chạy" : "Đã kết thúc"));
+            sessionSubtitleView.setText("PID " + sessionAtRow.getPid() + " · " + (isRunning ? "Đang chạy" : "Đã kết thúc"));
         }
 
-        // Color tag
-        int tagColor = sSessionColorMap.getOrDefault(sessionAtRow.mHandle, TAG_COLORS[position % TAG_COLORS.length]);
+        // Status Indicator Dot (Mint for running, Muted for stopped)
+        boolean sessionRunning = sessionAtRow.isRunning();
         GradientDrawable dot = new GradientDrawable();
         dot.setShape(GradientDrawable.OVAL);
-        dot.setColor(tagColor);
+        dot.setColor(sessionRunning ? 0xFF3DDC97 : 0xFF6B7280);
         dot.setSize(22, 22);
         colorTagView.setBackground(dot);
 
         // Strike through if stopped
-        boolean sessionRunning = sessionAtRow.isRunning();
         if (sessionRunning) {
             sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-            sessionTitleView.setTextColor(isActive ? Color.WHITE : Color.parseColor("#E2E8F0"));
-            sessionSubtitleView.setTextColor(isActive ? Color.parseColor("#CBD5E1") : Color.parseColor("#94A3B8"));
+            sessionTitleView.setTextColor(isActive ? Color.parseColor("#3DDC97") : Color.parseColor("#F2EDE4"));
+            sessionSubtitleView.setTextColor(isActive ? Color.parseColor("#CDB89A") : Color.parseColor("#9E988F"));
         } else {
             sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            sessionTitleView.setTextColor(Color.parseColor("#EF4444"));
-            sessionSubtitleView.setTextColor(Color.parseColor("#F87171"));
+            sessionTitleView.setTextColor(Color.parseColor("#6B7280"));
+            sessionSubtitleView.setTextColor(Color.parseColor("#4B5563"));
         }
 
         // Close button action
@@ -144,7 +143,7 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
                         running++;
                     }
                 }
-                countText.setText(count + " phiên đang mở • " + running + " đang chạy");
+                countText.setText(count + " phiên đang mở · " + running + " đang chạy");
             }
         });
     }

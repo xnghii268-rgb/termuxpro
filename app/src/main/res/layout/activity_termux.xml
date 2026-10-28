@@ -33,30 +33,90 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <!-- Top Slim Glass Session Chips Bar -->
-                <HorizontalScrollView
-                    android:id="@+id/session_chips_scroll_view"
+                <!-- Floating Glass Top Bar (Terminal Chrome) -->
+                <LinearLayout
+                    android:id="@+id/terminal_top_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:scrollbars="none"
-                    android:background="@drawable/bg_session_chips_bar"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="5dp">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:background="@drawable/bg_session_chips_bar">
 
-                    <LinearLayout
-                        android:id="@+id/session_chips_container"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical" />
-                </HorizontalScrollView>
+                    <!-- Back to Home Chevron Button -->
+                    <FrameLayout
+                        android:id="@+id/terminal_top_bar_btn_home"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_glass_round_btn"
+                        android:contentDescription="Trang chủ">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_chevron_left"
+                            app:tint="#F2EDE4" />
+                    </FrameLayout>
+
+                    <!-- Session Chips Scroll -->
+                    <HorizontalScrollView
+                        android:id="@+id/session_chips_scroll_view"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/session_chips_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical" />
+                    </HorizontalScrollView>
+
+                    <!-- New Session Button (+) -->
+                    <FrameLayout
+                        android:id="@+id/terminal_top_bar_btn_new_session"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_glass_round_btn"
+                        android:contentDescription="Phiên mới">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_plus_new"
+                            app:tint="#3DDC97" />
+                    </FrameLayout>
+
+                    <!-- Overflow Menu Button (...) -->
+                    <FrameLayout
+                        android:id="@+id/terminal_top_bar_btn_overflow"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_glass_round_btn"
+                        android:contentDescription="Tùy chọn">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_more_dots"
+                            app:tint="#F2EDE4" />
+                    </FrameLayout>
+                </LinearLayout>
 
                 <com.termux.view.TerminalView
                     android:id="@+id/terminal_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/session_chips_scroll_view"
+                    android:layout_below="@id/terminal_top_bar"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
                     android:defaultFocusHighlightEnabled="false"
                     android:focusableInTouchMode="true"
                     android:scrollbarThumbVertical="@drawable/terminal_scroll_shape"
@@ -635,7 +695,7 @@
 
             <LinearLayout
                 android:id="@+id/left_drawer"
-                android:layout_width="300dp"
+                android:layout_width="320dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:choiceMode="singleChoice"
@@ -648,9 +708,10 @@
                 <!-- Glass Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="18dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -663,8 +724,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Termux Pro"
-                            android:textColor="#FFFFFF"
-                            android:textSize="17sp"
+                            android:textColor="#F2EDE4"
+                            android:textSize="20sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.02" />
 
@@ -672,21 +733,18 @@
                             android:id="@+id/drawer_session_count_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Phiên làm việc"
-                            android:textColor="#94A3B8"
-                            android:textSize="11.5sp"
-                            android:layout_marginTop="1dp" />
+                            android:text="1 phiên đang mở · 1 đang chạy"
+                            android:textColor="#9E988F"
+                            android:textSize="13sp"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
 
                     <ImageButton
                         android:id="@+id/settings_button"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:src="@drawable/ic_settings"
-                        android:padding="8dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/action_open_settings"
-                        app:tint="#94A3B8" />
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:contentDescription="@string/action_open_settings" />
                 </LinearLayout>
 
                 <View
@@ -716,7 +774,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="14dp"
                     android:paddingVertical="8dp"
                     android:orientation="horizontal">
 
@@ -726,11 +784,11 @@
                         android:layout_height="44dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:textColor="#E2E8F0"
+                        android:textColor="#F2EDE4"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:background="@drawable/bg_drawer_toggle_kbd_btn"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="10dp"
                         android:text="@string/action_toggle_soft_keyboard" />
 
                     <TextView
@@ -739,8 +797,8 @@
                         android:layout_height="44dp"
                         android:layout_weight="1.1"
                         android:gravity="center"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
+                        android:textColor="#0E0F11"
+                        android:textSize="13.5sp"
                         android:textStyle="bold"
                         android:background="@drawable/bg_drawer_new_session_btn"
                         android:text="@string/action_new_session" />

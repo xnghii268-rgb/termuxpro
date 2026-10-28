@@ -71,12 +71,12 @@ public class TermuxProPaletteManager {
         final String currentThemeId = TermuxProThemeManager.getCurrentThemeId(activity);
         final boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
 
-        final int textColor = isDark ? Color.parseColor("#F8FAFC") : Color.parseColor("#0F172A");
-        final int subTextColor = isDark ? Color.parseColor("#94A3B8") : Color.parseColor("#64748B");
-        final int cardBgColor = isDark ? Color.parseColor("#1E2430") : Color.parseColor("#FFFFFF");
-        final int sheetBgColor = isDark ? Color.parseColor("#F511141A") : Color.parseColor("#F5F6F8FA");
-        final int borderColor = isDark ? Color.parseColor("#1FFFFFFF") : Color.parseColor("#14000000");
-        final int accentColor = Color.parseColor("#FF3C70");
+        final int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        final int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
+        final int cardBgColor = isDark ? Color.parseColor("#1A1D24") : Color.parseColor("#FFFFFF");
+        final int sheetBgColor = isDark ? Color.parseColor("#E61A1D24") : Color.parseColor("#F5FBF9F5");
+        final int borderColor = isDark ? Color.parseColor("#33FFFFFF") : Color.parseColor("#14000000");
+        final int accentColor = Color.parseColor("#3DDC97");
 
         final BottomSheetDialog sheet = new BottomSheetDialog(activity);
 
@@ -125,6 +125,9 @@ public class TermuxProPaletteManager {
         actionBtn.setTypeface(null, Typeface.BOLD);
         actionBtn.setPadding((int)(14 * density), (int)(7 * density), (int)(14 * density), (int)(7 * density));
         headerRow.addView(actionBtn);
+
+        FrameLayout closeBtn = com.termux.app.ui.GlassComponents.createRoundGlassButton(activity, R.drawable.ic_close, v -> sheet.dismiss());
+        headerRow.addView(closeBtn);
 
         root.addView(headerRow);
 
@@ -332,12 +335,12 @@ public class TermuxProPaletteManager {
 
             GradientDrawable activeBg = new GradientDrawable();
             activeBg.setCornerRadius(17 * density);
-            activeBg.setColor(isDark ? Color.parseColor("#283142") : Color.parseColor("#FFFFFF"));
-            activeBg.setStroke((int)(0.5f * density), isDark ? Color.parseColor("#33FFFFFF") : Color.parseColor("#14000000"));
+            activeBg.setColor(Color.parseColor("#1A3DDC97"));
+            activeBg.setStroke((int)(1.2f * density), Color.parseColor("#3DDC97"));
 
             if (!isTemplate) {
                 tabHistory.setBackground(activeBg);
-                tabHistory.setTextColor(textColor);
+                tabHistory.setTextColor(Color.parseColor("#3DDC97"));
                 tabHistory.setTypeface(null, Typeface.BOLD);
 
                 tabTemplates.setBackground(null);
@@ -348,23 +351,34 @@ public class TermuxProPaletteManager {
                 actionBtn.setText("Xoá lịch sử");
                 actionBtn.setTextColor(subTextColor);
                 actionBtn.setBackground(null);
-                actionBtn.setOnClickListener(v -> showClearHistoryDialog(activity, store, () -> refreshPaletteData(
-                    store, isTemplateTab[0], currentQuery[0], recyclerView, emptyLayout, emptyIcon, emptyText, activity)));
+                actionBtn.setOnClickListener(v -> com.termux.app.ui.GlassComponents.showGlassConfirmDialog(
+                    activity,
+                    "Xoá lịch sử lệnh?",
+                    "Toàn bộ lịch sử lệnh gần đây sẽ bị xoá. Các lệnh đã ghim sẽ được giữ lại nguyên vẹn.",
+                    "Xoá lịch sử",
+                    () -> {
+                        store.clearHistoryKeepPinned(activity);
+                        com.termux.app.ui.GlassComponents.showGlassToast(activity, root, "Đã xoá lịch sử lệnh");
+                        refreshPaletteData(store, isTemplateTab[0], currentQuery[0], recyclerView, emptyLayout, emptyIcon, emptyText, activity);
+                    },
+                    "Hủy",
+                    null
+                ));
             } else {
                 tabTemplates.setBackground(activeBg);
-                tabTemplates.setTextColor(textColor);
+                tabTemplates.setTextColor(Color.parseColor("#3DDC97"));
                 tabTemplates.setTypeface(null, Typeface.BOLD);
 
                 tabHistory.setBackground(null);
                 tabHistory.setTextColor(subTextColor);
                 tabHistory.setTypeface(null, Typeface.NORMAL);
 
-                // Action button: "Thêm mẫu" (Pill)
+                // Action button: "Thêm mẫu" (Mint Pill with Obsidian Text)
                 actionBtn.setText("+ Thêm mẫu");
-                actionBtn.setTextColor(Color.parseColor("#FFFFFF"));
+                actionBtn.setTextColor(Color.parseColor("#0E0F11"));
                 GradientDrawable addBg = new GradientDrawable();
                 addBg.setCornerRadius(14 * density);
-                addBg.setColor(accentColor);
+                addBg.setColor(Color.parseColor("#3DDC97"));
                 actionBtn.setBackground(addBg);
                 actionBtn.setOnClickListener(v -> showAddOrEditTemplateDialog(activity, store, null, () -> refreshPaletteData(
                     store, isTemplateTab[0], currentQuery[0], recyclerView, emptyLayout, emptyIcon, emptyText, activity)));
@@ -613,11 +627,11 @@ public class TermuxProPaletteManager {
         String themeId = TermuxProThemeManager.getCurrentThemeId(context);
         boolean isDark = !themeId.equals("giay") && !themeId.equals("suong");
 
-        int textColor = isDark ? Color.parseColor("#F8FAFC") : Color.parseColor("#0F172A");
-        int subTextColor = isDark ? Color.parseColor("#94A3B8") : Color.parseColor("#64748B");
-        int sheetBg = isDark ? Color.parseColor("#151922") : Color.parseColor("#FFFFFF");
-        int inputBgColor = isDark ? Color.parseColor("#1E2430") : Color.parseColor("#F1F5F9");
-        int accentColor = Color.parseColor("#FF3C70");
+        int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
+        int sheetBg = isDark ? Color.parseColor("#E61A1D24") : Color.parseColor("#F5FBF9F5");
+        int inputBgColor = isDark ? Color.parseColor("#22000000") : Color.parseColor("#14000000");
+        int accentColor = Color.parseColor("#3DDC97");
 
         LinearLayout form = new LinearLayout(context);
         form.setOrientation(LinearLayout.VERTICAL);
@@ -720,10 +734,10 @@ public class TermuxProPaletteManager {
         saveBtn.setText("Lưu");
         saveBtn.setTextSize(14);
         saveBtn.setTypeface(null, Typeface.BOLD);
-        saveBtn.setTextColor(Color.WHITE);
+        saveBtn.setTextColor(Color.parseColor("#0E0F11"));
         GradientDrawable sbg = new GradientDrawable();
         sbg.setCornerRadius(14 * density);
-        sbg.setColor(accentColor);
+        sbg.setColor(Color.parseColor("#3DDC97"));
         saveBtn.setBackground(sbg);
         saveBtn.setPadding((int)(24 * density), (int)(10 * density), (int)(24 * density), (int)(10 * density));
 

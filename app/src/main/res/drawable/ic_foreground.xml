@@ -5,19 +5,19 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Termux Pro Command Prompt Chevron (Hot Neon Pink) -->
+    <!-- Termux Pro Command Prompt Chevron (Terminal Mint Green) -->
     <path
-        android:fillColor="#FF3C70"
+        android:fillColor="#3DDC97"
         android:pathData="M32,33 L55,54 L32,75 L41,75 L62,54 L41,33 Z" />
 
-    <!-- Terminal Underscore Cursor (Pure Ice Platinum) -->
+    <!-- Terminal Underscore Cursor (Warm Cream) -->
     <path
-        android:fillColor="#F8FAFC"
+        android:fillColor="#F2EDE4"
         android:pathData="M66,67 h14 a2,2 0 0 1 2,2 v3 a2,2 0 0 1 -2,2 h-14 a2,2 0 0 1 -2,-2 v-3 a2,2 0 0 1 2,-2 z" />
 
-    <!-- Top-Right PRO Diamond Spark (Holographic Cyan) -->
+    <!-- Top-Right PRO Diamond Spark (Champagne Tint) -->
     <path
-        android:fillColor="#38BDF8"
+        android:fillColor="#CDB89A"
         android:pathData="M73,33.5 L77.5,40 L73,46.5 L68.5,40 Z" />
 
     <!-- Diamond Center Core Spark (Pure White) -->

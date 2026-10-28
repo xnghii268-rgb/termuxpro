@@ -1,14 +1,16 @@
 package com.termux.app.ui;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -20,13 +22,15 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.termux.R;
 import com.termux.app.theme.TermuxProThemeManager;
 
 import java.util.List;
 
 /**
- * Modern Material 3 Glass BottomSheet for Termux Pro.
+ * Modern Liquid Glass BottomSheet for Termux Pro.
  * Replaces standard legacy AlertDialogs with unified, sentence-case Vietnamese glass sheets.
+ * Scrim alpha 0.35 max, real blur behind, 28dp continuous-curvature squircle, round glass close button.
  */
 public class GlassSheet {
 
@@ -52,8 +56,8 @@ public class GlassSheet {
                 GradientDrawable bg = new GradientDrawable();
                 bg.setShape(GradientDrawable.RECTANGLE);
                 bg.setCornerRadii(new float[]{
-                    20 * density, 20 * density,
-                    20 * density, 20 * density,
+                    28 * density, 28 * density,
+                    28 * density, 28 * density,
                     0, 0, 0, 0
                 });
 
@@ -61,13 +65,23 @@ public class GlassSheet {
                 boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
 
                 if (isDark) {
-                    bg.setColor(Color.parseColor("#F5161B22"));
-                    bg.setStroke((int)(1 * density), Color.parseColor("#33FFFFFF"));
+                    bg.setColor(Color.parseColor("#E61A1D24"));
+                    bg.setStroke((int)(1.2f * density), Color.parseColor("#33FFFFFF"));
                 } else {
                     bg.setColor(Color.parseColor("#F5FBF9F5"));
-                    bg.setStroke((int)(1 * density), Color.parseColor("#22000000"));
+                    bg.setStroke((int)(1.2f * density), Color.parseColor("#22000000"));
                 }
                 bottomSheet.setBackground(bg);
+            }
+
+            // Window level blur and scrim alpha
+            Window win = dialog.getWindow();
+            if (win != null) {
+                win.setDimAmount(0.35f); // 35% max scrim so living backdrop refracts
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    win.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+                    win.getAttributes().setBlurBehindRadius(28);
+                }
             }
         });
         return dialog;
@@ -83,35 +97,45 @@ public class GlassSheet {
 
         String currentThemeId = TermuxProThemeManager.getCurrentThemeId(context);
         boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
-        int textColor = isDark ? Color.parseColor("#F3F4F6") : Color.parseColor("#1F2937");
-        int subTextColor = isDark ? Color.parseColor("#9CA3AF") : Color.parseColor("#6B7280");
-        int accentColor = Color.parseColor("#FF3C70");
+        int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
+        int accentColor = Color.parseColor("#3DDC97"); // Mint
 
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(24 * density));
 
-        // Drag handle
+        // Drag handle (Glass grabber)
         View handle = new View(context);
         GradientDrawable handleBg = new GradientDrawable();
         handleBg.setShape(GradientDrawable.RECTANGLE);
-        handleBg.setCornerRadius(2 * density);
+        handleBg.setCornerRadius(2.5f * density);
         handleBg.setColor(isDark ? Color.parseColor("#4DFFFFFF") : Color.parseColor("#33000000"));
-        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(36 * density), (int)(4 * density));
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(38 * density), (int)(5 * density));
         handleParams.gravity = Gravity.CENTER_HORIZONTAL;
-        handleParams.bottomMargin = (int)(16 * density);
+        handleParams.bottomMargin = (int)(14 * density);
         handle.setLayoutParams(handleParams);
         handle.setBackground(handleBg);
         root.addView(handle);
 
-        // Title
+        // Header Row: Large Title + Round Glass Close Button
+        LinearLayout headerRow = new LinearLayout(context);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        headerRow.setGravity(Gravity.CENTER_VERTICAL);
+        headerRow.setPadding(0, 0, 0, (int)(14 * density));
+
         TextView titleView = new TextView(context);
         titleView.setText(title);
-        titleView.setTextSize(17);
-        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextSize(18);
+        titleView.setTypeface(null, Typeface.BOLD);
         titleView.setTextColor(textColor);
-        titleView.setPadding(0, 0, 0, (int)(16 * density));
-        root.addView(titleView);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        titleView.setLayoutParams(titleParams);
+        headerRow.addView(titleView);
+
+        FrameLayout closeBtn = GlassComponents.createRoundGlassButton(context, R.drawable.ic_close, v -> dialog.dismiss());
+        headerRow.addView(closeBtn);
+        root.addView(headerRow);
 
         // Scrollable Items list
         ScrollView scrollView = new ScrollView(context);
@@ -125,23 +149,24 @@ public class GlassSheet {
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding((int)(12 * density), (int)(14 * density), (int)(12 * density), (int)(14 * density));
+            row.setPadding((int)(14 * density), (int)(14 * density), (int)(14 * density), (int)(14 * density));
 
             GradientDrawable rowBg = new GradientDrawable();
-            rowBg.setCornerRadius(10 * density);
+            rowBg.setCornerRadius(14 * density);
             if (isSelected) {
-                rowBg.setColor(Color.parseColor("#26FF3C70"));
-                rowBg.setStroke((int)(1 * density), Color.parseColor("#66FF3C70"));
+                rowBg.setColor(Color.parseColor("#1A3DDC97"));
+                rowBg.setStroke((int)(1.5f * density), Color.parseColor("#3DDC97"));
             } else {
-                rowBg.setColor(Color.TRANSPARENT);
+                rowBg.setColor(isDark ? Color.parseColor("#12FFFFFF") : Color.parseColor("#0A000000"));
+                rowBg.setStroke((int)(0.5f * density), isDark ? Color.parseColor("#1FFFFFFF") : Color.parseColor("#0F000000"));
             }
             row.setBackground(rowBg);
 
             TextView itemText = new TextView(context);
             itemText.setText(items.get(i));
-            itemText.setTextSize(14);
+            itemText.setTextSize(14.5f);
             itemText.setTextColor(isSelected ? accentColor : textColor);
-            if (isSelected) itemText.setTypeface(null, android.graphics.Typeface.BOLD);
+            if (isSelected) itemText.setTypeface(null, Typeface.BOLD);
             LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             itemText.setLayoutParams(textParams);
             row.addView(itemText);
@@ -151,7 +176,7 @@ public class GlassSheet {
                 check.setText("✓");
                 check.setTextSize(16);
                 check.setTextColor(accentColor);
-                check.setTypeface(null, android.graphics.Typeface.BOLD);
+                check.setTypeface(null, Typeface.BOLD);
                 row.addView(check);
             }
 
@@ -160,22 +185,16 @@ public class GlassSheet {
                 dialog.dismiss();
             });
 
+            LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            rowParams.bottomMargin = (int)(8 * density);
+            row.setLayoutParams(rowParams);
             itemsContainer.addView(row);
         }
 
         scrollView.addView(itemsContainer);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
-        scrollParams.bottomMargin = (int)(12 * density);
         root.addView(scrollView, scrollParams);
-
-        // Close button
-        Button closeBtn = new Button(context, null, android.R.attr.borderlessButtonStyle);
-        closeBtn.setText("Đóng");
-        closeBtn.setTextColor(subTextColor);
-        closeBtn.setTextSize(14);
-        closeBtn.setOnClickListener(v -> dialog.dismiss());
-        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)(44 * density));
-        root.addView(closeBtn, btnParams);
 
         dialog.setContentView(root);
         dialog.show();
@@ -193,35 +212,44 @@ public class GlassSheet {
 
         String currentThemeId = TermuxProThemeManager.getCurrentThemeId(context);
         boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
-        int textColor = isDark ? Color.parseColor("#F3F4F6") : Color.parseColor("#1F2937");
-        int subTextColor = isDark ? Color.parseColor("#9CA3AF") : Color.parseColor("#6B7280");
-        int accentColor = Color.parseColor("#FF3C70");
+        int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
 
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(20 * density));
+        root.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(24 * density));
 
-        // Handle
+        // Glass grabber
         View handle = new View(context);
         GradientDrawable handleBg = new GradientDrawable();
         handleBg.setShape(GradientDrawable.RECTANGLE);
-        handleBg.setCornerRadius(2 * density);
+        handleBg.setCornerRadius(2.5f * density);
         handleBg.setColor(isDark ? Color.parseColor("#4DFFFFFF") : Color.parseColor("#33000000"));
-        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(36 * density), (int)(4 * density));
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(38 * density), (int)(5 * density));
         handleParams.gravity = Gravity.CENTER_HORIZONTAL;
-        handleParams.bottomMargin = (int)(16 * density);
+        handleParams.bottomMargin = (int)(14 * density);
         handle.setLayoutParams(handleParams);
         handle.setBackground(handleBg);
         root.addView(handle);
 
-        // Title
+        // Header Row: Title + Round Glass Close Button
+        LinearLayout headerRow = new LinearLayout(context);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        headerRow.setGravity(Gravity.CENTER_VERTICAL);
+        headerRow.setPadding(0, 0, 0, (int)(8 * density));
+
         TextView titleView = new TextView(context);
         titleView.setText(title);
-        titleView.setTextSize(17);
-        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextSize(18);
+        titleView.setTypeface(null, Typeface.BOLD);
         titleView.setTextColor(textColor);
-        titleView.setPadding(0, 0, 0, (int)(8 * density));
-        root.addView(titleView);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        titleView.setLayoutParams(titleParams);
+        headerRow.addView(titleView);
+
+        FrameLayout closeBtn = GlassComponents.createRoundGlassButton(context, R.drawable.ic_close, v -> dialog.dismiss());
+        headerRow.addView(closeBtn);
+        root.addView(headerRow);
 
         // Message
         TextView msgView = new TextView(context);
@@ -238,33 +266,20 @@ public class GlassSheet {
         btnRow.setGravity(Gravity.END);
 
         if (!TextUtils.isEmpty(negativeText)) {
-            Button negBtn = new Button(context, null, android.R.attr.borderlessButtonStyle);
-            negBtn.setText(negativeText);
-            negBtn.setTextColor(subTextColor);
-            negBtn.setTextSize(14);
-            negBtn.setOnClickListener(v -> {
+            TextView negBtn = GlassComponents.createSecondaryGlassButton(context, negativeText, v -> {
                 if (onNegative != null) onNegative.run();
                 dialog.dismiss();
             });
             LinearLayout.LayoutParams negParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
-            negParams.rightMargin = (int)(8 * density);
+            negParams.rightMargin = (int)(10 * density);
             btnRow.addView(negBtn, negParams);
         }
 
-        Button posBtn = new Button(context);
-        posBtn.setText(positiveText);
-        posBtn.setTextSize(14);
-        posBtn.setTextColor(Color.parseColor("#1A0A10")); // WCAG 5.60:1 on #FF3C70
-        GradientDrawable posBg = new GradientDrawable();
-        posBg.setCornerRadius(10 * density);
-        posBg.setColor(accentColor);
-        posBtn.setBackground(posBg);
-        posBtn.setOnClickListener(v -> {
+        TextView posBtn = GlassComponents.createPrimaryMintButton(context, positiveText, v -> {
             if (onPositive != null) onPositive.run();
             dialog.dismiss();
         });
         LinearLayout.LayoutParams posParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
-        posParams.leftMargin = (int)(4 * density);
         btnRow.addView(posBtn, posParams);
 
         root.addView(btnRow);
@@ -284,37 +299,46 @@ public class GlassSheet {
 
         String currentThemeId = TermuxProThemeManager.getCurrentThemeId(context);
         boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
-        int textColor = isDark ? Color.parseColor("#F3F4F6") : Color.parseColor("#1F2937");
-        int subTextColor = isDark ? Color.parseColor("#9CA3AF") : Color.parseColor("#6B7280");
-        int accentColor = Color.parseColor("#FF3C70");
+        int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
 
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(20 * density));
+        root.setPadding((int)(20 * density), (int)(12 * density), (int)(20 * density), (int)(24 * density));
 
-        // Handle
+        // Glass grabber
         View handle = new View(context);
         GradientDrawable handleBg = new GradientDrawable();
         handleBg.setShape(GradientDrawable.RECTANGLE);
-        handleBg.setCornerRadius(2 * density);
+        handleBg.setCornerRadius(2.5f * density);
         handleBg.setColor(isDark ? Color.parseColor("#4DFFFFFF") : Color.parseColor("#33000000"));
-        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(36 * density), (int)(4 * density));
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams((int)(38 * density), (int)(5 * density));
         handleParams.gravity = Gravity.CENTER_HORIZONTAL;
-        handleParams.bottomMargin = (int)(16 * density);
+        handleParams.bottomMargin = (int)(14 * density);
         handle.setLayoutParams(handleParams);
         handle.setBackground(handleBg);
         root.addView(handle);
 
-        // Title
+        // Header Row: Title + Round Close Button
+        LinearLayout headerRow = new LinearLayout(context);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        headerRow.setGravity(Gravity.CENTER_VERTICAL);
+        headerRow.setPadding(0, 0, 0, (int)(12 * density));
+
         TextView titleView = new TextView(context);
         titleView.setText(title);
-        titleView.setTextSize(17);
-        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextSize(18);
+        titleView.setTypeface(null, Typeface.BOLD);
         titleView.setTextColor(textColor);
-        titleView.setPadding(0, 0, 0, (int)(12 * density));
-        root.addView(titleView);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        titleView.setLayoutParams(titleParams);
+        headerRow.addView(titleView);
 
-        // EditText
+        FrameLayout closeBtn = GlassComponents.createRoundGlassButton(context, R.drawable.ic_close, v -> dialog.dismiss());
+        headerRow.addView(closeBtn);
+        root.addView(headerRow);
+
+        // EditText in glass pill
         EditText editText = new EditText(context);
         editText.setHint(hint);
         if (initialText != null) {
@@ -325,11 +349,11 @@ public class GlassSheet {
         editText.setHintTextColor(subTextColor);
         editText.setTextSize(15);
         GradientDrawable inputBg = new GradientDrawable();
-        inputBg.setCornerRadius(10 * density);
-        inputBg.setColor(isDark ? Color.parseColor("#26000000") : Color.parseColor("#14000000"));
+        inputBg.setCornerRadius(14 * density);
+        inputBg.setColor(isDark ? Color.parseColor("#22000000") : Color.parseColor("#14000000"));
         inputBg.setStroke((int)(1 * density), isDark ? Color.parseColor("#33FFFFFF") : Color.parseColor("#22000000"));
         editText.setBackground(inputBg);
-        editText.setPadding((int)(12 * density), (int)(10 * density), (int)(12 * density), (int)(10 * density));
+        editText.setPadding((int)(14 * density), (int)(12 * density), (int)(14 * density), (int)(12 * density));
         LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         inputParams.bottomMargin = (int)(20 * density);
         root.addView(editText, inputParams);
@@ -339,24 +363,12 @@ public class GlassSheet {
         btnRow.setOrientation(LinearLayout.HORIZONTAL);
         btnRow.setGravity(Gravity.END);
 
-        Button negBtn = new Button(context, null, android.R.attr.borderlessButtonStyle);
-        negBtn.setText("Hủy");
-        negBtn.setTextColor(subTextColor);
-        negBtn.setTextSize(14);
-        negBtn.setOnClickListener(v -> dialog.dismiss());
+        TextView negBtn = GlassComponents.createSecondaryGlassButton(context, "Hủy", v -> dialog.dismiss());
         LinearLayout.LayoutParams negParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)(44 * density));
-        negParams.rightMargin = (int)(8 * density);
+        negParams.rightMargin = (int)(10 * density);
         btnRow.addView(negBtn, negParams);
 
-        Button posBtn = new Button(context);
-        posBtn.setText(positiveText);
-        posBtn.setTextSize(14);
-        posBtn.setTextColor(Color.parseColor("#1A0A10"));
-        GradientDrawable posBg = new GradientDrawable();
-        posBg.setCornerRadius(10 * density);
-        posBg.setColor(accentColor);
-        posBtn.setBackground(posBg);
-        posBtn.setOnClickListener(v -> {
+        TextView posBtn = GlassComponents.createPrimaryMintButton(context, positiveText, v -> {
             if (onPositive != null) onPositive.onInput(editText.getText().toString());
             dialog.dismiss();
         });

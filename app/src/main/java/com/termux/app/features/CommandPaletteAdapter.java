@@ -83,11 +83,11 @@ public class CommandPaletteAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         String themeId = TermuxProThemeManager.getCurrentThemeId(context);
         this.mIsDarkTheme = !themeId.equals("giay") && !themeId.equals("suong");
 
-        this.mTextColor = mIsDarkTheme ? Color.parseColor("#F8FAFC") : Color.parseColor("#0F172A");
-        this.mSubTextColor = mIsDarkTheme ? Color.parseColor("#94A3B8") : Color.parseColor("#64748B");
-        this.mCardBgColor = mIsDarkTheme ? Color.parseColor("#1E2430") : Color.parseColor("#FFFFFF");
+        this.mTextColor = mIsDarkTheme ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        this.mSubTextColor = mIsDarkTheme ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
+        this.mCardBgColor = mIsDarkTheme ? Color.parseColor("#1A1D24") : Color.parseColor("#FFFFFF");
         this.mSeparatorColor = mIsDarkTheme ? Color.parseColor("#1AFFFFFF") : Color.parseColor("#14000000");
-        this.mAccentColor = Color.parseColor("#FF3C70");
+        this.mAccentColor = Color.parseColor("#3DDC97");
     }
 
     public void updateData(List<CommandItem> pinnedItems, List<CommandItem> regularItems, boolean isTemplateTab) {
@@ -95,7 +95,7 @@ public class CommandPaletteAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         // 1. Pinned Section (only if pins exist)
         if (pinnedItems != null && !pinnedItems.isEmpty()) {
-            mRows.add(new RowModel("ĐÃ GHIM"));
+            mRows.add(new RowModel("Đã ghim"));
             for (int i = 0; i < pinnedItems.size(); i++) {
                 boolean first = (i == 0);
                 boolean last = (i == pinnedItems.size() - 1);
@@ -105,7 +105,7 @@ public class CommandPaletteAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         // 2. Regular Section
         if (regularItems != null && !regularItems.isEmpty()) {
-            String sectionTitle = isTemplateTab ? "TẤT CẢ MẪU" : "GẦN ĐÂY";
+            String sectionTitle = isTemplateTab ? "Tất cả mẫu" : "Gần đây";
             mRows.add(new RowModel(sectionTitle));
             for (int i = 0; i < regularItems.size(); i++) {
                 boolean first = (i == 0);

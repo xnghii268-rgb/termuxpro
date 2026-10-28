@@ -1,16 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#0E0F11">
 
-    <include
-        layout="@layout/partial_primary_toolbar"
-        android:id="@+id/partial_primary_toolbar"/>
-
-    <FrameLayout
-        android:id="@+id/settings"
+    <!-- Living Backdrop Layer -->
+    <com.termux.app.ui.LiquidBackdropView
+        android:id="@+id/settings_backdrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/settings_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top Bar with Round Glass Back Button -->
+        <LinearLayout
+            android:id="@+id/settings_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp">
+
+            <FrameLayout
+                android:id="@+id/settings_btn_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_glass_round_btn"
+                android:contentDescription="Quay lại">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="#F2EDE4" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cài đặt"
+                android:textColor="#F2EDE4"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginStart="14dp" />
+        </LinearLayout>
+
+        <!-- Grouped List Container -->
+        <ScrollView
+            android:id="@+id/settings_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:overScrollMode="always"
+            android:scrollbars="none"
+            android:paddingHorizontal="16dp">
+
+            <LinearLayout
+                android:id="@+id/settings_cards_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="48dp" />
+        </ScrollView>
+    </LinearLayout>
+
+</FrameLayout>

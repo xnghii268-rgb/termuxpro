@@ -68,9 +68,9 @@ public class TermuxProExtraKeysEditor {
 
         String currentThemeId = TermuxProThemeManager.getCurrentThemeId(activity);
         boolean isDark = !currentThemeId.equals("giay") && !currentThemeId.equals("suong");
-        int textColor = isDark ? Color.parseColor("#F3F4F6") : Color.parseColor("#1F2937");
-        int subTextColor = isDark ? Color.parseColor("#9CA3AF") : Color.parseColor("#6B7280");
-        int accentColor = Color.parseColor("#FF3C70");
+        int textColor = isDark ? Color.parseColor("#F2EDE4") : Color.parseColor("#1C1917");
+        int subTextColor = isDark ? Color.parseColor("#9E988F") : Color.parseColor("#64748B");
+        int accentColor = Color.parseColor("#3DDC97");
 
         ScrollView scrollView = new ScrollView(activity);
         LinearLayout root = new LinearLayout(activity);

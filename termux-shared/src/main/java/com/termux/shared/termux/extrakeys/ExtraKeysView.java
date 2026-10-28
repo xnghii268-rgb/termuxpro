@@ -428,8 +428,8 @@ public final class ExtraKeysView extends GridLayout {
         mTerminalFg = terminalFg;
         mTerminalAccent = accent;
         mIsDarkTheme = isDark;
-        mAccentColor = accent != 0 ? accent : (isDark ? 0xFF2DD4BF : 0xFF0D9488);
-        mButtonTextColor = terminalFg != 0 ? terminalFg : (isDark ? 0xFFF3F4F6 : 0xFF111827);
+        mAccentColor = 0xFF3DDC97; // Liquid Glass Terminal Mint
+        mButtonTextColor = terminalFg != 0 ? terminalFg : (isDark ? 0xFFF2EDE4 : 0xFF1C1917);
         mButtonActiveTextColor = mAccentColor;
 
         if (isClassicMode()) {
@@ -442,23 +442,19 @@ public final class ExtraKeysView extends GridLayout {
             mButtonTextColor = 0xFFFFFFFF;
             mButtonActiveTextColor = mAccentColor;
         } else if (isDark) {
-            mBarBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.08f);
-            mBarBackgroundColor = ColorUtils.setAlphaComponent(mBarBackgroundColor, 0xEE);
-
-            mKeyNormalBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.12f);
-            mKeyPressedBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFFFFFFFF, 0.22f);
-            mKeyStrokeColor = 0x26FFFFFF;
-            mAccentBgColor = ColorUtils.setAlphaComponent(mAccentColor, 0x2E);
-            mAccentStrokeColor = ColorUtils.setAlphaComponent(mAccentColor, 0x66);
+            mBarBackgroundColor = 0xE614161B;
+            mKeyNormalBackgroundColor = 0xE61F222A;
+            mKeyPressedBackgroundColor = 0x333DDC97;
+            mKeyStrokeColor = 0x33FFFFFF;
+            mAccentBgColor = 0x2E3DDC97;
+            mAccentStrokeColor = 0x803DDC97;
         } else {
-            mBarBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.08f);
-            mBarBackgroundColor = ColorUtils.setAlphaComponent(mBarBackgroundColor, 0xEE);
-
-            mKeyNormalBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.06f);
-            mKeyPressedBackgroundColor = ColorUtils.blendARGB(terminalBg, 0xFF000000, 0.15f);
-            mKeyStrokeColor = 0x1F000000;
-            mAccentBgColor = ColorUtils.setAlphaComponent(mAccentColor, 0x22);
-            mAccentStrokeColor = ColorUtils.setAlphaComponent(mAccentColor, 0x55);
+            mBarBackgroundColor = 0xE6F5FBF9;
+            mKeyNormalBackgroundColor = 0xE6FFFFFF;
+            mKeyPressedBackgroundColor = 0x223DDC97;
+            mKeyStrokeColor = 0x22000000;
+            mAccentBgColor = 0x223DDC97;
+            mAccentStrokeColor = 0x663DDC97;
         }
 
         mButtonBackgroundColor = mKeyNormalBackgroundColor;
@@ -493,15 +489,15 @@ public final class ExtraKeysView extends GridLayout {
         if ("-".equals(key) || "-".equals(display) || "―".equals(display)) return "-";
         if ("/".equals(key) || "/".equals(display)) return "/";
 
-        // Uppercase labels matching stock reference
-        if ("ESC".equalsIgnoreCase(display) || "ESC".equalsIgnoreCase(key)) return "ESC";
-        if ("CTRL".equalsIgnoreCase(display) || "CTRL".equalsIgnoreCase(key)) return "CTRL";
-        if ("ALT".equalsIgnoreCase(display) || "ALT".equalsIgnoreCase(key)) return "ALT";
-        if ("TAB".equalsIgnoreCase(display) || "TAB".equalsIgnoreCase(key)) return "⇥";
-        if ("HOME".equalsIgnoreCase(display) || "HOME".equalsIgnoreCase(key)) return "HOME";
-        if ("END".equalsIgnoreCase(display) || "END".equalsIgnoreCase(key)) return "END";
-        if ("PGUP".equalsIgnoreCase(display) || "PGUP".equalsIgnoreCase(key)) return "PGUP";
-        if ("PGDN".equalsIgnoreCase(display) || "PGDN".equalsIgnoreCase(key)) return "PGDN";
+        // Sentence case labels matching Liquid Glass Art Direction
+        if ("ESC".equalsIgnoreCase(display) || "ESC".equalsIgnoreCase(key)) return "Esc";
+        if ("CTRL".equalsIgnoreCase(display) || "CTRL".equalsIgnoreCase(key)) return "Ctrl";
+        if ("ALT".equalsIgnoreCase(display) || "ALT".equalsIgnoreCase(key)) return "Alt";
+        if ("TAB".equalsIgnoreCase(display) || "TAB".equalsIgnoreCase(key)) return "Tab";
+        if ("HOME".equalsIgnoreCase(display) || "HOME".equalsIgnoreCase(key)) return "Home";
+        if ("END".equalsIgnoreCase(display) || "END".equalsIgnoreCase(key)) return "End";
+        if ("PGUP".equalsIgnoreCase(display) || "PGUP".equalsIgnoreCase(key)) return "PgUp";
+        if ("PGDN".equalsIgnoreCase(display) || "PGDN".equalsIgnoreCase(key)) return "PgDn";
 
         // Arrows
         if ("UP".equalsIgnoreCase(display) || "UP".equalsIgnoreCase(key)) return "↑";

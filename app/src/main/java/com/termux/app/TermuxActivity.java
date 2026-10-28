@@ -371,6 +371,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         // notification with the crash details if it did
         TermuxCrashUtils.notifyAppCrashFromCrashLogFile(this, LOG_TAG);
 
+        if (mLiquidTabBar != null) {
+            mLiquidTabBar.setVisibility(mIsMenuHubVisible ? View.VISIBLE : View.GONE);
+            mLiquidTabBar.setSelectedTab(mIsMenuHubVisible ? 0 : 1, false);
+        }
+
         mIsOnResumeAfterOnCreate = false;
     }
 
@@ -764,36 +769,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     private void showAiAgentDialog() {
-        List<String> options = java.util.Arrays.asList(
-            "Khởi chạy Antigravity CLI (agy)",
-            "Khởi chạy Gemini AI Assistant",
-            "Cài đặt Antigravity Framework",
-            "Xem trạng thái phiên AI Agent"
-        );
-        com.termux.app.ui.GlassSheet.showListSheet(
-            this,
-            "AI Coding Agent Hub",
-            options,
-            -1,
-            which -> {
-                showTerminalView(true);
-                TerminalSession session = getCurrentSession();
-                if (session == null) return;
-                String cmd = null;
-                if (which == 0) {
-                    cmd = "antigravity\n";
-                } else if (which == 1) {
-                    cmd = "gemini\n";
-                } else if (which == 2) {
-                    cmd = "pip install antigravity-cli --upgrade\n";
-                } else if (which == 3) {
-                    cmd = "echo '[TermuxPro AI Hub] Antigravity ready.'\n";
-                }
-                if (cmd != null) {
-                    session.write(cmd);
-                }
-            }
-        );
+        com.termux.app.ui.AiAgentHubSheet.show(this);
     }
 
     public void showMenuHub() {
@@ -804,9 +780,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (mTerminalView != null) {
             mTerminalView.setVisibility(View.GONE);
         }
-        View sessionScroll = findViewById(R.id.session_chips_scroll_view);
-        if (sessionScroll != null) {
-            sessionScroll.setVisibility(View.GONE);
+        View topBar = findViewById(R.id.terminal_top_bar);
+        if (topBar != null) {
+            topBar.setVisibility(View.GONE);
         }
         ViewPager toolbarPager = getTerminalToolbarViewPager();
         if (toolbarPager != null) {
@@ -819,6 +795,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
 
         if (mLiquidTabBar != null) {
+            mLiquidTabBar.setVisibility(View.VISIBLE);
             mLiquidTabBar.setSelectedTab(0, true);
         }
         updateMenuHubSessionInfo();
@@ -833,9 +810,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             mTerminalView.setVisibility(View.VISIBLE);
             mTerminalView.requestFocus();
         }
-        View sessionScroll = findViewById(R.id.session_chips_scroll_view);
-        if (sessionScroll != null) {
-            sessionScroll.setVisibility(View.VISIBLE);
+        View topBar = findViewById(R.id.terminal_top_bar);
+        if (topBar != null) {
+            topBar.setVisibility(View.VISIBLE);
         }
         ViewPager toolbarPager = getTerminalToolbarViewPager();
         if (toolbarPager != null && mPreferences != null && mPreferences.shouldShowTerminalToolbar()) {
@@ -843,7 +820,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
 
         if (mLiquidTabBar != null) {
-            mLiquidTabBar.setSelectedTab(1, true);
+            mLiquidTabBar.setVisibility(View.GONE);
+            mLiquidTabBar.setSelectedTab(1, false);
         }
 
         if (openKeyboard && mTerminalView != null) {
@@ -852,6 +830,57 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 imm.showSoftInput(mTerminalView, InputMethodManager.SHOW_IMPLICIT);
             }
         }
+    }
+
+    public static String sanitizeTerminalTranscript(String transcript) {
+        if (transcript == null || transcript.trim().isEmpty()) {
+            return "Chưa có đầu ra";
+        }
+        String clean = transcript.replaceAll("\u001B\\[[;?0-9]*[a-zA-Z]", "")
+                                 .replaceAll("\u001B\\([a-zA-Z]", "")
+                                 .replaceAll("\u001B\\][^\u0007\u001B]*(\u0007|\u001B\\\\)", "")
+                                 .replaceAll("\r", "");
+
+        String[] lines = clean.split("\n");
+        java.util.List<String> meaningful = new java.util.ArrayList<>();
+        String lastLine = null;
+
+        for (String raw : lines) {
+            String line = raw.trim();
+            if (line.isEmpty()) continue;
+
+            String strippedRules = line.replaceAll("[─━═│┌┐└┘├┤┬┴┼\\-=_+~#*]", "").trim();
+            if (strippedRules.isEmpty()) continue;
+
+            if (line.startsWith("> Accept-edits") || line.startsWith("? for shortcuts") ||
+                line.startsWith("⠋") || line.startsWith("⠙") || line.startsWith("⠹") ||
+                line.startsWith("⠸") || line.startsWith("⠼") || line.startsWith("⠴") ||
+                line.startsWith("⠦") || line.startsWith("⠧") || line.startsWith("⠇") ||
+                line.startsWith("⠏") || line.startsWith("●") || line.startsWith("○")) {
+                continue;
+            }
+
+            if (line.equals(lastLine)) continue;
+            lastLine = line;
+
+            meaningful.add(line);
+        }
+
+        if (meaningful.isEmpty()) {
+            return "Chưa có đầu ra";
+        }
+
+        int start = Math.max(0, meaningful.size() - 3);
+        StringBuilder sb = new StringBuilder();
+        for (int i = start; i < meaningful.size(); i++) {
+            if (sb.length() > 0) sb.append("\n");
+            String l = meaningful.get(i);
+            if (l.length() > 60) {
+                l = l.substring(0, 58) + "…";
+            }
+            sb.append(l);
+        }
+        return sb.toString();
     }
 
     public void updateMenuHubSessionInfo() {
@@ -888,30 +917,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 if (currentSession != null && currentSession.getEmulator() != null) {
                     try {
                         String transcript = currentSession.getEmulator().getScreen().getTranscriptText();
-                        if (transcript != null && !transcript.trim().isEmpty()) {
-                            String[] lines = transcript.split("\n");
-                            StringBuilder recent = new StringBuilder();
-                            int start = Math.max(0, lines.length - 4);
-                            for (int i = start; i < lines.length; i++) {
-                                String t = lines[i].trim();
-                                if (!t.isEmpty()) {
-                                    if (recent.length() > 0) recent.append("\n");
-                                    recent.append(t);
-                                }
-                            }
-                            if (recent.length() > 0) {
-                                mMenuHeroTerminalPreview.setText(recent.toString());
-                            } else {
-                                mMenuHeroTerminalPreview.setText("~ $ \n~ $ bash session active.");
-                            }
-                        } else {
-                            mMenuHeroTerminalPreview.setText("~ $ \n~ $ bash session active.");
-                        }
+                        mMenuHeroTerminalPreview.setText(sanitizeTerminalTranscript(transcript));
                     } catch (Exception e) {
-                        mMenuHeroTerminalPreview.setText("~ $ \n~ $ bash session active.");
+                        mMenuHeroTerminalPreview.setText("Chưa có đầu ra");
                     }
                 } else {
-                    mMenuHeroTerminalPreview.setText("~ $ \n~ $ Termux Pro Liquid Glass ready.");
+                    mMenuHeroTerminalPreview.setText("Chưa có đầu ra");
                 }
             }
         });
@@ -1024,17 +1035,22 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (mTermuxActivityRootView == null) return;
 
         ViewCompat.setOnApplyWindowInsetsListener(mTermuxActivityRootView, (v, insets) -> {
-            // Apply status bar and display cutout padding to session chips bar
+            // Apply status bar and display cutout padding to terminal top bar and drawer
             int statusBarTop = insets.getInsets(WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout()).top;
-            HorizontalScrollView sessionScroll = findViewById(R.id.session_chips_scroll_view);
-            if (sessionScroll != null) {
+            View topBar = findViewById(R.id.terminal_top_bar);
+            if (topBar != null) {
                 float density = getResources().getDisplayMetrics().density;
-                int basePad = (int)(4 * density + 0.5f);
-                int sidePad = (int)(6 * density + 0.5f);
-                int targetTop = statusBarTop + basePad;
-                if (sessionScroll.getPaddingTop() != targetTop) {
-                    sessionScroll.setPadding(sidePad, targetTop, sidePad, basePad);
+                int basePadTop = (int)(4 * density + 0.5f);
+                int basePadHoriz = (int)(10 * density + 0.5f);
+                int targetTop = statusBarTop + basePadTop;
+                if (topBar.getPaddingTop() != targetTop) {
+                    topBar.setPadding(basePadHoriz, targetTop, basePadHoriz, basePadTop);
                 }
+            }
+
+            View leftDrawer = findViewById(R.id.left_drawer);
+            if (leftDrawer != null && leftDrawer.getPaddingTop() != statusBarTop) {
+                leftDrawer.setPadding(0, statusBarTop, 0, 0);
             }
 
             if (mMenuHubLayout != null) {
@@ -1169,7 +1185,87 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private void setTopSessionChipsBar() {
         mSessionChipsContainer = findViewById(R.id.session_chips_container);
+        setupTopBarButtons();
         updateTopSessionChips();
+    }
+
+    private void setupTopBarButtons() {
+        View btnHome = findViewById(R.id.terminal_top_bar_btn_home);
+        if (btnHome != null) {
+            btnHome.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                showMenuHub();
+            });
+        }
+
+        View btnNewSession = findViewById(R.id.terminal_top_bar_btn_new_session);
+        if (btnNewSession != null) {
+            btnNewSession.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                if (mTermuxTerminalSessionActivityClient != null) {
+                    mTermuxTerminalSessionActivityClient.addNewSession(false, null);
+                }
+            });
+        }
+
+        View btnOverflow = findViewById(R.id.terminal_top_bar_btn_overflow);
+        if (btnOverflow != null) {
+            btnOverflow.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                List<String> options = java.util.Arrays.asList(
+                    "Danh sách phiên (Mở ngăn kéo)",
+                    "Kho Lệnh Nhanh (Command Palette)",
+                    "AI Coding Agent Hub",
+                    "Đổi giao diện (Theme)",
+                    "Chọn đường dẫn (Select URL)",
+                    "Chia sẻ bản ghi (Share Transcript)",
+                    "Cài đặt",
+                    "Đặt lại Terminal (Reset)"
+                );
+                com.termux.app.ui.GlassSheet.showListSheet(
+                    TermuxActivity.this,
+                    "Tùy chọn Terminal",
+                    options,
+                    -1,
+                    which -> {
+                        switch (which) {
+                            case 0:
+                                if (getDrawer() != null) getDrawer().openDrawer(GravityCompat.START);
+                                break;
+                            case 1:
+                                com.termux.app.features.TermuxProPaletteManager.showCommandPalette(TermuxActivity.this);
+                                break;
+                            case 2:
+                                showAiAgentDialog();
+                                break;
+                            case 3:
+                                com.termux.app.ui.ThemePickerSheet.show(TermuxActivity.this);
+                                break;
+                            case 4:
+                                if (mTermuxTerminalViewClient != null) {
+                                    mTermuxTerminalViewClient.showUrlSelection();
+                                }
+                                break;
+                            case 5:
+                                if (mTermuxTerminalViewClient != null) {
+                                    mTermuxTerminalViewClient.shareSessionTranscript();
+                                }
+                                break;
+                            case 6:
+                                ActivityUtils.startActivity(TermuxActivity.this, new Intent(TermuxActivity.this, SettingsActivity.class));
+                                break;
+                            case 7:
+                                TerminalSession s = getCurrentSession();
+                                if (s != null) {
+                                    s.reset();
+                                    showToast("Đã đặt lại Terminal", false);
+                                }
+                                break;
+                        }
+                    }
+                );
+            });
+        }
     }
 
     public void updateTopSessionChips() {
@@ -1177,8 +1273,13 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             updateMenuHubSessionInfo();
             if (mIsMenuHubVisible) {
                 if (mTerminalView != null) mTerminalView.setVisibility(View.GONE);
+                View topBar = findViewById(R.id.terminal_top_bar);
+                if (topBar != null) topBar.setVisibility(View.GONE);
+            } else {
+                View topBar = findViewById(R.id.terminal_top_bar);
+                if (topBar != null) topBar.setVisibility(View.VISIBLE);
                 HorizontalScrollView sessionScroll = findViewById(R.id.session_chips_scroll_view);
-                if (sessionScroll != null) sessionScroll.setVisibility(View.GONE);
+                if (sessionScroll != null) sessionScroll.setVisibility(View.VISIBLE);
             }
             if (mSessionChipsContainer == null || mTermuxService == null) return;
             mSessionChipsContainer.removeAllViews();
@@ -1220,9 +1321,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 GradientDrawable dotDrawable = new GradientDrawable();
                 dotDrawable.setShape(GradientDrawable.OVAL);
                 boolean isRunning = session.isRunning();
-                int tagColor = isRunning ?
-                    TermuxSessionsListViewController.TAG_COLORS[i % TermuxSessionsListViewController.TAG_COLORS.length] :
-                    Color.parseColor("#EF4444");
+                int tagColor = isRunning ? 0xFF3DDC97 : 0xFF6B7280;
                 dotDrawable.setColor(tagColor);
                 dot.setBackground(dotDrawable);
                 chip.addView(dot);
@@ -1237,8 +1336,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     title = "Phiên " + (i + 1);
                 }
                 label.setText(title);
-                label.setTextSize(11.5f);
-                label.setTextColor(isSelected ? Color.WHITE : Color.parseColor("#94A3B8"));
+                label.setTextSize(12f);
+                label.setTextColor(isSelected ? Color.parseColor("#3DDC97") : Color.parseColor("#9E988F"));
                 if (isSelected) label.setTypeface(null, android.graphics.Typeface.BOLD);
                 chip.addView(label);
 
@@ -1323,7 +1422,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             TextView addText = new TextView(TermuxActivity.this);
             addText.setText("+");
             addText.setTextSize(16);
-            addText.setTextColor(Color.parseColor("#FF3C70"));
+            addText.setTextColor(Color.parseColor("#3DDC97"));
             addText.setTypeface(null, android.graphics.Typeface.BOLD);
             addChip.addView(addText);
 

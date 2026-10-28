@@ -193,25 +193,7 @@ public class TermuxProThemeManager {
     }
 
     public static void showThemeDialog(final TermuxActivity activity) {
-        init(activity);
-        List<ThemeItem> themeList = getAvailableThemes(activity);
-        String currentId = getCurrentThemeId(activity);
-
-        List<String> names = new ArrayList<>();
-        int selectedIndex = 0;
-        for (int i = 0; i < themeList.size(); i++) {
-            ThemeItem t = themeList.get(i);
-            names.add(t.name + (t.isDark ? " (Tối)" : " (Sáng)"));
-            if (t.id.equals(currentId)) selectedIndex = i;
-        }
-
-        com.termux.app.ui.GlassSheet.showListSheet(activity,
-            "Chọn chủ đề giao diện",
-            names,
-            selectedIndex,
-            which -> {
-                ThemeItem selected = themeList.get(which);
-                applyTheme(activity, selected.id);
-            });
+        if (activity == null) return;
+        com.termux.app.ui.ThemePickerSheet.show(activity);
     }
 }
