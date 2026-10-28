@@ -133,6 +133,14 @@ public class TerminalInputConnection extends BaseInputConnection {
         if (mEngine == null || !mEngine.isEnabled()) {
             return nfc;
         }
+        // If input contains non-ASCII characters and doesn't end with an ASCII letter modifier,
+        // it is already a finalized/composed word from an external IME.
+        if (!isPureAscii(nfc)) {
+            char last = nfc.charAt(nfc.length() - 1);
+            if (last > 127 || !Character.isLetter(last)) {
+                return nfc;
+            }
+        }
         int end = nfc.length();
         while (end > 0 && Character.isWhitespace(nfc.charAt(end - 1))) {
             end--;
@@ -159,6 +167,9 @@ public class TerminalInputConnection extends BaseInputConnection {
             if (!str.isEmpty()) {
                 mListener.onCommitTextRaw(str);
             }
+            try {
+                super.setComposingText(str, newCursorPosition);
+            } catch (Throwable ignored) {}
             return true;
         }
 
@@ -196,6 +207,9 @@ public class TerminalInputConnection extends BaseInputConnection {
 
         mComposingOnPty = target;
         mBatchModified = true;
+        try {
+            super.setComposingText(target, newCursorPosition);
+        } catch (Throwable ignored) {}
         return true;
     }
 
@@ -208,6 +222,9 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public boolean finishComposingText() {
         logEvent("finishComposingText()");
+        try {
+            super.finishComposingText();
+        } catch (Throwable ignored) {}
         if (mComposingOnPty.length() > 0) {
             mMirroredText.append(mComposingOnPty);
             if (mMirroredText.length() > 2000) {
@@ -235,6 +252,9 @@ public class TerminalInputConnection extends BaseInputConnection {
             if (!rawStr.isEmpty()) {
                 mListener.onCommitTextRaw(rawStr);
             }
+            try {
+                super.commitText(rawStr, newCursorPosition);
+            } catch (Throwable ignored) {}
             return true;
         }
 
@@ -270,9 +290,17 @@ public class TerminalInputConnection extends BaseInputConnection {
                 mMirroredText.delete(0, mMirroredText.length() - 1000);
             }
             Selection.setSelection(mMirroredText, mMirroredText.length());
+            try {
+                super.commitText(target, newCursorPosition);
+            } catch (Throwable ignored) {}
         } else {
-            // Direct commit mode (per-character commit or whole word commit from suggestion)
-            if (rawStr.length() == 1 && Character.isLetter(rawStr.charAt(0)) && mEngine != null && mEngine.isEnabled() && (mListener == null || !mListener.isBypassInputEngine())) {
+            // Direct commit mode:
+            // Only buffer single pure-ASCII letters (for Telex composition without IME)
+            boolean isSingleAsciiLetter = (rawStr.length() == 1 && rawStr.charAt(0) <= 127 && Character.isLetter(rawStr.charAt(0)));
+            if (isSingleAsciiLetter && mEngine != null && mEngine.isEnabled() && (mListener == null || !mListener.isBypassInputEngine())) {
+                if (mCommitWordBuffer.length() == 0) {
+                    mLastCommittedWordDisplay = "";
+                }
                 mCommitWordBuffer.append(rawStr.charAt(0));
                 String targetWord = transformComposingText(mCommitWordBuffer.toString());
                 int common = 0;
@@ -298,17 +326,25 @@ public class TerminalInputConnection extends BaseInputConnection {
                     mMirroredText.delete(0, mMirroredText.length() - 1000);
                 }
                 Selection.setSelection(mMirroredText, mMirroredText.length());
+                try {
+                    super.commitText(append, newCursorPosition);
+                } catch (Throwable ignored) {}
             } else {
+                // Word commit from suggestion or space/enter/non-letter/already-composed text (á, đ, etc.)
                 mCommitWordBuffer.setLength(0);
                 mLastCommittedWordDisplay = "";
-                if (mListener != null && !rawStr.isEmpty()) {
-                    mListener.onCommitTextRaw(rawStr);
+                String target = Normalizer.normalize(rawStr, Normalizer.Form.NFC);
+                if (mListener != null && !target.isEmpty()) {
+                    mListener.onCommitTextRaw(target);
                 }
-                mMirroredText.append(rawStr);
+                mMirroredText.append(target);
                 if (mMirroredText.length() > 2000) {
                     mMirroredText.delete(0, mMirroredText.length() - 1000);
                 }
                 Selection.setSelection(mMirroredText, mMirroredText.length());
+                try {
+                    super.commitText(target, newCursorPosition);
+                } catch (Throwable ignored) {}
             }
         }
 
@@ -319,6 +355,9 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public boolean deleteSurroundingText(int leftLength, int rightLength) {
         logEvent("deleteSurroundingText(" + leftLength + ", " + rightLength + ")");
+        try {
+            super.deleteSurroundingText(leftLength, rightLength);
+        } catch (Throwable ignored) {}
         if (leftLength <= 0 && rightLength <= 0) return true;
 
         if (mComposingOnPty.length() > 0) {
@@ -419,6 +458,14 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public CharSequence getTextBeforeCursor(int n, int flags) {
         if (n <= 0) return "";
+        CharSequence superText = null;
+        try {
+            superText = super.getTextBeforeCursor(n, flags);
+        } catch (Throwable ignored) {}
+        if (superText != null && superText.length() > 0) {
+            logEvent("getTextBeforeCursor(" + n + ") [super] -> \"" + superText + "\"");
+            return superText;
+        }
         String combined = (mComposingOnPty.length() > 0)
                 ? mMirroredText.toString() + mComposingOnPty
                 : mMirroredText.toString();

@@ -250,4 +250,30 @@ public class TerminalInputConnectionTest {
         }
         Assert.assertEquals("fix ", mTerminalBuffer.toString());
     }
+
+    @Test
+    public void testDirectCommitSingleLetterDDoesNotSwallow() {
+        setUp();
+        mConnection.commitText("d", 1);
+        Assert.assertEquals("d", mTerminalBuffer.toString());
+
+        setUp();
+        mConnection.commitText("d", 1);
+        mConnection.commitText("d", 1);
+        Assert.assertEquals("đ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testGboardDirectSuggestionCommitWithDiacritics() {
+        setUp();
+        mConnection.commitText("a", 1);
+        mConnection.commitText("á", 1);
+        Assert.assertEquals("aá", mTerminalBuffer.toString());
+
+        setUp();
+        mConnection.setComposingText("thuong", 1);
+        Assert.assertEquals("thuong", mTerminalBuffer.toString());
+        mConnection.commitText("thương", 1);
+        Assert.assertEquals("thương", mTerminalBuffer.toString());
+    }
 }
