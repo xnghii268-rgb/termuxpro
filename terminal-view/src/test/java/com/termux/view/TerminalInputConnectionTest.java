@@ -168,4 +168,46 @@ public class TerminalInputConnectionTest {
         mConnection.commitText("daaus ", 1);
         Assert.assertEquals("dấu ", mTerminalBuffer.toString());
     }
+
+    @Test
+    public void testLiveComposingDdToDe() {
+        setUp();
+        mConnection.setComposingText("d", 1);
+        Assert.assertEquals("d", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("dd", 1);
+        Assert.assertEquals("đ", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("dde", 1);
+        Assert.assertEquals("đe", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("ddee", 1);
+        Assert.assertEquals("đê", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("ddeer", 1);
+        Assert.assertEquals("để", mTerminalBuffer.toString());
+
+        mConnection.commitText("ddeer ", 1);
+        Assert.assertEquals("để ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testLiveComposingMixedPrecomposedDe() {
+        setUp();
+        // Emulates Gboard composing "đ" then adding "ee" then "r"
+        mConnection.setComposingText("đ", 1);
+        Assert.assertEquals("đ", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("đe", 1);
+        Assert.assertEquals("đe", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("đee", 1);
+        Assert.assertEquals("đê", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("đeer", 1);
+        Assert.assertEquals("để", mTerminalBuffer.toString());
+
+        mConnection.commitText("đeer", 1);
+        Assert.assertEquals("để", mTerminalBuffer.toString());
+    }
 }

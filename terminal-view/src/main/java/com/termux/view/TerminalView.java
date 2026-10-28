@@ -412,10 +412,10 @@ public final class TerminalView extends View {
 
             @Override
             public void onDeleteCodePoints(int codePoints) {
-                if (mEmulator == null) return;
+                if (mEmulator == null || mTermSession == null) return;
                 stopTextSelectionMode();
                 for (int i = 0; i < codePoints; i++) {
-                    inputCodePoint(KEY_EVENT_SOURCE_SOFT_KEYBOARD, 127, false, false);
+                    mTermSession.writeCodePoint(false, 0x7F);
                 }
             }
 
@@ -432,7 +432,7 @@ public final class TerminalView extends View {
             @Override
             public boolean isBypassInputEngine() {
                 boolean isAltScreen = (mEmulator != null && mEmulator.isAlternateBufferActive());
-                boolean isPassword = (mTermSession != null && !mTermSession.isPtyEcho());
+                boolean isPassword = isPasswordPromptActive(mTermSession, mEmulator);
                 return isAltScreen || isPassword;
             }
         });
@@ -976,7 +976,7 @@ public final class TerminalView extends View {
             }
 
             boolean isAltScreen = (mEmulator != null && mEmulator.isAlternateBufferActive());
-            boolean isPassword = (mTermSession != null && !mTermSession.isPtyEcho());
+            boolean isPassword = isPasswordPromptActive(mTermSession, mEmulator);
             boolean bypassEngine = isAltScreen || isPassword || controlDown || altDown;
 
             if (!bypassEngine && codePoint <= 0xFFFF && mTelexEngine != null && mTelexEngine.isEnabled()) {
@@ -1653,6 +1653,28 @@ public final class TerminalView extends View {
                 case MotionEvent.ACTION_CANCEL:
                     showFloatingToolbar();
             }
+        }
+    }
+
+    /**
+     * Determines whether the terminal is actively waiting for a password with ECHO disabled.
+     * Prevents false-positives in interactive raw-mode CLIs (like agy / Node readline).
+     */
+    public static boolean isPasswordPromptActive(TerminalSession session, TerminalEmulator emulator) {
+        if (session == null || emulator == null) return false;
+        if (session.isPtyEcho()) return false;
+        try {
+            int row = emulator.getCursorRow();
+            int cols = emulator.mColumns;
+            int startRow = Math.max(0, row - 1);
+            String line = emulator.getSelectedText(0, startRow, cols, row);
+            if (line == null) return false;
+            String lower = line.toLowerCase();
+            return lower.contains("password") || lower.contains("passcode") ||
+                   lower.contains("pin:") || lower.contains("mật khẩu") ||
+                   lower.contains("passphrase") || lower.contains("enter token");
+        } catch (Throwable t) {
+            return false;
         }
     }
 

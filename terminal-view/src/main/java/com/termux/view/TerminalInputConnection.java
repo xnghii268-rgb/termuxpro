@@ -130,10 +130,6 @@ public class TerminalInputConnection extends BaseInputConnection {
         if (mEngine == null || !mEngine.isEnabled()) {
             return nfc;
         }
-        if (!isPureAscii(nfc)) {
-            // Already contains accented characters composed by external IME
-            return nfc;
-        }
         int end = nfc.length();
         while (end > 0 && Character.isWhitespace(nfc.charAt(end - 1))) {
             end--;
@@ -337,10 +333,14 @@ public class TerminalInputConnection extends BaseInputConnection {
 
     @Override
     public CharSequence getTextBeforeCursor(int n, int flags) {
-        int len = mMirroredText.length();
+        if (n <= 0) return "";
+        String combined = (mComposingOnPty.length() > 0)
+                ? mMirroredText.toString() + mComposingOnPty
+                : mMirroredText.toString();
+        int len = combined.length();
         if (len == 0) return "";
         int start = Math.max(0, len - n);
-        CharSequence res = mMirroredText.subSequence(start, len);
+        CharSequence res = combined.subSequence(start, len);
         logEvent("getTextBeforeCursor(" + n + ") -> \"" + res + "\"");
         return res;
     }
