@@ -44,16 +44,16 @@ android {
         applicationId "com.termuxpro.app"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
-        versionCode 140
-        versionName "0.120.7"
+        versionCode 141
+        versionName "0.120.8"
 
         if (appVersionName) versionName = appVersionName
         validateVersionName(versionName)
 
         buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by TermuxApplication class
-        buildConfigField "String", "GIT_COMMIT_HASH", "\"8f3cbe3\""
-        buildConfigField "String", "BUILD_TIMESTAMP", "\"2026-10-28 22:30:00\""
-        buildConfigField "String", "INPUT_ENGINE_VERSION", "\"engine 3.0 (universal composing & direct commit pipeline)\""
+        buildConfigField "String", "GIT_COMMIT_HASH", "\"17299a7\""
+        buildConfigField "String", "BUILD_TIMESTAMP", "\"2026-10-28 23:45:00\""
+        buildConfigField "String", "INPUT_ENGINE_VERSION", "\"engine 3.1 (AOSP native editable sync + zero-spam telex)\""
         buildConfigField "String", "INPUT_TEST_COUNT", "\"4940/4940 passed\""
 
         manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termuxpro.app"

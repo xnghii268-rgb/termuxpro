@@ -3,7 +3,6 @@ package com.termux.view;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Selection;
-import android.text.SpannableStringBuilder;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
@@ -16,8 +15,8 @@ import java.util.List;
 
 /**
  * High-performance, root-cause Vietnamese Telex/VNI InputConnection for Termux Pro.
- * Preserves full composing buffers, mirrors line context for IME word rewrites,
- * guarantees NFC Unicode normalization, and sends code-point-accurate backspaces.
+ * Preserves native AOSP BaseInputConnection Editable synchronization to prevent IME desynchronization,
+ * bridges live composing and direct commit deltas to PTY, and auto-restores English words.
  */
 public class TerminalInputConnection extends BaseInputConnection {
 
@@ -32,8 +31,6 @@ public class TerminalInputConnection extends BaseInputConnection {
     }
 
     private final TerminalInputListener mListener;
-    private final SpannableStringBuilder mComposingBuffer = new SpannableStringBuilder();
-    private final SpannableStringBuilder mMirroredText = new SpannableStringBuilder();
     private final StringBuilder mCommitWordBuffer = new StringBuilder();
     private String mLastCommittedWordDisplay = "";
     private String mComposingOnPty = "";
@@ -42,6 +39,8 @@ public class TerminalInputConnection extends BaseInputConnection {
     private boolean mBatchModified = false;
     private static boolean sDebugLogEnabled = false;
     private static final List<String> sDebugLog = new ArrayList<>();
+    private String mActiveImeId = "unknown";
+    private final StringBuilder mCommittedHistory = new StringBuilder();
 
     public TerminalInputConnection(View targetView, TerminalInputListener listener) {
         super(targetView, true);
@@ -75,8 +74,6 @@ public class TerminalInputConnection extends BaseInputConnection {
         }
     }
 
-    private String mActiveImeId = "unknown";
-
     public void setActiveImeId(String imeId) {
         this.mActiveImeId = (imeId != null) ? imeId : "unknown";
     }
@@ -102,9 +99,19 @@ public class TerminalInputConnection extends BaseInputConnection {
         }
     }
 
-    @Override
-    public Editable getEditable() {
-        return mMirroredText;
+    private void clearNativeEditable() {
+        try {
+            Editable e = super.getEditable();
+            if (e != null) {
+                e.clear();
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private void trimHistory() {
+        if (mCommittedHistory.length() > 1000) {
+            mCommittedHistory.delete(0, mCommittedHistory.length() - 500);
+        }
     }
 
     @Override
@@ -163,23 +170,21 @@ public class TerminalInputConnection extends BaseInputConnection {
         String str = (text != null) ? text.toString() : "";
         logEvent("setComposingText(\"" + str + "\", " + newCursorPosition + ")");
 
+        // Update Android native Editable with the raw text sent by IME.
+        // This guarantees Gboard's internal model stays 100% in sync without desync or span corruption.
+        try {
+            super.setComposingText(text, newCursorPosition);
+        } catch (Throwable ignored) {}
+
         if (mListener != null && mListener.isControlOrAltActive()) {
             if (!str.isEmpty()) {
                 mListener.onCommitTextRaw(str);
             }
-            try {
-                super.setComposingText(str, newCursorPosition);
-            } catch (Throwable ignored) {}
             return true;
         }
 
         mCommitWordBuffer.setLength(0);
         mLastCommittedWordDisplay = "";
-
-        mComposingBuffer.clear();
-        if (!str.isEmpty()) {
-            mComposingBuffer.append(str);
-        }
 
         if (mListener != null) {
             mListener.onComposingStateChanged(str);
@@ -207,9 +212,6 @@ public class TerminalInputConnection extends BaseInputConnection {
 
         mComposingOnPty = target;
         mBatchModified = true;
-        try {
-            super.setComposingText(target, newCursorPosition);
-        } catch (Throwable ignored) {}
         return true;
     }
 
@@ -225,17 +227,16 @@ public class TerminalInputConnection extends BaseInputConnection {
         try {
             super.finishComposingText();
         } catch (Throwable ignored) {}
+
         if (mComposingOnPty.length() > 0) {
-            mMirroredText.append(mComposingOnPty);
-            if (mMirroredText.length() > 2000) {
-                mMirroredText.delete(0, mMirroredText.length() - 1000);
-            }
-            Selection.setSelection(mMirroredText, mMirroredText.length());
+            mCommittedHistory.append(mComposingOnPty);
+            trimHistory();
             mComposingOnPty = "";
         }
-        mComposingBuffer.clear();
         mCommitWordBuffer.setLength(0);
         mLastCommittedWordDisplay = "";
+        clearNativeEditable();
+
         if (mListener != null) {
             mListener.onComposingStateChanged("");
         }
@@ -248,17 +249,18 @@ public class TerminalInputConnection extends BaseInputConnection {
         String rawStr = text.toString();
         logEvent("commitText(\"" + rawStr + "\", " + newCursorPosition + ")");
 
+        try {
+            super.commitText(text, newCursorPosition);
+        } catch (Throwable ignored) {}
+
         if (mListener != null && mListener.isControlOrAltActive()) {
             if (!rawStr.isEmpty()) {
                 mListener.onCommitTextRaw(rawStr);
             }
-            try {
-                super.commitText(rawStr, newCursorPosition);
-            } catch (Throwable ignored) {}
+            clearNativeEditable();
             return true;
         }
 
-        mComposingBuffer.clear();
         if (mListener != null) {
             mListener.onComposingStateChanged("");
         }
@@ -285,14 +287,9 @@ public class TerminalInputConnection extends BaseInputConnection {
             }
             mComposingOnPty = "";
 
-            mMirroredText.append(target);
-            if (mMirroredText.length() > 2000) {
-                mMirroredText.delete(0, mMirroredText.length() - 1000);
-            }
-            Selection.setSelection(mMirroredText, mMirroredText.length());
-            try {
-                super.commitText(target, newCursorPosition);
-            } catch (Throwable ignored) {}
+            mCommittedHistory.append(target);
+            trimHistory();
+            clearNativeEditable();
         } else {
             // Direct commit mode:
             // Only buffer single pure-ASCII letters (for Telex composition without IME)
@@ -321,14 +318,8 @@ public class TerminalInputConnection extends BaseInputConnection {
                 }
                 mLastCommittedWordDisplay = targetWord;
 
-                mMirroredText.append(append);
-                if (mMirroredText.length() > 2000) {
-                    mMirroredText.delete(0, mMirroredText.length() - 1000);
-                }
-                Selection.setSelection(mMirroredText, mMirroredText.length());
-                try {
-                    super.commitText(append, newCursorPosition);
-                } catch (Throwable ignored) {}
+                mCommittedHistory.append(append);
+                trimHistory();
             } else {
                 // Word commit from suggestion or space/enter/non-letter/already-composed text (á, đ, etc.)
                 mCommitWordBuffer.setLength(0);
@@ -337,14 +328,9 @@ public class TerminalInputConnection extends BaseInputConnection {
                 if (mListener != null && !target.isEmpty()) {
                     mListener.onCommitTextRaw(target);
                 }
-                mMirroredText.append(target);
-                if (mMirroredText.length() > 2000) {
-                    mMirroredText.delete(0, mMirroredText.length() - 1000);
-                }
-                Selection.setSelection(mMirroredText, mMirroredText.length());
-                try {
-                    super.commitText(target, newCursorPosition);
-                } catch (Throwable ignored) {}
+                mCommittedHistory.append(target);
+                trimHistory();
+                clearNativeEditable();
             }
         }
 
@@ -367,10 +353,6 @@ public class TerminalInputConnection extends BaseInputConnection {
                 mListener.onDeleteCodePoints(del);
             }
             mComposingOnPty = newTarget;
-            mComposingBuffer.clear();
-            if (!newTarget.isEmpty()) {
-                mComposingBuffer.append(newTarget);
-            }
             if (mListener != null) {
                 mListener.onComposingStateChanged(newTarget);
             }
@@ -406,13 +388,13 @@ public class TerminalInputConnection extends BaseInputConnection {
 
         if (leftLength > 0) {
             int codePointsToDelete = 0;
-            int mirrorLen = mMirroredText.length();
+            int histLen = mCommittedHistory.length();
             int charsRemaining = leftLength;
 
-            while (charsRemaining > 0 && mirrorLen > 0) {
-                int cp = Character.codePointBefore(mMirroredText, mirrorLen);
+            while (charsRemaining > 0 && histLen > 0) {
+                int cp = Character.codePointBefore(mCommittedHistory, histLen);
                 int charCount = Character.charCount(cp);
-                mirrorLen -= charCount;
+                histLen -= charCount;
                 charsRemaining -= charCount;
                 codePointsToDelete++;
             }
@@ -421,9 +403,9 @@ public class TerminalInputConnection extends BaseInputConnection {
                 codePointsToDelete = leftLength;
             }
 
-            if (mMirroredText.length() > 0) {
-                int delFrom = Math.max(0, mMirroredText.length() - leftLength);
-                mMirroredText.delete(delFrom, mMirroredText.length());
+            if (mCommittedHistory.length() > 0) {
+                int delFrom = Math.max(0, mCommittedHistory.length() - leftLength);
+                mCommittedHistory.delete(delFrom, mCommittedHistory.length());
             }
 
             if (mListener != null) {
@@ -440,16 +422,16 @@ public class TerminalInputConnection extends BaseInputConnection {
         logEvent("deleteSurroundingTextInCodePoints(" + beforeLength + ", " + afterLength + ")");
         if (beforeLength > 0 && mListener != null) {
             mListener.onDeleteCodePoints(beforeLength);
-            if (mMirroredText.length() > 0) {
+            if (mCommittedHistory.length() > 0) {
                 int delChars = 0;
-                int len = mMirroredText.length();
+                int len = mCommittedHistory.length();
                 for (int i = 0; i < beforeLength && len > 0; i++) {
-                    int cp = Character.codePointBefore(mMirroredText, len);
+                    int cp = Character.codePointBefore(mCommittedHistory, len);
                     int cc = Character.charCount(cp);
                     len -= cc;
                     delChars += cc;
                 }
-                mMirroredText.delete(Math.max(0, mMirroredText.length() - delChars), mMirroredText.length());
+                mCommittedHistory.delete(Math.max(0, mCommittedHistory.length() - delChars), mCommittedHistory.length());
             }
         }
         return true;
@@ -467,8 +449,8 @@ public class TerminalInputConnection extends BaseInputConnection {
             return superText;
         }
         String combined = (mComposingOnPty.length() > 0)
-                ? mMirroredText.toString() + mComposingOnPty
-                : mMirroredText.toString();
+                ? mCommittedHistory.toString() + mComposingOnPty
+                : mCommittedHistory.toString();
         int len = combined.length();
         if (len == 0) return "";
         int start = Math.max(0, len - n);
@@ -496,7 +478,8 @@ public class TerminalInputConnection extends BaseInputConnection {
                 return true;
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 finishComposingText();
-                mMirroredText.clear();
+                mCommittedHistory.setLength(0);
+                clearNativeEditable();
             }
         }
         if (mListener != null) {
@@ -507,8 +490,10 @@ public class TerminalInputConnection extends BaseInputConnection {
 
     public void resetContext() {
         mComposingOnPty = "";
-        mComposingBuffer.clear();
-        mMirroredText.clear();
+        mCommitWordBuffer.setLength(0);
+        mLastCommittedWordDisplay = "";
+        mCommittedHistory.setLength(0);
+        clearNativeEditable();
         if (mListener != null) {
             mListener.onComposingStateChanged("");
         }
