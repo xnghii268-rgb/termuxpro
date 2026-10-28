@@ -376,6 +376,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             mLiquidTabBar.setSelectedTab(mIsMenuHubVisible ? 0 : 1, false);
         }
 
+        if (mTerminalView != null) {
+            mTerminalView.reloadVietnameseEnginePreferences();
+        }
+
         mIsOnResumeAfterOnCreate = false;
     }
 

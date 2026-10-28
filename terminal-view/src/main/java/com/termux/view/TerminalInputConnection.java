@@ -58,6 +58,25 @@ public class TerminalInputConnection extends BaseInputConnection {
         }
     }
 
+    private String mActiveImeId = "unknown";
+
+    public void setActiveImeId(String imeId) {
+        this.mActiveImeId = (imeId != null) ? imeId : "unknown";
+    }
+
+    public String getActiveImeId() {
+        return mActiveImeId;
+    }
+
+    public void logDebugState(String rawBuffer, String engineOutput, boolean isVietnamese, boolean isRestored, int bytesWritten, boolean echoOn) {
+        if (!sDebugLogEnabled) return;
+        if (!echoOn) {
+            logEvent("IME State: [PASSWORD_ECHO_OFF] bytesWritten=" + bytesWritten + " ime=" + mActiveImeId);
+        } else {
+            logEvent("IME State: raw=\"" + rawBuffer + "\" out=\"" + engineOutput + "\" vi=" + isVietnamese + " restored=" + isRestored + " bytes=" + bytesWritten + " ime=" + mActiveImeId);
+        }
+    }
+
     private void logEvent(String msg) {
         if (!sDebugLogEnabled) return;
         synchronized (sDebugLog) {

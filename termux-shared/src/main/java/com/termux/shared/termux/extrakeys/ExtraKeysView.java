@@ -510,7 +510,7 @@ public final class ExtraKeysView extends GridLayout {
         if ("RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(display)) return "Ảnh mới";
         if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(display)) return "Lệnh";
         if ("THEME".equalsIgnoreCase(key) || "GIAO DIỆN".equalsIgnoreCase(display)) return "Giao diện";
-        if ("TELEX".equalsIgnoreCase(key) || "TELEX".equalsIgnoreCase(display)) return "Telex";
+        if ("TELEX".equalsIgnoreCase(key) || "TELEX".equalsIgnoreCase(display) || "VI".equalsIgnoreCase(key) || "VI_EN".equalsIgnoreCase(key)) return "VI";
 
         return display;
     }

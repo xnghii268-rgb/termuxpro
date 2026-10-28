@@ -264,6 +264,16 @@ public final class TerminalSession extends TerminalOutput {
         return mShellPid != -1;
     }
 
+    /** Returns true if ECHO is enabled on the PTY, false during password entry. */
+    public boolean isPtyEcho() {
+        if (mShellPid <= 0 || mTerminalFileDescriptor <= 0) return true;
+        try {
+            return JNI.getPtyEcho(mTerminalFileDescriptor);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
     /** Only valid if not {@link #isRunning()}. */
     public synchronized int getExitStatus() {
         return mShellExitStatus;

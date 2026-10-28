@@ -179,6 +179,25 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         return mExtraKeysInfo;
     }
 
+    @Override
+    public void onExtraKeyButtonClick(View view, com.termux.shared.termux.extrakeys.ExtraKeyButton buttonInfo, com.google.android.material.button.MaterialButton button) {
+        if (buttonInfo != null && ("TELEX".equalsIgnoreCase(buttonInfo.getKey()) || "VI".equalsIgnoreCase(buttonInfo.getKey()) || "VI_EN".equalsIgnoreCase(buttonInfo.getKey()))) {
+            TerminalView tv = mActivity.getTerminalView();
+            if (tv != null && tv.getTelexEngine() != null) {
+                boolean nextState = !tv.getTelexEngine().isEnabled();
+                tv.getTelexEngine().setEnabled(nextState);
+                if (button != null) {
+                    button.setText(nextState ? "VI" : "EN");
+                    button.setTextColor(nextState ? 0xFF3DDC97 : 0xFF9E988F);
+                }
+                com.termux.app.ui.GlassComponents.showGlassToast(mActivity, mActivity.getWindow().getDecorView(),
+                    "Bộ gõ tiếng Việt: " + (nextState ? "BẬT (VI)" : "TẮT (EN)"));
+                return;
+            }
+        }
+        super.onExtraKeyButtonClick(view, buttonInfo, button);
+    }
+
     @SuppressLint("RtlHardcoded")
     @Override
     public void onTerminalExtraKeyButtonClick(View view, String key, boolean ctrlDown, boolean altDown, boolean shiftDown, boolean fnDown) {

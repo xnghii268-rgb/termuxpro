@@ -1,0 +1,4130 @@
+[
+  {
+    "input": "thuongw",
+    "expected": "thương"
+  },
+  {
+    "input": "thuowng",
+    "expected": "thương"
+  },
+  {
+    "input": "nguoiwf",
+    "expected": "người"
+  },
+  {
+    "input": "nguwowif",
+    "expected": "người"
+  },
+  {
+    "input": "duocj",
+    "expected": "được"
+  },
+  {
+    "input": "truongwf",
+    "expected": "trường"
+  },
+  {
+    "input": "nhuwngx",
+    "expected": "những"
+  },
+  {
+    "input": "Vieetj",
+    "expected": "Việt"
+  },
+  {
+    "input": "Vietj",
+    "expected": "Việt"
+  },
+  {
+    "input": "quoocs",
+    "expected": "quốc"
+  },
+  {
+    "input": "nguyeenx",
+    "expected": "nguyễn"
+  },
+  {
+    "input": "huowngs",
+    "expected": "hướng"
+  },
+  {
+    "input": "muowjn",
+    "expected": "mượn"
+  },
+  {
+    "input": "muowfn",
+    "expected": "mườn"
+  },
+  {
+    "input": "khuyeens",
+    "expected": "khuyến"
+  },
+  {
+    "input": "thuyr",
+    "expected": "thủy"
+  },
+  {
+    "input": "hoaf",
+    "expected": "hoà"
+  },
+  {
+    "input": "Dduwowcj",
+    "expected": "Được"
+  },
+  {
+    "input": "ddi",
+    "expected": "đi"
+  },
+  {
+    "input": "Ddaf",
+    "expected": "Đà"
+  },
+  {
+    "input": "Nangwx",
+    "expected": "Nẵng"
+  },
+  {
+    "input": "aaa",
+    "expected": "aa"
+  },
+  {
+    "input": "ww",
+    "expected": "w"
+  },
+  {
+    "input": "ss",
+    "expected": "s"
+  },
+  {
+    "input": "thuong7",
+    "expected": "thương"
+  },
+  {
+    "input": "nguoi72",
+    "expected": "người"
+  },
+  {
+    "input": "truong72",
+    "expected": "trường"
+  },
+  {
+    "input": "duoc75",
+    "expected": "được"
+  },
+  {
+    "input": "nhung74",
+    "expected": "những"
+  },
+  {
+    "input": "Viet65",
+    "expected": "Việt"
+  },
+  {
+    "input": "quoc61",
+    "expected": "quốc"
+  },
+  {
+    "input": "asf",
+    "expected": "à"
+  },
+  {
+    "input": "toans",
+    "expected": "toán"
+  },
+  {
+    "input": "toanf",
+    "expected": "toàn"
+  },
+  {
+    "input": "toanr",
+    "expected": "toản"
+  },
+  {
+    "input": "toanx",
+    "expected": "toãn"
+  },
+  {
+    "input": "toanj",
+    "expected": "toạn"
+  },
+  {
+    "input": "langs",
+    "expected": "láng"
+  },
+  {
+    "input": "langf",
+    "expected": "làng"
+  },
+  {
+    "input": "langr",
+    "expected": "lảng"
+  },
+  {
+    "input": "langx",
+    "expected": "lãng"
+  },
+  {
+    "input": "langj",
+    "expected": "lạng"
+  },
+  {
+    "input": "nams",
+    "expected": "nám"
+  },
+  {
+    "input": "namf",
+    "expected": "nàm"
+  },
+  {
+    "input": "namr",
+    "expected": "nảm"
+  },
+  {
+    "input": "namx",
+    "expected": "nãm"
+  },
+  {
+    "input": "namj",
+    "expected": "nạm"
+  },
+  {
+    "input": "minhs",
+    "expected": "mính"
+  },
+  {
+    "input": "minhf",
+    "expected": "mình"
+  },
+  {
+    "input": "minhr",
+    "expected": "mỉnh"
+  },
+  {
+    "input": "minhx",
+    "expected": "mĩnh"
+  },
+  {
+    "input": "minhj",
+    "expected": "mịnh"
+  },
+  {
+    "input": "thanhs",
+    "expected": "thánh"
+  },
+  {
+    "input": "thanhf",
+    "expected": "thành"
+  },
+  {
+    "input": "thanhr",
+    "expected": "thảnh"
+  },
+  {
+    "input": "thanhx",
+    "expected": "thãnh"
+  },
+  {
+    "input": "thanhj",
+    "expected": "thạnh"
+  },
+  {
+    "input": "biens",
+    "expected": "bién"
+  },
+  {
+    "input": "bienf",
+    "expected": "bièn"
+  },
+  {
+    "input": "bienr",
+    "expected": "biẻn"
+  },
+  {
+    "input": "bienx",
+    "expected": "biẽn"
+  },
+  {
+    "input": "bienj",
+    "expected": "biẹn"
+  },
+  {
+    "input": "duongs",
+    "expected": "duóng"
+  },
+  {
+    "input": "duongf",
+    "expected": "duòng"
+  },
+  {
+    "input": "duongr",
+    "expected": "duỏng"
+  },
+  {
+    "input": "duongx",
+    "expected": "duõng"
+  },
+  {
+    "input": "duongj",
+    "expected": "duọng"
+  },
+  {
+    "input": "laas",
+    "expected": "lấ"
+  },
+  {
+    "input": "laaf",
+    "expected": "lầ"
+  },
+  {
+    "input": "laar",
+    "expected": "lẩ"
+  },
+  {
+    "input": "laax",
+    "expected": "lẫ"
+  },
+  {
+    "input": "laaj",
+    "expected": "lậ"
+  },
+  {
+    "input": "lees",
+    "expected": "lế"
+  },
+  {
+    "input": "leef",
+    "expected": "lề"
+  },
+  {
+    "input": "leer",
+    "expected": "lể"
+  },
+  {
+    "input": "leex",
+    "expected": "lễ"
+  },
+  {
+    "input": "leej",
+    "expected": "lệ"
+  },
+  {
+    "input": "loos",
+    "expected": "lố"
+  },
+  {
+    "input": "loof",
+    "expected": "lồ"
+  },
+  {
+    "input": "loor",
+    "expected": "lổ"
+  },
+  {
+    "input": "loox",
+    "expected": "lỗ"
+  },
+  {
+    "input": "looj",
+    "expected": "lộ"
+  },
+  {
+    "input": "laws",
+    "expected": "lắ"
+  },
+  {
+    "input": "lawf",
+    "expected": "lằ"
+  },
+  {
+    "input": "lawr",
+    "expected": "lẳ"
+  },
+  {
+    "input": "lawx",
+    "expected": "lẵ"
+  },
+  {
+    "input": "lawj",
+    "expected": "lặ"
+  },
+  {
+    "input": "lows",
+    "expected": "lớ"
+  },
+  {
+    "input": "lowf",
+    "expected": "lờ"
+  },
+  {
+    "input": "lowr",
+    "expected": "lở"
+  },
+  {
+    "input": "lowx",
+    "expected": "lỡ"
+  },
+  {
+    "input": "lowj",
+    "expected": "lợ"
+  },
+  {
+    "input": "luws",
+    "expected": "lứ"
+  },
+  {
+    "input": "luwf",
+    "expected": "lừ"
+  },
+  {
+    "input": "luwr",
+    "expected": "lử"
+  },
+  {
+    "input": "luwx",
+    "expected": "lữ"
+  },
+  {
+    "input": "luwj",
+    "expected": "lự"
+  },
+  {
+    "input": "muonw",
+    "expected": "mươn"
+  },
+  {
+    "input": "muonwf",
+    "expected": "mườn"
+  },
+  {
+    "input": "muonws",
+    "expected": "mướn"
+  },
+  {
+    "input": "muonwj",
+    "expected": "mượn"
+  },
+  {
+    "input": "huongw",
+    "expected": "hương"
+  },
+  {
+    "input": "huongwf",
+    "expected": "hường"
+  },
+  {
+    "input": "huongws",
+    "expected": "hướng"
+  },
+  {
+    "input": "huongwj",
+    "expected": "hượng"
+  },
+  {
+    "input": "luongw",
+    "expected": "lương"
+  },
+  {
+    "input": "luongwf",
+    "expected": "lường"
+  },
+  {
+    "input": "luongws",
+    "expected": "lướng"
+  },
+  {
+    "input": "luongwj",
+    "expected": "lượng"
+  },
+  {
+    "input": "cuocws",
+    "expected": "cước"
+  },
+  {
+    "input": "cuocwj",
+    "expected": "cược"
+  },
+  {
+    "input": "nuocws",
+    "expected": "nước"
+  },
+  {
+    "input": "nuocwj",
+    "expected": "nược"
+  },
+  {
+    "input": "TOANS",
+    "expected": "TOÁN"
+  },
+  {
+    "input": "TOANF",
+    "expected": "TOÀN"
+  },
+  {
+    "input": "VIEETJ",
+    "expected": "VIỆT"
+  },
+  {
+    "input": "VIETJ",
+    "expected": "VIỆT"
+  },
+  {
+    "input": "NGUOIWF",
+    "expected": "NGƯỜI"
+  },
+  {
+    "input": "DDUWOWCJ",
+    "expected": "ĐƯỢC"
+  },
+  {
+    "input": "TRUONGWF",
+    "expected": "TRƯỜNG"
+  },
+  {
+    "input": "HAWS",
+    "expected": "HẮ"
+  },
+  {
+    "input": "HUWS",
+    "expected": "HỨ"
+  },
+  {
+    "input": "HOWS",
+    "expected": "HỚ"
+  },
+  {
+    "input": "DDAF",
+    "expected": "ĐÀ"
+  },
+  {
+    "input": "NAWNGX",
+    "expected": "NẴNG"
+  },
+  {
+    "input": "bas",
+    "expected": "bá"
+  },
+  {
+    "input": "bans",
+    "expected": "bán"
+  },
+  {
+    "input": "bams",
+    "expected": "bám"
+  },
+  {
+    "input": "bangs",
+    "expected": "báng"
+  },
+  {
+    "input": "baf",
+    "expected": "bà"
+  },
+  {
+    "input": "banf",
+    "expected": "bàn"
+  },
+  {
+    "input": "bamf",
+    "expected": "bàm"
+  },
+  {
+    "input": "bangf",
+    "expected": "bàng"
+  },
+  {
+    "input": "bar",
+    "expected": "bả"
+  },
+  {
+    "input": "banr",
+    "expected": "bản"
+  },
+  {
+    "input": "bamr",
+    "expected": "bảm"
+  },
+  {
+    "input": "bangr",
+    "expected": "bảng"
+  },
+  {
+    "input": "bax",
+    "expected": "bã"
+  },
+  {
+    "input": "banx",
+    "expected": "bãn"
+  },
+  {
+    "input": "bamx",
+    "expected": "bãm"
+  },
+  {
+    "input": "bangx",
+    "expected": "bãng"
+  },
+  {
+    "input": "baj",
+    "expected": "bạ"
+  },
+  {
+    "input": "banj",
+    "expected": "bạn"
+  },
+  {
+    "input": "bamj",
+    "expected": "bạm"
+  },
+  {
+    "input": "bangj",
+    "expected": "bạng"
+  },
+  {
+    "input": "cas",
+    "expected": "cá"
+  },
+  {
+    "input": "cans",
+    "expected": "cán"
+  },
+  {
+    "input": "cams",
+    "expected": "cám"
+  },
+  {
+    "input": "cangs",
+    "expected": "cáng"
+  },
+  {
+    "input": "caf",
+    "expected": "cà"
+  },
+  {
+    "input": "canf",
+    "expected": "càn"
+  },
+  {
+    "input": "camf",
+    "expected": "càm"
+  },
+  {
+    "input": "cangf",
+    "expected": "càng"
+  },
+  {
+    "input": "car",
+    "expected": "cả"
+  },
+  {
+    "input": "canr",
+    "expected": "cản"
+  },
+  {
+    "input": "camr",
+    "expected": "cảm"
+  },
+  {
+    "input": "cangr",
+    "expected": "cảng"
+  },
+  {
+    "input": "cax",
+    "expected": "cã"
+  },
+  {
+    "input": "canx",
+    "expected": "cãn"
+  },
+  {
+    "input": "camx",
+    "expected": "cãm"
+  },
+  {
+    "input": "cangx",
+    "expected": "cãng"
+  },
+  {
+    "input": "caj",
+    "expected": "cạ"
+  },
+  {
+    "input": "canj",
+    "expected": "cạn"
+  },
+  {
+    "input": "camj",
+    "expected": "cạm"
+  },
+  {
+    "input": "cangj",
+    "expected": "cạng"
+  },
+  {
+    "input": "das",
+    "expected": "dá"
+  },
+  {
+    "input": "dans",
+    "expected": "dán"
+  },
+  {
+    "input": "dams",
+    "expected": "dám"
+  },
+  {
+    "input": "dangs",
+    "expected": "dáng"
+  },
+  {
+    "input": "daf",
+    "expected": "dà"
+  },
+  {
+    "input": "danf",
+    "expected": "dàn"
+  },
+  {
+    "input": "damf",
+    "expected": "dàm"
+  },
+  {
+    "input": "dangf",
+    "expected": "dàng"
+  },
+  {
+    "input": "dar",
+    "expected": "dả"
+  },
+  {
+    "input": "danr",
+    "expected": "dản"
+  },
+  {
+    "input": "damr",
+    "expected": "dảm"
+  },
+  {
+    "input": "dangr",
+    "expected": "dảng"
+  },
+  {
+    "input": "dax",
+    "expected": "dã"
+  },
+  {
+    "input": "danx",
+    "expected": "dãn"
+  },
+  {
+    "input": "damx",
+    "expected": "dãm"
+  },
+  {
+    "input": "dangx",
+    "expected": "dãng"
+  },
+  {
+    "input": "daj",
+    "expected": "dạ"
+  },
+  {
+    "input": "danj",
+    "expected": "dạn"
+  },
+  {
+    "input": "damj",
+    "expected": "dạm"
+  },
+  {
+    "input": "dangj",
+    "expected": "dạng"
+  },
+  {
+    "input": "ddas",
+    "expected": "đá"
+  },
+  {
+    "input": "ddans",
+    "expected": "đán"
+  },
+  {
+    "input": "ddams",
+    "expected": "đám"
+  },
+  {
+    "input": "ddangs",
+    "expected": "đáng"
+  },
+  {
+    "input": "ddaf",
+    "expected": "đà"
+  },
+  {
+    "input": "ddanf",
+    "expected": "đàn"
+  },
+  {
+    "input": "ddamf",
+    "expected": "đàm"
+  },
+  {
+    "input": "ddangf",
+    "expected": "đàng"
+  },
+  {
+    "input": "ddar",
+    "expected": "đả"
+  },
+  {
+    "input": "ddanr",
+    "expected": "đản"
+  },
+  {
+    "input": "ddamr",
+    "expected": "đảm"
+  },
+  {
+    "input": "ddangr",
+    "expected": "đảng"
+  },
+  {
+    "input": "ddax",
+    "expected": "đã"
+  },
+  {
+    "input": "ddanx",
+    "expected": "đãn"
+  },
+  {
+    "input": "ddamx",
+    "expected": "đãm"
+  },
+  {
+    "input": "ddangx",
+    "expected": "đãng"
+  },
+  {
+    "input": "ddaj",
+    "expected": "đạ"
+  },
+  {
+    "input": "ddanj",
+    "expected": "đạn"
+  },
+  {
+    "input": "ddamj",
+    "expected": "đạm"
+  },
+  {
+    "input": "ddangj",
+    "expected": "đạng"
+  },
+  {
+    "input": "has",
+    "expected": "há"
+  },
+  {
+    "input": "hans",
+    "expected": "hán"
+  },
+  {
+    "input": "hams",
+    "expected": "hám"
+  },
+  {
+    "input": "hangs",
+    "expected": "háng"
+  },
+  {
+    "input": "haf",
+    "expected": "hà"
+  },
+  {
+    "input": "hanf",
+    "expected": "hàn"
+  },
+  {
+    "input": "hamf",
+    "expected": "hàm"
+  },
+  {
+    "input": "hangf",
+    "expected": "hàng"
+  },
+  {
+    "input": "har",
+    "expected": "hả"
+  },
+  {
+    "input": "hanr",
+    "expected": "hản"
+  },
+  {
+    "input": "hamr",
+    "expected": "hảm"
+  },
+  {
+    "input": "hangr",
+    "expected": "hảng"
+  },
+  {
+    "input": "hax",
+    "expected": "hã"
+  },
+  {
+    "input": "hanx",
+    "expected": "hãn"
+  },
+  {
+    "input": "hamx",
+    "expected": "hãm"
+  },
+  {
+    "input": "hangx",
+    "expected": "hãng"
+  },
+  {
+    "input": "haj",
+    "expected": "hạ"
+  },
+  {
+    "input": "hanj",
+    "expected": "hạn"
+  },
+  {
+    "input": "hamj",
+    "expected": "hạm"
+  },
+  {
+    "input": "hangj",
+    "expected": "hạng"
+  },
+  {
+    "input": "las",
+    "expected": "lá"
+  },
+  {
+    "input": "lans",
+    "expected": "lán"
+  },
+  {
+    "input": "lams",
+    "expected": "lám"
+  },
+  {
+    "input": "laf",
+    "expected": "là"
+  },
+  {
+    "input": "lanf",
+    "expected": "làn"
+  },
+  {
+    "input": "lamf",
+    "expected": "làm"
+  },
+  {
+    "input": "lar",
+    "expected": "lả"
+  },
+  {
+    "input": "lanr",
+    "expected": "lản"
+  },
+  {
+    "input": "lamr",
+    "expected": "lảm"
+  },
+  {
+    "input": "lax",
+    "expected": "lã"
+  },
+  {
+    "input": "lanx",
+    "expected": "lãn"
+  },
+  {
+    "input": "lamx",
+    "expected": "lãm"
+  },
+  {
+    "input": "laj",
+    "expected": "lạ"
+  },
+  {
+    "input": "lanj",
+    "expected": "lạn"
+  },
+  {
+    "input": "lamj",
+    "expected": "lạm"
+  },
+  {
+    "input": "mas",
+    "expected": "má"
+  },
+  {
+    "input": "mans",
+    "expected": "mán"
+  },
+  {
+    "input": "mams",
+    "expected": "mám"
+  },
+  {
+    "input": "mangs",
+    "expected": "máng"
+  },
+  {
+    "input": "maf",
+    "expected": "mà"
+  },
+  {
+    "input": "manf",
+    "expected": "màn"
+  },
+  {
+    "input": "mamf",
+    "expected": "màm"
+  },
+  {
+    "input": "mangf",
+    "expected": "màng"
+  },
+  {
+    "input": "mar",
+    "expected": "mả"
+  },
+  {
+    "input": "manr",
+    "expected": "mản"
+  },
+  {
+    "input": "mamr",
+    "expected": "mảm"
+  },
+  {
+    "input": "mangr",
+    "expected": "mảng"
+  },
+  {
+    "input": "max",
+    "expected": "mã"
+  },
+  {
+    "input": "manx",
+    "expected": "mãn"
+  },
+  {
+    "input": "mamx",
+    "expected": "mãm"
+  },
+  {
+    "input": "mangx",
+    "expected": "mãng"
+  },
+  {
+    "input": "maj",
+    "expected": "mạ"
+  },
+  {
+    "input": "manj",
+    "expected": "mạn"
+  },
+  {
+    "input": "mamj",
+    "expected": "mạm"
+  },
+  {
+    "input": "mangj",
+    "expected": "mạng"
+  },
+  {
+    "input": "nas",
+    "expected": "ná"
+  },
+  {
+    "input": "nans",
+    "expected": "nán"
+  },
+  {
+    "input": "nangs",
+    "expected": "náng"
+  },
+  {
+    "input": "naf",
+    "expected": "nà"
+  },
+  {
+    "input": "nanf",
+    "expected": "nàn"
+  },
+  {
+    "input": "nangf",
+    "expected": "nàng"
+  },
+  {
+    "input": "nar",
+    "expected": "nả"
+  },
+  {
+    "input": "nanr",
+    "expected": "nản"
+  },
+  {
+    "input": "nangr",
+    "expected": "nảng"
+  },
+  {
+    "input": "nax",
+    "expected": "nã"
+  },
+  {
+    "input": "nanx",
+    "expected": "nãn"
+  },
+  {
+    "input": "nangx",
+    "expected": "nãng"
+  },
+  {
+    "input": "naj",
+    "expected": "nạ"
+  },
+  {
+    "input": "nanj",
+    "expected": "nạn"
+  },
+  {
+    "input": "nangj",
+    "expected": "nạng"
+  },
+  {
+    "input": "pas",
+    "expected": "pá"
+  },
+  {
+    "input": "pans",
+    "expected": "pán"
+  },
+  {
+    "input": "pams",
+    "expected": "pám"
+  },
+  {
+    "input": "pangs",
+    "expected": "páng"
+  },
+  {
+    "input": "paf",
+    "expected": "pà"
+  },
+  {
+    "input": "panf",
+    "expected": "pàn"
+  },
+  {
+    "input": "pamf",
+    "expected": "pàm"
+  },
+  {
+    "input": "pangf",
+    "expected": "pàng"
+  },
+  {
+    "input": "par",
+    "expected": "pả"
+  },
+  {
+    "input": "panr",
+    "expected": "pản"
+  },
+  {
+    "input": "pamr",
+    "expected": "pảm"
+  },
+  {
+    "input": "pangr",
+    "expected": "pảng"
+  },
+  {
+    "input": "pax",
+    "expected": "pã"
+  },
+  {
+    "input": "panx",
+    "expected": "pãn"
+  },
+  {
+    "input": "pamx",
+    "expected": "pãm"
+  },
+  {
+    "input": "pangx",
+    "expected": "pãng"
+  },
+  {
+    "input": "paj",
+    "expected": "pạ"
+  },
+  {
+    "input": "panj",
+    "expected": "pạn"
+  },
+  {
+    "input": "pamj",
+    "expected": "pạm"
+  },
+  {
+    "input": "pangj",
+    "expected": "pạng"
+  },
+  {
+    "input": "ras",
+    "expected": "rá"
+  },
+  {
+    "input": "rans",
+    "expected": "rán"
+  },
+  {
+    "input": "rams",
+    "expected": "rám"
+  },
+  {
+    "input": "rangs",
+    "expected": "ráng"
+  },
+  {
+    "input": "raf",
+    "expected": "rà"
+  },
+  {
+    "input": "ranf",
+    "expected": "ràn"
+  },
+  {
+    "input": "ramf",
+    "expected": "ràm"
+  },
+  {
+    "input": "rangf",
+    "expected": "ràng"
+  },
+  {
+    "input": "rar",
+    "expected": "rả"
+  },
+  {
+    "input": "ranr",
+    "expected": "rản"
+  },
+  {
+    "input": "ramr",
+    "expected": "rảm"
+  },
+  {
+    "input": "rangr",
+    "expected": "rảng"
+  },
+  {
+    "input": "rax",
+    "expected": "rã"
+  },
+  {
+    "input": "ranx",
+    "expected": "rãn"
+  },
+  {
+    "input": "ramx",
+    "expected": "rãm"
+  },
+  {
+    "input": "rangx",
+    "expected": "rãng"
+  },
+  {
+    "input": "raj",
+    "expected": "rạ"
+  },
+  {
+    "input": "ranj",
+    "expected": "rạn"
+  },
+  {
+    "input": "ramj",
+    "expected": "rạm"
+  },
+  {
+    "input": "rangj",
+    "expected": "rạng"
+  },
+  {
+    "input": "sas",
+    "expected": "sá"
+  },
+  {
+    "input": "sans",
+    "expected": "sán"
+  },
+  {
+    "input": "sams",
+    "expected": "sám"
+  },
+  {
+    "input": "sangs",
+    "expected": "sáng"
+  },
+  {
+    "input": "saf",
+    "expected": "sà"
+  },
+  {
+    "input": "sanf",
+    "expected": "sàn"
+  },
+  {
+    "input": "samf",
+    "expected": "sàm"
+  },
+  {
+    "input": "sangf",
+    "expected": "sàng"
+  },
+  {
+    "input": "sar",
+    "expected": "sả"
+  },
+  {
+    "input": "sanr",
+    "expected": "sản"
+  },
+  {
+    "input": "samr",
+    "expected": "sảm"
+  },
+  {
+    "input": "sangr",
+    "expected": "sảng"
+  },
+  {
+    "input": "sax",
+    "expected": "sã"
+  },
+  {
+    "input": "sanx",
+    "expected": "sãn"
+  },
+  {
+    "input": "samx",
+    "expected": "sãm"
+  },
+  {
+    "input": "sangx",
+    "expected": "sãng"
+  },
+  {
+    "input": "saj",
+    "expected": "sạ"
+  },
+  {
+    "input": "sanj",
+    "expected": "sạn"
+  },
+  {
+    "input": "samj",
+    "expected": "sạm"
+  },
+  {
+    "input": "sangj",
+    "expected": "sạng"
+  },
+  {
+    "input": "tas",
+    "expected": "tá"
+  },
+  {
+    "input": "tans",
+    "expected": "tán"
+  },
+  {
+    "input": "tams",
+    "expected": "tám"
+  },
+  {
+    "input": "tangs",
+    "expected": "táng"
+  },
+  {
+    "input": "taf",
+    "expected": "tà"
+  },
+  {
+    "input": "tanf",
+    "expected": "tàn"
+  },
+  {
+    "input": "tamf",
+    "expected": "tàm"
+  },
+  {
+    "input": "tangf",
+    "expected": "tàng"
+  },
+  {
+    "input": "tar",
+    "expected": "tả"
+  },
+  {
+    "input": "tanr",
+    "expected": "tản"
+  },
+  {
+    "input": "tamr",
+    "expected": "tảm"
+  },
+  {
+    "input": "tangr",
+    "expected": "tảng"
+  },
+  {
+    "input": "tanx",
+    "expected": "tãn"
+  },
+  {
+    "input": "tamx",
+    "expected": "tãm"
+  },
+  {
+    "input": "tangx",
+    "expected": "tãng"
+  },
+  {
+    "input": "taj",
+    "expected": "tạ"
+  },
+  {
+    "input": "tanj",
+    "expected": "tạn"
+  },
+  {
+    "input": "tamj",
+    "expected": "tạm"
+  },
+  {
+    "input": "tangj",
+    "expected": "tạng"
+  },
+  {
+    "input": "vas",
+    "expected": "vá"
+  },
+  {
+    "input": "vans",
+    "expected": "ván"
+  },
+  {
+    "input": "vams",
+    "expected": "vám"
+  },
+  {
+    "input": "vangs",
+    "expected": "váng"
+  },
+  {
+    "input": "vaf",
+    "expected": "và"
+  },
+  {
+    "input": "vanf",
+    "expected": "vàn"
+  },
+  {
+    "input": "vamf",
+    "expected": "vàm"
+  },
+  {
+    "input": "vangf",
+    "expected": "vàng"
+  },
+  {
+    "input": "var",
+    "expected": "vả"
+  },
+  {
+    "input": "vanr",
+    "expected": "vản"
+  },
+  {
+    "input": "vamr",
+    "expected": "vảm"
+  },
+  {
+    "input": "vangr",
+    "expected": "vảng"
+  },
+  {
+    "input": "vax",
+    "expected": "vã"
+  },
+  {
+    "input": "vanx",
+    "expected": "vãn"
+  },
+  {
+    "input": "vamx",
+    "expected": "vãm"
+  },
+  {
+    "input": "vangx",
+    "expected": "vãng"
+  },
+  {
+    "input": "vaj",
+    "expected": "vạ"
+  },
+  {
+    "input": "vanj",
+    "expected": "vạn"
+  },
+  {
+    "input": "vamj",
+    "expected": "vạm"
+  },
+  {
+    "input": "vangj",
+    "expected": "vạng"
+  },
+  {
+    "input": "xas",
+    "expected": "xá"
+  },
+  {
+    "input": "xans",
+    "expected": "xán"
+  },
+  {
+    "input": "xams",
+    "expected": "xám"
+  },
+  {
+    "input": "xangs",
+    "expected": "xáng"
+  },
+  {
+    "input": "xaf",
+    "expected": "xà"
+  },
+  {
+    "input": "xanf",
+    "expected": "xàn"
+  },
+  {
+    "input": "xamf",
+    "expected": "xàm"
+  },
+  {
+    "input": "xangf",
+    "expected": "xàng"
+  },
+  {
+    "input": "xar",
+    "expected": "xả"
+  },
+  {
+    "input": "xanr",
+    "expected": "xản"
+  },
+  {
+    "input": "xamr",
+    "expected": "xảm"
+  },
+  {
+    "input": "xangr",
+    "expected": "xảng"
+  },
+  {
+    "input": "xax",
+    "expected": "xã"
+  },
+  {
+    "input": "xanx",
+    "expected": "xãn"
+  },
+  {
+    "input": "xamx",
+    "expected": "xãm"
+  },
+  {
+    "input": "xangx",
+    "expected": "xãng"
+  },
+  {
+    "input": "xaj",
+    "expected": "xạ"
+  },
+  {
+    "input": "xanj",
+    "expected": "xạn"
+  },
+  {
+    "input": "xamj",
+    "expected": "xạm"
+  },
+  {
+    "input": "xangj",
+    "expected": "xạng"
+  },
+  {
+    "input": "bos",
+    "expected": "bó"
+  },
+  {
+    "input": "bons",
+    "expected": "bón"
+  },
+  {
+    "input": "boms",
+    "expected": "bóm"
+  },
+  {
+    "input": "bongs",
+    "expected": "bóng"
+  },
+  {
+    "input": "bof",
+    "expected": "bò"
+  },
+  {
+    "input": "bonf",
+    "expected": "bòn"
+  },
+  {
+    "input": "bomf",
+    "expected": "bòm"
+  },
+  {
+    "input": "bongf",
+    "expected": "bòng"
+  },
+  {
+    "input": "bor",
+    "expected": "bỏ"
+  },
+  {
+    "input": "bonr",
+    "expected": "bỏn"
+  },
+  {
+    "input": "bomr",
+    "expected": "bỏm"
+  },
+  {
+    "input": "bongr",
+    "expected": "bỏng"
+  },
+  {
+    "input": "bonx",
+    "expected": "bõn"
+  },
+  {
+    "input": "bomx",
+    "expected": "bõm"
+  },
+  {
+    "input": "bongx",
+    "expected": "bõng"
+  },
+  {
+    "input": "boj",
+    "expected": "bọ"
+  },
+  {
+    "input": "bonj",
+    "expected": "bọn"
+  },
+  {
+    "input": "bomj",
+    "expected": "bọm"
+  },
+  {
+    "input": "bongj",
+    "expected": "bọng"
+  },
+  {
+    "input": "cos",
+    "expected": "có"
+  },
+  {
+    "input": "cons",
+    "expected": "cón"
+  },
+  {
+    "input": "coms",
+    "expected": "cóm"
+  },
+  {
+    "input": "congs",
+    "expected": "cóng"
+  },
+  {
+    "input": "cof",
+    "expected": "cò"
+  },
+  {
+    "input": "conf",
+    "expected": "còn"
+  },
+  {
+    "input": "comf",
+    "expected": "còm"
+  },
+  {
+    "input": "congf",
+    "expected": "còng"
+  },
+  {
+    "input": "cor",
+    "expected": "cỏ"
+  },
+  {
+    "input": "conr",
+    "expected": "cỏn"
+  },
+  {
+    "input": "comr",
+    "expected": "cỏm"
+  },
+  {
+    "input": "congr",
+    "expected": "cỏng"
+  },
+  {
+    "input": "cox",
+    "expected": "cõ"
+  },
+  {
+    "input": "conx",
+    "expected": "cõn"
+  },
+  {
+    "input": "comx",
+    "expected": "cõm"
+  },
+  {
+    "input": "congx",
+    "expected": "cõng"
+  },
+  {
+    "input": "coj",
+    "expected": "cọ"
+  },
+  {
+    "input": "conj",
+    "expected": "cọn"
+  },
+  {
+    "input": "comj",
+    "expected": "cọm"
+  },
+  {
+    "input": "congj",
+    "expected": "cọng"
+  },
+  {
+    "input": "dos",
+    "expected": "dó"
+  },
+  {
+    "input": "dons",
+    "expected": "dón"
+  },
+  {
+    "input": "doms",
+    "expected": "dóm"
+  },
+  {
+    "input": "dongs",
+    "expected": "dóng"
+  },
+  {
+    "input": "dof",
+    "expected": "dò"
+  },
+  {
+    "input": "donf",
+    "expected": "dòn"
+  },
+  {
+    "input": "domf",
+    "expected": "dòm"
+  },
+  {
+    "input": "dongf",
+    "expected": "dòng"
+  },
+  {
+    "input": "dor",
+    "expected": "dỏ"
+  },
+  {
+    "input": "donr",
+    "expected": "dỏn"
+  },
+  {
+    "input": "domr",
+    "expected": "dỏm"
+  },
+  {
+    "input": "dongr",
+    "expected": "dỏng"
+  },
+  {
+    "input": "dox",
+    "expected": "dõ"
+  },
+  {
+    "input": "donx",
+    "expected": "dõn"
+  },
+  {
+    "input": "domx",
+    "expected": "dõm"
+  },
+  {
+    "input": "dongx",
+    "expected": "dõng"
+  },
+  {
+    "input": "doj",
+    "expected": "dọ"
+  },
+  {
+    "input": "donj",
+    "expected": "dọn"
+  },
+  {
+    "input": "domj",
+    "expected": "dọm"
+  },
+  {
+    "input": "dongj",
+    "expected": "dọng"
+  },
+  {
+    "input": "ddos",
+    "expected": "đó"
+  },
+  {
+    "input": "ddons",
+    "expected": "đón"
+  },
+  {
+    "input": "ddoms",
+    "expected": "đóm"
+  },
+  {
+    "input": "ddongs",
+    "expected": "đóng"
+  },
+  {
+    "input": "ddof",
+    "expected": "đò"
+  },
+  {
+    "input": "ddonf",
+    "expected": "đòn"
+  },
+  {
+    "input": "ddomf",
+    "expected": "đòm"
+  },
+  {
+    "input": "ddongf",
+    "expected": "đòng"
+  },
+  {
+    "input": "ddor",
+    "expected": "đỏ"
+  },
+  {
+    "input": "ddonr",
+    "expected": "đỏn"
+  },
+  {
+    "input": "ddomr",
+    "expected": "đỏm"
+  },
+  {
+    "input": "ddongr",
+    "expected": "đỏng"
+  },
+  {
+    "input": "ddox",
+    "expected": "đõ"
+  },
+  {
+    "input": "ddonx",
+    "expected": "đõn"
+  },
+  {
+    "input": "ddomx",
+    "expected": "đõm"
+  },
+  {
+    "input": "ddongx",
+    "expected": "đõng"
+  },
+  {
+    "input": "ddoj",
+    "expected": "đọ"
+  },
+  {
+    "input": "ddonj",
+    "expected": "đọn"
+  },
+  {
+    "input": "ddomj",
+    "expected": "đọm"
+  },
+  {
+    "input": "ddongj",
+    "expected": "đọng"
+  },
+  {
+    "input": "hos",
+    "expected": "hó"
+  },
+  {
+    "input": "hons",
+    "expected": "hón"
+  },
+  {
+    "input": "homs",
+    "expected": "hóm"
+  },
+  {
+    "input": "hongs",
+    "expected": "hóng"
+  },
+  {
+    "input": "hof",
+    "expected": "hò"
+  },
+  {
+    "input": "honf",
+    "expected": "hòn"
+  },
+  {
+    "input": "homf",
+    "expected": "hòm"
+  },
+  {
+    "input": "hongf",
+    "expected": "hòng"
+  },
+  {
+    "input": "hor",
+    "expected": "hỏ"
+  },
+  {
+    "input": "honr",
+    "expected": "hỏn"
+  },
+  {
+    "input": "homr",
+    "expected": "hỏm"
+  },
+  {
+    "input": "hongr",
+    "expected": "hỏng"
+  },
+  {
+    "input": "hox",
+    "expected": "hõ"
+  },
+  {
+    "input": "honx",
+    "expected": "hõn"
+  },
+  {
+    "input": "homx",
+    "expected": "hõm"
+  },
+  {
+    "input": "hongx",
+    "expected": "hõng"
+  },
+  {
+    "input": "hoj",
+    "expected": "họ"
+  },
+  {
+    "input": "honj",
+    "expected": "họn"
+  },
+  {
+    "input": "homj",
+    "expected": "họm"
+  },
+  {
+    "input": "hongj",
+    "expected": "họng"
+  },
+  {
+    "input": "los",
+    "expected": "ló"
+  },
+  {
+    "input": "lons",
+    "expected": "lón"
+  },
+  {
+    "input": "loms",
+    "expected": "lóm"
+  },
+  {
+    "input": "longs",
+    "expected": "lóng"
+  },
+  {
+    "input": "lof",
+    "expected": "lò"
+  },
+  {
+    "input": "lonf",
+    "expected": "lòn"
+  },
+  {
+    "input": "lomf",
+    "expected": "lòm"
+  },
+  {
+    "input": "longf",
+    "expected": "lòng"
+  },
+  {
+    "input": "lor",
+    "expected": "lỏ"
+  },
+  {
+    "input": "lonr",
+    "expected": "lỏn"
+  },
+  {
+    "input": "lomr",
+    "expected": "lỏm"
+  },
+  {
+    "input": "longr",
+    "expected": "lỏng"
+  },
+  {
+    "input": "lox",
+    "expected": "lõ"
+  },
+  {
+    "input": "lonx",
+    "expected": "lõn"
+  },
+  {
+    "input": "lomx",
+    "expected": "lõm"
+  },
+  {
+    "input": "longx",
+    "expected": "lõng"
+  },
+  {
+    "input": "loj",
+    "expected": "lọ"
+  },
+  {
+    "input": "lonj",
+    "expected": "lọn"
+  },
+  {
+    "input": "lomj",
+    "expected": "lọm"
+  },
+  {
+    "input": "longj",
+    "expected": "lọng"
+  },
+  {
+    "input": "mos",
+    "expected": "mó"
+  },
+  {
+    "input": "mons",
+    "expected": "món"
+  },
+  {
+    "input": "moms",
+    "expected": "móm"
+  },
+  {
+    "input": "mongs",
+    "expected": "móng"
+  },
+  {
+    "input": "mof",
+    "expected": "mò"
+  },
+  {
+    "input": "monf",
+    "expected": "mòn"
+  },
+  {
+    "input": "momf",
+    "expected": "mòm"
+  },
+  {
+    "input": "mongf",
+    "expected": "mòng"
+  },
+  {
+    "input": "mor",
+    "expected": "mỏ"
+  },
+  {
+    "input": "monr",
+    "expected": "mỏn"
+  },
+  {
+    "input": "momr",
+    "expected": "mỏm"
+  },
+  {
+    "input": "mongr",
+    "expected": "mỏng"
+  },
+  {
+    "input": "mox",
+    "expected": "mõ"
+  },
+  {
+    "input": "monx",
+    "expected": "mõn"
+  },
+  {
+    "input": "momx",
+    "expected": "mõm"
+  },
+  {
+    "input": "mongx",
+    "expected": "mõng"
+  },
+  {
+    "input": "moj",
+    "expected": "mọ"
+  },
+  {
+    "input": "monj",
+    "expected": "mọn"
+  },
+  {
+    "input": "momj",
+    "expected": "mọm"
+  },
+  {
+    "input": "mongj",
+    "expected": "mọng"
+  },
+  {
+    "input": "nos",
+    "expected": "nó"
+  },
+  {
+    "input": "nons",
+    "expected": "nón"
+  },
+  {
+    "input": "noms",
+    "expected": "nóm"
+  },
+  {
+    "input": "nongs",
+    "expected": "nóng"
+  },
+  {
+    "input": "nof",
+    "expected": "nò"
+  },
+  {
+    "input": "nonf",
+    "expected": "nòn"
+  },
+  {
+    "input": "nomf",
+    "expected": "nòm"
+  },
+  {
+    "input": "nongf",
+    "expected": "nòng"
+  },
+  {
+    "input": "nor",
+    "expected": "nỏ"
+  },
+  {
+    "input": "nonr",
+    "expected": "nỏn"
+  },
+  {
+    "input": "nomr",
+    "expected": "nỏm"
+  },
+  {
+    "input": "nongr",
+    "expected": "nỏng"
+  },
+  {
+    "input": "nox",
+    "expected": "nõ"
+  },
+  {
+    "input": "nonx",
+    "expected": "nõn"
+  },
+  {
+    "input": "nomx",
+    "expected": "nõm"
+  },
+  {
+    "input": "nongx",
+    "expected": "nõng"
+  },
+  {
+    "input": "noj",
+    "expected": "nọ"
+  },
+  {
+    "input": "nonj",
+    "expected": "nọn"
+  },
+  {
+    "input": "nomj",
+    "expected": "nọm"
+  },
+  {
+    "input": "nongj",
+    "expected": "nọng"
+  },
+  {
+    "input": "bus",
+    "expected": "bú"
+  },
+  {
+    "input": "buns",
+    "expected": "bún"
+  },
+  {
+    "input": "bums",
+    "expected": "búm"
+  },
+  {
+    "input": "bungs",
+    "expected": "búng"
+  },
+  {
+    "input": "buf",
+    "expected": "bù"
+  },
+  {
+    "input": "bunf",
+    "expected": "bùn"
+  },
+  {
+    "input": "bumf",
+    "expected": "bùm"
+  },
+  {
+    "input": "bungf",
+    "expected": "bùng"
+  },
+  {
+    "input": "bur",
+    "expected": "bủ"
+  },
+  {
+    "input": "bunr",
+    "expected": "bủn"
+  },
+  {
+    "input": "bumr",
+    "expected": "bủm"
+  },
+  {
+    "input": "bungr",
+    "expected": "bủng"
+  },
+  {
+    "input": "bux",
+    "expected": "bũ"
+  },
+  {
+    "input": "bunx",
+    "expected": "bũn"
+  },
+  {
+    "input": "bumx",
+    "expected": "bũm"
+  },
+  {
+    "input": "bungx",
+    "expected": "bũng"
+  },
+  {
+    "input": "buj",
+    "expected": "bụ"
+  },
+  {
+    "input": "bunj",
+    "expected": "bụn"
+  },
+  {
+    "input": "bumj",
+    "expected": "bụm"
+  },
+  {
+    "input": "bungj",
+    "expected": "bụng"
+  },
+  {
+    "input": "cus",
+    "expected": "cú"
+  },
+  {
+    "input": "cuns",
+    "expected": "cún"
+  },
+  {
+    "input": "cums",
+    "expected": "cúm"
+  },
+  {
+    "input": "cungs",
+    "expected": "cúng"
+  },
+  {
+    "input": "cuf",
+    "expected": "cù"
+  },
+  {
+    "input": "cunf",
+    "expected": "cùn"
+  },
+  {
+    "input": "cumf",
+    "expected": "cùm"
+  },
+  {
+    "input": "cungf",
+    "expected": "cùng"
+  },
+  {
+    "input": "cur",
+    "expected": "củ"
+  },
+  {
+    "input": "cunr",
+    "expected": "củn"
+  },
+  {
+    "input": "cumr",
+    "expected": "củm"
+  },
+  {
+    "input": "cungr",
+    "expected": "củng"
+  },
+  {
+    "input": "cux",
+    "expected": "cũ"
+  },
+  {
+    "input": "cunx",
+    "expected": "cũn"
+  },
+  {
+    "input": "cumx",
+    "expected": "cũm"
+  },
+  {
+    "input": "cungx",
+    "expected": "cũng"
+  },
+  {
+    "input": "cuj",
+    "expected": "cụ"
+  },
+  {
+    "input": "cunj",
+    "expected": "cụn"
+  },
+  {
+    "input": "cumj",
+    "expected": "cụm"
+  },
+  {
+    "input": "cungj",
+    "expected": "cụng"
+  },
+  {
+    "input": "dus",
+    "expected": "dú"
+  },
+  {
+    "input": "duns",
+    "expected": "dún"
+  },
+  {
+    "input": "dums",
+    "expected": "dúm"
+  },
+  {
+    "input": "dungs",
+    "expected": "dúng"
+  },
+  {
+    "input": "duf",
+    "expected": "dù"
+  },
+  {
+    "input": "dunf",
+    "expected": "dùn"
+  },
+  {
+    "input": "dumf",
+    "expected": "dùm"
+  },
+  {
+    "input": "dungf",
+    "expected": "dùng"
+  },
+  {
+    "input": "dur",
+    "expected": "dủ"
+  },
+  {
+    "input": "dunr",
+    "expected": "dủn"
+  },
+  {
+    "input": "dumr",
+    "expected": "dủm"
+  },
+  {
+    "input": "dungr",
+    "expected": "dủng"
+  },
+  {
+    "input": "dux",
+    "expected": "dũ"
+  },
+  {
+    "input": "dunx",
+    "expected": "dũn"
+  },
+  {
+    "input": "dumx",
+    "expected": "dũm"
+  },
+  {
+    "input": "dungx",
+    "expected": "dũng"
+  },
+  {
+    "input": "duj",
+    "expected": "dụ"
+  },
+  {
+    "input": "dunj",
+    "expected": "dụn"
+  },
+  {
+    "input": "dumj",
+    "expected": "dụm"
+  },
+  {
+    "input": "dungj",
+    "expected": "dụng"
+  },
+  {
+    "input": "ddus",
+    "expected": "đú"
+  },
+  {
+    "input": "dduns",
+    "expected": "đún"
+  },
+  {
+    "input": "ddums",
+    "expected": "đúm"
+  },
+  {
+    "input": "ddungs",
+    "expected": "đúng"
+  },
+  {
+    "input": "dduf",
+    "expected": "đù"
+  },
+  {
+    "input": "ddunf",
+    "expected": "đùn"
+  },
+  {
+    "input": "ddumf",
+    "expected": "đùm"
+  },
+  {
+    "input": "ddungf",
+    "expected": "đùng"
+  },
+  {
+    "input": "ddur",
+    "expected": "đủ"
+  },
+  {
+    "input": "ddunr",
+    "expected": "đủn"
+  },
+  {
+    "input": "ddumr",
+    "expected": "đủm"
+  },
+  {
+    "input": "ddungr",
+    "expected": "đủng"
+  },
+  {
+    "input": "ddux",
+    "expected": "đũ"
+  },
+  {
+    "input": "ddunx",
+    "expected": "đũn"
+  },
+  {
+    "input": "ddumx",
+    "expected": "đũm"
+  },
+  {
+    "input": "ddungx",
+    "expected": "đũng"
+  },
+  {
+    "input": "dduj",
+    "expected": "đụ"
+  },
+  {
+    "input": "ddunj",
+    "expected": "đụn"
+  },
+  {
+    "input": "ddumj",
+    "expected": "đụm"
+  },
+  {
+    "input": "ddungj",
+    "expected": "đụng"
+  },
+  {
+    "input": "hus",
+    "expected": "hú"
+  },
+  {
+    "input": "huns",
+    "expected": "hún"
+  },
+  {
+    "input": "hums",
+    "expected": "húm"
+  },
+  {
+    "input": "hungs",
+    "expected": "húng"
+  },
+  {
+    "input": "huf",
+    "expected": "hù"
+  },
+  {
+    "input": "hunf",
+    "expected": "hùn"
+  },
+  {
+    "input": "humf",
+    "expected": "hùm"
+  },
+  {
+    "input": "hungf",
+    "expected": "hùng"
+  },
+  {
+    "input": "hur",
+    "expected": "hủ"
+  },
+  {
+    "input": "hunr",
+    "expected": "hủn"
+  },
+  {
+    "input": "humr",
+    "expected": "hủm"
+  },
+  {
+    "input": "hungr",
+    "expected": "hủng"
+  },
+  {
+    "input": "hux",
+    "expected": "hũ"
+  },
+  {
+    "input": "hunx",
+    "expected": "hũn"
+  },
+  {
+    "input": "humx",
+    "expected": "hũm"
+  },
+  {
+    "input": "hungx",
+    "expected": "hũng"
+  },
+  {
+    "input": "huj",
+    "expected": "hụ"
+  },
+  {
+    "input": "hunj",
+    "expected": "hụn"
+  },
+  {
+    "input": "humj",
+    "expected": "hụm"
+  },
+  {
+    "input": "hungj",
+    "expected": "hụng"
+  },
+  {
+    "input": "lus",
+    "expected": "lú"
+  },
+  {
+    "input": "luns",
+    "expected": "lún"
+  },
+  {
+    "input": "lums",
+    "expected": "lúm"
+  },
+  {
+    "input": "lungs",
+    "expected": "lúng"
+  },
+  {
+    "input": "luf",
+    "expected": "lù"
+  },
+  {
+    "input": "lunf",
+    "expected": "lùn"
+  },
+  {
+    "input": "lumf",
+    "expected": "lùm"
+  },
+  {
+    "input": "lungf",
+    "expected": "lùng"
+  },
+  {
+    "input": "lur",
+    "expected": "lủ"
+  },
+  {
+    "input": "lunr",
+    "expected": "lủn"
+  },
+  {
+    "input": "lumr",
+    "expected": "lủm"
+  },
+  {
+    "input": "lungr",
+    "expected": "lủng"
+  },
+  {
+    "input": "lux",
+    "expected": "lũ"
+  },
+  {
+    "input": "lunx",
+    "expected": "lũn"
+  },
+  {
+    "input": "lumx",
+    "expected": "lũm"
+  },
+  {
+    "input": "lungx",
+    "expected": "lũng"
+  },
+  {
+    "input": "luj",
+    "expected": "lụ"
+  },
+  {
+    "input": "lunj",
+    "expected": "lụn"
+  },
+  {
+    "input": "lumj",
+    "expected": "lụm"
+  },
+  {
+    "input": "lungj",
+    "expected": "lụng"
+  },
+  {
+    "input": "mus",
+    "expected": "mú"
+  },
+  {
+    "input": "muns",
+    "expected": "mún"
+  },
+  {
+    "input": "mums",
+    "expected": "múm"
+  },
+  {
+    "input": "mungs",
+    "expected": "múng"
+  },
+  {
+    "input": "muf",
+    "expected": "mù"
+  },
+  {
+    "input": "munf",
+    "expected": "mùn"
+  },
+  {
+    "input": "mumf",
+    "expected": "mùm"
+  },
+  {
+    "input": "mungf",
+    "expected": "mùng"
+  },
+  {
+    "input": "mur",
+    "expected": "mủ"
+  },
+  {
+    "input": "munr",
+    "expected": "mủn"
+  },
+  {
+    "input": "mumr",
+    "expected": "mủm"
+  },
+  {
+    "input": "mungr",
+    "expected": "mủng"
+  },
+  {
+    "input": "mux",
+    "expected": "mũ"
+  },
+  {
+    "input": "munx",
+    "expected": "mũn"
+  },
+  {
+    "input": "mumx",
+    "expected": "mũm"
+  },
+  {
+    "input": "mungx",
+    "expected": "mũng"
+  },
+  {
+    "input": "muj",
+    "expected": "mụ"
+  },
+  {
+    "input": "munj",
+    "expected": "mụn"
+  },
+  {
+    "input": "mumj",
+    "expected": "mụm"
+  },
+  {
+    "input": "mungj",
+    "expected": "mụng"
+  },
+  {
+    "input": "nus",
+    "expected": "nú"
+  },
+  {
+    "input": "nuns",
+    "expected": "nún"
+  },
+  {
+    "input": "nums",
+    "expected": "núm"
+  },
+  {
+    "input": "nungs",
+    "expected": "núng"
+  },
+  {
+    "input": "nuf",
+    "expected": "nù"
+  },
+  {
+    "input": "nunf",
+    "expected": "nùn"
+  },
+  {
+    "input": "numf",
+    "expected": "nùm"
+  },
+  {
+    "input": "nungf",
+    "expected": "nùng"
+  },
+  {
+    "input": "nur",
+    "expected": "nủ"
+  },
+  {
+    "input": "nunr",
+    "expected": "nủn"
+  },
+  {
+    "input": "numr",
+    "expected": "nủm"
+  },
+  {
+    "input": "nungr",
+    "expected": "nủng"
+  },
+  {
+    "input": "nux",
+    "expected": "nũ"
+  },
+  {
+    "input": "nunx",
+    "expected": "nũn"
+  },
+  {
+    "input": "numx",
+    "expected": "nũm"
+  },
+  {
+    "input": "nungx",
+    "expected": "nũng"
+  },
+  {
+    "input": "nuj",
+    "expected": "nụ"
+  },
+  {
+    "input": "nunj",
+    "expected": "nụn"
+  },
+  {
+    "input": "numj",
+    "expected": "nụm"
+  },
+  {
+    "input": "nungj",
+    "expected": "nụng"
+  },
+  {
+    "input": "bes",
+    "expected": "bé"
+  },
+  {
+    "input": "bens",
+    "expected": "bén"
+  },
+  {
+    "input": "bems",
+    "expected": "bém"
+  },
+  {
+    "input": "bengs",
+    "expected": "béng"
+  },
+  {
+    "input": "bef",
+    "expected": "bè"
+  },
+  {
+    "input": "benf",
+    "expected": "bèn"
+  },
+  {
+    "input": "bemf",
+    "expected": "bèm"
+  },
+  {
+    "input": "bengf",
+    "expected": "bèng"
+  },
+  {
+    "input": "ber",
+    "expected": "bẻ"
+  },
+  {
+    "input": "benr",
+    "expected": "bẻn"
+  },
+  {
+    "input": "bemr",
+    "expected": "bẻm"
+  },
+  {
+    "input": "bengr",
+    "expected": "bẻng"
+  },
+  {
+    "input": "bex",
+    "expected": "bẽ"
+  },
+  {
+    "input": "benx",
+    "expected": "bẽn"
+  },
+  {
+    "input": "bemx",
+    "expected": "bẽm"
+  },
+  {
+    "input": "bengx",
+    "expected": "bẽng"
+  },
+  {
+    "input": "bej",
+    "expected": "bẹ"
+  },
+  {
+    "input": "benj",
+    "expected": "bẹn"
+  },
+  {
+    "input": "bemj",
+    "expected": "bẹm"
+  },
+  {
+    "input": "bengj",
+    "expected": "bẹng"
+  },
+  {
+    "input": "kes",
+    "expected": "ké"
+  },
+  {
+    "input": "kens",
+    "expected": "kén"
+  },
+  {
+    "input": "kems",
+    "expected": "kém"
+  },
+  {
+    "input": "kengs",
+    "expected": "kéng"
+  },
+  {
+    "input": "kef",
+    "expected": "kè"
+  },
+  {
+    "input": "kenf",
+    "expected": "kèn"
+  },
+  {
+    "input": "kemf",
+    "expected": "kèm"
+  },
+  {
+    "input": "kengf",
+    "expected": "kèng"
+  },
+  {
+    "input": "ker",
+    "expected": "kẻ"
+  },
+  {
+    "input": "kenr",
+    "expected": "kẻn"
+  },
+  {
+    "input": "kemr",
+    "expected": "kẻm"
+  },
+  {
+    "input": "kengr",
+    "expected": "kẻng"
+  },
+  {
+    "input": "kex",
+    "expected": "kẽ"
+  },
+  {
+    "input": "kenx",
+    "expected": "kẽn"
+  },
+  {
+    "input": "kemx",
+    "expected": "kẽm"
+  },
+  {
+    "input": "kengx",
+    "expected": "kẽng"
+  },
+  {
+    "input": "kej",
+    "expected": "kẹ"
+  },
+  {
+    "input": "kenj",
+    "expected": "kẹn"
+  },
+  {
+    "input": "kemj",
+    "expected": "kẹm"
+  },
+  {
+    "input": "kengj",
+    "expected": "kẹng"
+  },
+  {
+    "input": "des",
+    "expected": "dé"
+  },
+  {
+    "input": "dens",
+    "expected": "dén"
+  },
+  {
+    "input": "dems",
+    "expected": "dém"
+  },
+  {
+    "input": "dengs",
+    "expected": "déng"
+  },
+  {
+    "input": "def",
+    "expected": "dè"
+  },
+  {
+    "input": "denf",
+    "expected": "dèn"
+  },
+  {
+    "input": "demf",
+    "expected": "dèm"
+  },
+  {
+    "input": "dengf",
+    "expected": "dèng"
+  },
+  {
+    "input": "der",
+    "expected": "dẻ"
+  },
+  {
+    "input": "denr",
+    "expected": "dẻn"
+  },
+  {
+    "input": "demr",
+    "expected": "dẻm"
+  },
+  {
+    "input": "dengr",
+    "expected": "dẻng"
+  },
+  {
+    "input": "dex",
+    "expected": "dẽ"
+  },
+  {
+    "input": "denx",
+    "expected": "dẽn"
+  },
+  {
+    "input": "demx",
+    "expected": "dẽm"
+  },
+  {
+    "input": "dengx",
+    "expected": "dẽng"
+  },
+  {
+    "input": "dej",
+    "expected": "dẹ"
+  },
+  {
+    "input": "denj",
+    "expected": "dẹn"
+  },
+  {
+    "input": "demj",
+    "expected": "dẹm"
+  },
+  {
+    "input": "dengj",
+    "expected": "dẹng"
+  },
+  {
+    "input": "ddes",
+    "expected": "đé"
+  },
+  {
+    "input": "ddens",
+    "expected": "đén"
+  },
+  {
+    "input": "ddems",
+    "expected": "đém"
+  },
+  {
+    "input": "ddengs",
+    "expected": "đéng"
+  },
+  {
+    "input": "ddef",
+    "expected": "đè"
+  },
+  {
+    "input": "ddenf",
+    "expected": "đèn"
+  },
+  {
+    "input": "ddemf",
+    "expected": "đèm"
+  },
+  {
+    "input": "ddengf",
+    "expected": "đèng"
+  },
+  {
+    "input": "dder",
+    "expected": "đẻ"
+  },
+  {
+    "input": "ddenr",
+    "expected": "đẻn"
+  },
+  {
+    "input": "ddemr",
+    "expected": "đẻm"
+  },
+  {
+    "input": "ddengr",
+    "expected": "đẻng"
+  },
+  {
+    "input": "ddex",
+    "expected": "đẽ"
+  },
+  {
+    "input": "ddenx",
+    "expected": "đẽn"
+  },
+  {
+    "input": "ddemx",
+    "expected": "đẽm"
+  },
+  {
+    "input": "ddengx",
+    "expected": "đẽng"
+  },
+  {
+    "input": "ddej",
+    "expected": "đẹ"
+  },
+  {
+    "input": "ddenj",
+    "expected": "đẹn"
+  },
+  {
+    "input": "ddemj",
+    "expected": "đẹm"
+  },
+  {
+    "input": "ddengj",
+    "expected": "đẹng"
+  },
+  {
+    "input": "hes",
+    "expected": "hé"
+  },
+  {
+    "input": "hens",
+    "expected": "hén"
+  },
+  {
+    "input": "hems",
+    "expected": "hém"
+  },
+  {
+    "input": "hengs",
+    "expected": "héng"
+  },
+  {
+    "input": "hef",
+    "expected": "hè"
+  },
+  {
+    "input": "henf",
+    "expected": "hèn"
+  },
+  {
+    "input": "hemf",
+    "expected": "hèm"
+  },
+  {
+    "input": "hengf",
+    "expected": "hèng"
+  },
+  {
+    "input": "her",
+    "expected": "hẻ"
+  },
+  {
+    "input": "henr",
+    "expected": "hẻn"
+  },
+  {
+    "input": "hemr",
+    "expected": "hẻm"
+  },
+  {
+    "input": "hengr",
+    "expected": "hẻng"
+  },
+  {
+    "input": "hex",
+    "expected": "hẽ"
+  },
+  {
+    "input": "henx",
+    "expected": "hẽn"
+  },
+  {
+    "input": "hemx",
+    "expected": "hẽm"
+  },
+  {
+    "input": "hengx",
+    "expected": "hẽng"
+  },
+  {
+    "input": "hej",
+    "expected": "hẹ"
+  },
+  {
+    "input": "henj",
+    "expected": "hẹn"
+  },
+  {
+    "input": "hemj",
+    "expected": "hẹm"
+  },
+  {
+    "input": "hengj",
+    "expected": "hẹng"
+  },
+  {
+    "input": "les",
+    "expected": "lé"
+  },
+  {
+    "input": "lens",
+    "expected": "lén"
+  },
+  {
+    "input": "lems",
+    "expected": "lém"
+  },
+  {
+    "input": "lengs",
+    "expected": "léng"
+  },
+  {
+    "input": "lef",
+    "expected": "lè"
+  },
+  {
+    "input": "lenf",
+    "expected": "lèn"
+  },
+  {
+    "input": "lemf",
+    "expected": "lèm"
+  },
+  {
+    "input": "lengf",
+    "expected": "lèng"
+  },
+  {
+    "input": "ler",
+    "expected": "lẻ"
+  },
+  {
+    "input": "lenr",
+    "expected": "lẻn"
+  },
+  {
+    "input": "lemr",
+    "expected": "lẻm"
+  },
+  {
+    "input": "lengr",
+    "expected": "lẻng"
+  },
+  {
+    "input": "lex",
+    "expected": "lẽ"
+  },
+  {
+    "input": "lenx",
+    "expected": "lẽn"
+  },
+  {
+    "input": "lemx",
+    "expected": "lẽm"
+  },
+  {
+    "input": "lengx",
+    "expected": "lẽng"
+  },
+  {
+    "input": "lej",
+    "expected": "lẹ"
+  },
+  {
+    "input": "lenj",
+    "expected": "lẹn"
+  },
+  {
+    "input": "lemj",
+    "expected": "lẹm"
+  },
+  {
+    "input": "lengj",
+    "expected": "lẹng"
+  },
+  {
+    "input": "mes",
+    "expected": "mé"
+  },
+  {
+    "input": "mens",
+    "expected": "mén"
+  },
+  {
+    "input": "mems",
+    "expected": "mém"
+  },
+  {
+    "input": "mengs",
+    "expected": "méng"
+  },
+  {
+    "input": "mef",
+    "expected": "mè"
+  },
+  {
+    "input": "menf",
+    "expected": "mèn"
+  },
+  {
+    "input": "memf",
+    "expected": "mèm"
+  },
+  {
+    "input": "mengf",
+    "expected": "mèng"
+  },
+  {
+    "input": "mer",
+    "expected": "mẻ"
+  },
+  {
+    "input": "menr",
+    "expected": "mẻn"
+  },
+  {
+    "input": "memr",
+    "expected": "mẻm"
+  },
+  {
+    "input": "mengr",
+    "expected": "mẻng"
+  },
+  {
+    "input": "mex",
+    "expected": "mẽ"
+  },
+  {
+    "input": "menx",
+    "expected": "mẽn"
+  },
+  {
+    "input": "memx",
+    "expected": "mẽm"
+  },
+  {
+    "input": "mengx",
+    "expected": "mẽng"
+  },
+  {
+    "input": "mej",
+    "expected": "mẹ"
+  },
+  {
+    "input": "menj",
+    "expected": "mẹn"
+  },
+  {
+    "input": "memj",
+    "expected": "mẹm"
+  },
+  {
+    "input": "mengj",
+    "expected": "mẹng"
+  },
+  {
+    "input": "nes",
+    "expected": "né"
+  },
+  {
+    "input": "nens",
+    "expected": "nén"
+  },
+  {
+    "input": "nems",
+    "expected": "ném"
+  },
+  {
+    "input": "nengs",
+    "expected": "néng"
+  },
+  {
+    "input": "nef",
+    "expected": "nè"
+  },
+  {
+    "input": "nenf",
+    "expected": "nèn"
+  },
+  {
+    "input": "nemf",
+    "expected": "nèm"
+  },
+  {
+    "input": "nengf",
+    "expected": "nèng"
+  },
+  {
+    "input": "ner",
+    "expected": "nẻ"
+  },
+  {
+    "input": "nenr",
+    "expected": "nẻn"
+  },
+  {
+    "input": "nemr",
+    "expected": "nẻm"
+  },
+  {
+    "input": "nengr",
+    "expected": "nẻng"
+  },
+  {
+    "input": "nex",
+    "expected": "nẽ"
+  },
+  {
+    "input": "nenx",
+    "expected": "nẽn"
+  },
+  {
+    "input": "nemx",
+    "expected": "nẽm"
+  },
+  {
+    "input": "nengx",
+    "expected": "nẽng"
+  },
+  {
+    "input": "nej",
+    "expected": "nẹ"
+  },
+  {
+    "input": "nenj",
+    "expected": "nẹn"
+  },
+  {
+    "input": "nemj",
+    "expected": "nẹm"
+  },
+  {
+    "input": "nengj",
+    "expected": "nẹng"
+  },
+  {
+    "input": "bis",
+    "expected": "bí"
+  },
+  {
+    "input": "bins",
+    "expected": "bín"
+  },
+  {
+    "input": "bims",
+    "expected": "bím"
+  },
+  {
+    "input": "bings",
+    "expected": "bíng"
+  },
+  {
+    "input": "bif",
+    "expected": "bì"
+  },
+  {
+    "input": "binf",
+    "expected": "bìn"
+  },
+  {
+    "input": "bimf",
+    "expected": "bìm"
+  },
+  {
+    "input": "bingf",
+    "expected": "bìng"
+  },
+  {
+    "input": "bir",
+    "expected": "bỉ"
+  },
+  {
+    "input": "binr",
+    "expected": "bỉn"
+  },
+  {
+    "input": "bimr",
+    "expected": "bỉm"
+  },
+  {
+    "input": "bingr",
+    "expected": "bỉng"
+  },
+  {
+    "input": "bix",
+    "expected": "bĩ"
+  },
+  {
+    "input": "binx",
+    "expected": "bĩn"
+  },
+  {
+    "input": "bimx",
+    "expected": "bĩm"
+  },
+  {
+    "input": "bingx",
+    "expected": "bĩng"
+  },
+  {
+    "input": "bij",
+    "expected": "bị"
+  },
+  {
+    "input": "binj",
+    "expected": "bịn"
+  },
+  {
+    "input": "bimj",
+    "expected": "bịm"
+  },
+  {
+    "input": "bingj",
+    "expected": "bịng"
+  },
+  {
+    "input": "kis",
+    "expected": "kí"
+  },
+  {
+    "input": "kins",
+    "expected": "kín"
+  },
+  {
+    "input": "kims",
+    "expected": "kím"
+  },
+  {
+    "input": "kings",
+    "expected": "kíng"
+  },
+  {
+    "input": "kif",
+    "expected": "kì"
+  },
+  {
+    "input": "kinf",
+    "expected": "kìn"
+  },
+  {
+    "input": "kimf",
+    "expected": "kìm"
+  },
+  {
+    "input": "kingf",
+    "expected": "kìng"
+  },
+  {
+    "input": "kir",
+    "expected": "kỉ"
+  },
+  {
+    "input": "kinr",
+    "expected": "kỉn"
+  },
+  {
+    "input": "kimr",
+    "expected": "kỉm"
+  },
+  {
+    "input": "kingr",
+    "expected": "kỉng"
+  },
+  {
+    "input": "kix",
+    "expected": "kĩ"
+  },
+  {
+    "input": "kinx",
+    "expected": "kĩn"
+  },
+  {
+    "input": "kimx",
+    "expected": "kĩm"
+  },
+  {
+    "input": "kingx",
+    "expected": "kĩng"
+  },
+  {
+    "input": "kij",
+    "expected": "kị"
+  },
+  {
+    "input": "kinj",
+    "expected": "kịn"
+  },
+  {
+    "input": "kimj",
+    "expected": "kịm"
+  },
+  {
+    "input": "kingj",
+    "expected": "kịng"
+  },
+  {
+    "input": "dis",
+    "expected": "dí"
+  },
+  {
+    "input": "dins",
+    "expected": "dín"
+  },
+  {
+    "input": "dims",
+    "expected": "dím"
+  },
+  {
+    "input": "dings",
+    "expected": "díng"
+  },
+  {
+    "input": "dif",
+    "expected": "dì"
+  },
+  {
+    "input": "dinf",
+    "expected": "dìn"
+  },
+  {
+    "input": "dimf",
+    "expected": "dìm"
+  },
+  {
+    "input": "dingf",
+    "expected": "dìng"
+  },
+  {
+    "input": "dir",
+    "expected": "dỉ"
+  },
+  {
+    "input": "dinr",
+    "expected": "dỉn"
+  },
+  {
+    "input": "dimr",
+    "expected": "dỉm"
+  },
+  {
+    "input": "dingr",
+    "expected": "dỉng"
+  },
+  {
+    "input": "dix",
+    "expected": "dĩ"
+  },
+  {
+    "input": "dinx",
+    "expected": "dĩn"
+  },
+  {
+    "input": "dimx",
+    "expected": "dĩm"
+  },
+  {
+    "input": "dingx",
+    "expected": "dĩng"
+  },
+  {
+    "input": "dij",
+    "expected": "dị"
+  },
+  {
+    "input": "dinj",
+    "expected": "dịn"
+  },
+  {
+    "input": "dimj",
+    "expected": "dịm"
+  },
+  {
+    "input": "dingj",
+    "expected": "dịng"
+  },
+  {
+    "input": "ddis",
+    "expected": "đí"
+  },
+  {
+    "input": "ddins",
+    "expected": "đín"
+  },
+  {
+    "input": "ddims",
+    "expected": "đím"
+  },
+  {
+    "input": "ddings",
+    "expected": "đíng"
+  },
+  {
+    "input": "ddif",
+    "expected": "đì"
+  },
+  {
+    "input": "ddinf",
+    "expected": "đìn"
+  },
+  {
+    "input": "ddimf",
+    "expected": "đìm"
+  },
+  {
+    "input": "ddingf",
+    "expected": "đìng"
+  },
+  {
+    "input": "ddir",
+    "expected": "đỉ"
+  },
+  {
+    "input": "ddinr",
+    "expected": "đỉn"
+  },
+  {
+    "input": "ddimr",
+    "expected": "đỉm"
+  },
+  {
+    "input": "ddingr",
+    "expected": "đỉng"
+  },
+  {
+    "input": "ddix",
+    "expected": "đĩ"
+  },
+  {
+    "input": "ddinx",
+    "expected": "đĩn"
+  },
+  {
+    "input": "ddimx",
+    "expected": "đĩm"
+  },
+  {
+    "input": "ddingx",
+    "expected": "đĩng"
+  },
+  {
+    "input": "ddij",
+    "expected": "đị"
+  },
+  {
+    "input": "ddinj",
+    "expected": "địn"
+  },
+  {
+    "input": "ddimj",
+    "expected": "địm"
+  },
+  {
+    "input": "ddingj",
+    "expected": "địng"
+  },
+  {
+    "input": "his",
+    "expected": "hí"
+  },
+  {
+    "input": "hins",
+    "expected": "hín"
+  },
+  {
+    "input": "hims",
+    "expected": "hím"
+  },
+  {
+    "input": "hings",
+    "expected": "híng"
+  },
+  {
+    "input": "hif",
+    "expected": "hì"
+  },
+  {
+    "input": "hinf",
+    "expected": "hìn"
+  },
+  {
+    "input": "himf",
+    "expected": "hìm"
+  },
+  {
+    "input": "hingf",
+    "expected": "hìng"
+  },
+  {
+    "input": "hir",
+    "expected": "hỉ"
+  },
+  {
+    "input": "hinr",
+    "expected": "hỉn"
+  },
+  {
+    "input": "himr",
+    "expected": "hỉm"
+  },
+  {
+    "input": "hingr",
+    "expected": "hỉng"
+  },
+  {
+    "input": "hix",
+    "expected": "hĩ"
+  },
+  {
+    "input": "hinx",
+    "expected": "hĩn"
+  },
+  {
+    "input": "himx",
+    "expected": "hĩm"
+  },
+  {
+    "input": "hingx",
+    "expected": "hĩng"
+  },
+  {
+    "input": "hij",
+    "expected": "hị"
+  },
+  {
+    "input": "hinj",
+    "expected": "hịn"
+  },
+  {
+    "input": "himj",
+    "expected": "hịm"
+  },
+  {
+    "input": "hingj",
+    "expected": "hịng"
+  },
+  {
+    "input": "lis",
+    "expected": "lí"
+  },
+  {
+    "input": "lins",
+    "expected": "lín"
+  },
+  {
+    "input": "lims",
+    "expected": "lím"
+  },
+  {
+    "input": "lings",
+    "expected": "líng"
+  },
+  {
+    "input": "lif",
+    "expected": "lì"
+  },
+  {
+    "input": "linf",
+    "expected": "lìn"
+  },
+  {
+    "input": "limf",
+    "expected": "lìm"
+  },
+  {
+    "input": "lingf",
+    "expected": "lìng"
+  },
+  {
+    "input": "lir",
+    "expected": "lỉ"
+  },
+  {
+    "input": "linr",
+    "expected": "lỉn"
+  },
+  {
+    "input": "limr",
+    "expected": "lỉm"
+  },
+  {
+    "input": "lingr",
+    "expected": "lỉng"
+  },
+  {
+    "input": "lix",
+    "expected": "lĩ"
+  },
+  {
+    "input": "linx",
+    "expected": "lĩn"
+  },
+  {
+    "input": "limx",
+    "expected": "lĩm"
+  },
+  {
+    "input": "lingx",
+    "expected": "lĩng"
+  },
+  {
+    "input": "lij",
+    "expected": "lị"
+  },
+  {
+    "input": "linj",
+    "expected": "lịn"
+  },
+  {
+    "input": "limj",
+    "expected": "lịm"
+  },
+  {
+    "input": "lingj",
+    "expected": "lịng"
+  },
+  {
+    "input": "mis",
+    "expected": "mí"
+  },
+  {
+    "input": "mins",
+    "expected": "mín"
+  },
+  {
+    "input": "mims",
+    "expected": "mím"
+  },
+  {
+    "input": "mings",
+    "expected": "míng"
+  },
+  {
+    "input": "mif",
+    "expected": "mì"
+  },
+  {
+    "input": "minf",
+    "expected": "mìn"
+  },
+  {
+    "input": "mimf",
+    "expected": "mìm"
+  },
+  {
+    "input": "mingf",
+    "expected": "mìng"
+  },
+  {
+    "input": "mir",
+    "expected": "mỉ"
+  },
+  {
+    "input": "minr",
+    "expected": "mỉn"
+  },
+  {
+    "input": "mimr",
+    "expected": "mỉm"
+  },
+  {
+    "input": "mingr",
+    "expected": "mỉng"
+  },
+  {
+    "input": "minx",
+    "expected": "mĩn"
+  },
+  {
+    "input": "mimx",
+    "expected": "mĩm"
+  },
+  {
+    "input": "mingx",
+    "expected": "mĩng"
+  },
+  {
+    "input": "mij",
+    "expected": "mị"
+  },
+  {
+    "input": "minj",
+    "expected": "mịn"
+  },
+  {
+    "input": "mimj",
+    "expected": "mịm"
+  },
+  {
+    "input": "mingj",
+    "expected": "mịng"
+  },
+  {
+    "input": "nis",
+    "expected": "ní"
+  },
+  {
+    "input": "nins",
+    "expected": "nín"
+  },
+  {
+    "input": "nims",
+    "expected": "ním"
+  },
+  {
+    "input": "nings",
+    "expected": "níng"
+  },
+  {
+    "input": "nif",
+    "expected": "nì"
+  },
+  {
+    "input": "ninf",
+    "expected": "nìn"
+  },
+  {
+    "input": "nimf",
+    "expected": "nìm"
+  },
+  {
+    "input": "ningf",
+    "expected": "nìng"
+  },
+  {
+    "input": "nir",
+    "expected": "nỉ"
+  },
+  {
+    "input": "ninr",
+    "expected": "nỉn"
+  },
+  {
+    "input": "nimr",
+    "expected": "nỉm"
+  },
+  {
+    "input": "ningr",
+    "expected": "nỉng"
+  },
+  {
+    "input": "nix",
+    "expected": "nĩ"
+  },
+  {
+    "input": "ninx",
+    "expected": "nĩn"
+  },
+  {
+    "input": "nimx",
+    "expected": "nĩm"
+  },
+  {
+    "input": "ningx",
+    "expected": "nĩng"
+  },
+  {
+    "input": "nij",
+    "expected": "nị"
+  },
+  {
+    "input": "ninj",
+    "expected": "nịn"
+  },
+  {
+    "input": "nimj",
+    "expected": "nịm"
+  },
+  {
+    "input": "ningj",
+    "expected": "nịng"
+  }
+]

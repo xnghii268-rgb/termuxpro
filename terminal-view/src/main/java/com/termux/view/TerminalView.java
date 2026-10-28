@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
+import com.termux.view.input.VietnameseEngine;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -17,6 +19,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ActionMode;
+import android.provider.Settings;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;
 import android.view.Choreographer;
@@ -67,6 +70,29 @@ public final class TerminalView extends View {
 
     public VietnameseTelexEngine getTelexEngine() {
         return mTelexEngine;
+    }
+
+    public void reloadVietnameseEnginePreferences() {
+        if (mTelexEngine == null) return;
+        try {
+            SharedPreferences sp = getContext().getSharedPreferences("termuxpro_settings", Context.MODE_PRIVATE);
+            VietnameseEngine engine = mTelexEngine.getUnderlyingEngine();
+            if (engine != null) {
+                VietnameseEngine.Options opt = engine.getOptions();
+                int modeIdx = sp.getInt("input_engine_mode", 0);
+                switch (modeIdx) {
+                    case 0: opt.mode = VietnameseEngine.Options.Mode.AUTO; break;
+                    case 1: opt.mode = VietnameseEngine.Options.Mode.TELEX; break;
+                    case 2: opt.mode = VietnameseEngine.Options.Mode.VNI; break;
+                    case 3: opt.mode = VietnameseEngine.Options.Mode.OFF; break;
+                }
+                opt.autoRestore = sp.getBoolean("auto_restore_english", true);
+                int toneIdx = sp.getInt("tone_placement", 0);
+                opt.modernTonePlacement = (toneIdx == 0);
+                opt.wFirstToU = sp.getBoolean("w_first_to_u", false);
+                engine.setEnabled(opt.mode != VietnameseEngine.Options.Mode.OFF);
+            }
+        } catch (Throwable ignored) {}
     }
 
     private TextSelectionCursorController mTextSelectionCursorController;
@@ -272,6 +298,7 @@ public final class TerminalView extends View {
         mScroller = new Scroller(context);
         AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
         mAccessibilityEnabled = am.isEnabled();
+        reloadVietnameseEnginePreferences();
     }
 
 
@@ -395,6 +422,13 @@ public final class TerminalView extends View {
                 // Composing feedback
             }
         });
+
+        try {
+            String defaultIme = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+            if (mTerminalInputConnection != null) {
+                mTerminalInputConnection.setActiveImeId(defaultIme);
+            }
+        } catch (Throwable ignored) {}
 
         InputConnection baseInputConnection = mTerminalInputConnection;
 
@@ -923,7 +957,11 @@ public final class TerminalView extends View {
                 }
             }
 
-            if (!controlDown && !altDown && codePoint <= 0xFFFF && mTelexEngine != null && mTelexEngine.isEnabled()) {
+            boolean isAltScreen = (mEmulator != null && mEmulator.isAlternateBufferActive());
+            boolean isPassword = (mTermSession != null && !mTermSession.isPtyEcho());
+            boolean bypassEngine = isAltScreen || isPassword || controlDown || altDown;
+
+            if (!bypassEngine && codePoint <= 0xFFFF && mTelexEngine != null && mTelexEngine.isEnabled()) {
                 VietnameseTelexEngine.TransformResult tr = mTelexEngine.processChar((char) codePoint);
                 if (tr != null) {
                     for (int i = 0; i < tr.backspaces; i++) {
@@ -932,6 +970,8 @@ public final class TerminalView extends View {
                     mTermSession.write(tr.text);
                     return;
                 }
+            } else if (bypassEngine && mTelexEngine != null) {
+                mTelexEngine.reset();
             }
 
             // If left alt, send escape before the code point to make e.g. Alt+B and Alt+F work in readline:

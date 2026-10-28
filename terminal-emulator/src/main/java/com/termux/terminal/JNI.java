@@ -38,4 +38,7 @@ final class JNI {
     /** Close a file descriptor through the close(2) system call. */
     public static native void close(int fileDescriptor);
 
+    /** Query whether ECHO flag is set on the pty. Returns false during password entry. */
+    public static native boolean getPtyEcho(int fileDescriptor);
+
 }

@@ -4,7 +4,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 
 ## 1. Bố cục Thư mục (Target Folder Layout)
 - `~/storage/downloads/termuxpro/src`: Mã nguồn chính (Git repo xnghii268-rgb/termuxpro).
-- `~/storage/downloads/termuxpro/apk`: Lưu trữ APK phát hành (`termuxpro-v0.119.0.apk`).
+- `~/storage/downloads/termuxpro/apk`: Lưu trữ APK phát hành (`termuxpro-v0.120.0.apk`).
 - `~/storage/downloads/termuxpro/backup`: Lưu trữ bản sao lưu `.tar.gz` của home.
 - `~/.secrets/termuxpro`: Keystore phát hành và GPG key signing (`termuxpro-apt-private.asc`, chmod 600).
 - `~/pull-termuxpro.sh`: Tập lệnh tự động kéo APK phát hành mới nhất từ GitHub Actions qua `gh`.
@@ -12,8 +12,8 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 ## 2. Thông số Kỹ thuật & Môi trường
 - **Mã định danh gói (applicationId)**: `com.termuxpro.app` (cài song song độc lập với Termux gốc).
 - **Tiền tố Linux (PREFIX)**: `/data/data/com.termuxpro.app/files/usr` (Home: `/data/data/com.termuxpro.app/files/home`).
-- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.119.0 (code 132).
-- **Quy chuẩn Phiên bản (Version Bump Rule)**: Mỗi đợt update tính năng/giao diện mới bắt buộc nâng cả `versionCode` (+1) và `versionName` (vd: `0.120.0`, `0.121.0`...) theo chuẩn SemVer trong `app/build.gradle`.
+- **targetSdkVersion**: 28 | **Kiến trúc**: `arm64-v8a` | **Phiên bản**: v0.120.0 (code 133).
+- **Quy chuẩn Phiên bản**: Mỗi đợt update tính năng/giao diện mới bắt buộc nâng cả `versionCode` (+1) và `versionName` (vd: `0.120.0`, `0.121.0`...) theo chuẩn SemVer trong `app/build.gradle`.
 - **CI / Kho APT**: GitHub Actions (`build.yml`) & kho APT ký GPG `https://xnghii268-rgb.github.io/termuxpro/`.
 
 ## 3. Hệ thống Giao diện Liquid Glass (Round 2 & Terminal Addendum)
@@ -25,13 +25,16 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **MOTD Tự Động Co Giãn**: Tính toán độ rộng động theo `$COLUMNS`, đường kẻ chuẩn khớp độ rộng cột, bọc từ mẹo 2 dòng.
 - **6 Bộ Theme Tiếng Việt Chuẩn**: Nguồn chân lý duy nhất (Than đêm, Mực, Rượu vang, Rêu đêm, Giấy, Sương), cursor mint `#3DDC97`, contrast >= 4.5:1.
 
-## 4. Bộ Gõ Tiếng Việt & TerminalInputConnection
-- **Tài liệu phân tích chuyên sâu**: Bắt buộc tham khảo [docs/INPUT.md](file:///data/data/com.termuxpro.app/files/home/storage/downloads/termuxpro/src/docs/INPUT.md).
-- **Kiến trúc**: `TerminalInputConnection` kế thừa `BaseInputConnection`, composing buffer riêng, chuẩn hóa NFC, xóa code-point chính xác.
-- **Kiểm thử tự động**: 249 cases trong `tests/telex_cases.json`, regression guard `tools/input_test.sh` đạt 100% pass.
-- **Design Lint**: `tools/ui_lint.sh` kiểm soát 0 widget cũ, 0 màu lệch chuẩn, 6 theme tiếng Việt.
+## 4. Bộ Gõ Tiếng Việt & TerminalInputConnection (Round 2)
+- **Tài liệu phân tích chuyên sâu**: Tham khảo [docs/INPUT.md](file:///data/data/com.termuxpro.app/files/home/storage/downloads/termuxpro/src/docs/INPUT.md) & [docs/INPUT_MANUAL.md](file:///data/data/com.termuxpro.app/files/home/storage/downloads/termuxpro/src/docs/INPUT_MANUAL.md).
+- **Kiến trúc Pure Java JVM**: `VietnameseEngine` và `VietnamesePhonotactics` thuần JVM 0 dependency Android, hàm không trạng thái `f(rawKeys, options)`, validate âm tiết ngữ âm chuẩn xác.
+- **Khôi phục lệnh Tiếng Anh tự động**: Lệnh Linux (`fix`, `docker`, `curl`, `git`, `exit`, `test`, `raw`) không bao giờ bị méo dấu.
+- **Bypass thông minh**: Tự tắt trong alt-screen (vim/nano/htop) & khi nhập mật khẩu ẩn (`isPtyEcho() == false`).
+- **Nút bật/tắt nhanh**: Nút `VI`/`EN` trên thanh extra keys chuyển đổi bộ gõ tức thì.
+- **Kiểm thử tự động**: 4940 assertions đạt 100% pass qua `tools/input_test.sh` (1032 engine cases, 418 English words, 3200 Vietnamese words, 249 legacy cases).
 
 ## 5. Trạng thái Dự án
 - [x] **Phase 0 - 5**: Sửa status bar, brand redesign, GlassSheet, IME animation, tối ưu Vsync, Command Palette iOS-27.
 - [x] **Phase 6 (Liquid Glass Round 1)**: Living backdrop, LiquidTabBar drop lens, Live Terminal Preview.
 - [x] **Phase 7 (Liquid Glass Round 2 & Terminal Chrome)**: SettingsActivity GlassScreen, ThemePickerSheet carousel, AiAgentHubSheet, Floating Top Bar, Extra keys Liquid Glass, MOTD dynamic cols.
+- [x] **Phase 8 (Vietnamese Input Round 2)**: Built-in pure JVM Telex/VNI engine, auto-restore English safety net, alt-screen/password bypass, VI/EN toggle, 4940 regression assertions pass.

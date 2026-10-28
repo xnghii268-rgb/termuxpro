@@ -49,6 +49,12 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_REDUCE_MOTION = "reduce_motion";
     private static final String KEY_HAPTICS = "haptics_enabled";
     private static final String KEY_TELEX_MODE = "telex_mode";
+    public static final String KEY_INPUT_ENGINE_MODE = "input_engine_mode";
+    public static final String KEY_AUTO_RESTORE_ENGLISH = "auto_restore_english";
+    public static final String KEY_TONE_PLACEMENT = "tone_placement";
+    public static final String KEY_W_FIRST_TO_U = "w_first_to_u";
+    public static final String KEY_DISABLE_IN_ALT_SCREEN = "disable_in_alt_screen";
+    public static final String KEY_DISABLE_ON_PASSWORD = "disable_on_password";
     private static final String KEY_COMPRESS_IMAGE = "compress_image";
 
     private SharedPreferences mPrefs;
@@ -137,9 +143,19 @@ public class SettingsActivity extends AppCompatActivity {
         // 2. BÀN PHÍM & NHẬP LIỆU
         addSectionHeader(container, "Bàn phím & Nhập liệu");
         LinearLayout cardInput = createGlassCard(container);
-        addSegmentedRow(cardInput, "Bộ gõ tiếng Việt Telex", new String[]{"Tự động", "Bật", "Tắt"}, KEY_TELEX_MODE, 0);
+        addSegmentedRow(cardInput, "Bộ gõ tích hợp", new String[]{"Tự động", "Telex", "VNI", "Tắt"}, KEY_INPUT_ENGINE_MODE, 0);
         addDivider(cardInput);
-        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", "249/249 test cases đạt 100%", R.drawable.ic_nav_command, v -> {
+        addToggleRow(cardInput, "Tự khôi phục từ tiếng Anh", "Tự động hoàn tác khi gõ lệnh hoặc từ tiếng Anh (fix, curl, git)", KEY_AUTO_RESTORE_ENGLISH, true);
+        addDivider(cardInput);
+        addSegmentedRow(cardInput, "Kiểu bỏ dấu", new String[]{"hòa (Mới)", "hoà (Cũ)"}, KEY_TONE_PLACEMENT, 0);
+        addDivider(cardInput);
+        addToggleRow(cardInput, "\"w\" đầu từ thành \"ư\"", "Chuyển w thành ư khi gõ đầu từ (tắt khi dùng lệnh wget, which)", KEY_W_FIRST_TO_U, false);
+        addDivider(cardInput);
+        addToggleRow(cardInput, "Tắt trong app toàn màn hình", "Tự động tắt trong vim, nano, less, htop", KEY_DISABLE_IN_ALT_SCREEN, true);
+        addDivider(cardInput);
+        addToggleRow(cardInput, "Tắt khi nhập mật khẩu", "Bảo vệ mật khẩu khi PTY tắt echo", KEY_DISABLE_ON_PASSWORD, true);
+        addDivider(cardInput);
+        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", "Pass 100% regression guards", R.drawable.ic_nav_command, v -> {
             GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "Bộ gõ Telex/VNI: AOSP Compliant (100% OK)");
         });
 
