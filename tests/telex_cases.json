@@ -1,0 +1,998 @@
+[
+  {
+    "input": "nguowfi",
+    "expected": "người"
+  },
+  {
+    "input": "dduwowcj",
+    "expected": "được"
+  },
+  {
+    "input": "truwowngf",
+    "expected": "trường"
+  },
+  {
+    "input": "nhuwngx",
+    "expected": "những"
+  },
+  {
+    "input": "Vieetj",
+    "expected": "Việt"
+  },
+  {
+    "input": "quoocs",
+    "expected": "quốc"
+  },
+  {
+    "input": "thuowng",
+    "expected": "thương"
+  },
+  {
+    "input": "Vieetj Nam",
+    "expected": "Việt Nam"
+  },
+  {
+    "input": "Ddaaf Nawngx",
+    "expected": "Đà Nẵng"
+  },
+  {
+    "input": "nguyeexn",
+    "expected": "nguyễn"
+  },
+  {
+    "input": "truyeenf",
+    "expected": "truyền"
+  },
+  {
+    "input": "hoangf",
+    "expected": "hoàng"
+  },
+  {
+    "input": "khuyeens",
+    "expected": "khuyến"
+  },
+  {
+    "input": "tuyeetj",
+    "expected": "tuyệt"
+  },
+  {
+    "input": "uowfs",
+    "expected": "ướ"
+  },
+  {
+    "input": "uowf",
+    "expected": "ườ"
+  },
+  {
+    "input": "uowfr",
+    "expected": "ưở"
+  },
+  {
+    "input": "uowfj",
+    "expected": "ượ"
+  },
+  {
+    "input": "ngheej",
+    "expected": "nghệ"
+  },
+  {
+    "input": "ngoo",
+    "expected": "ngô"
+  },
+  {
+    "input": "ghees",
+    "expected": "ghế"
+  },
+  {
+    "input": "huow",
+    "expected": "hươ"
+  },
+  {
+    "input": "hoaf",
+    "expected": "hoà"
+  },
+  {
+    "input": "hoef",
+    "expected": "hoè"
+  },
+  {
+    "input": "thuyf",
+    "expected": "thuỳ"
+  },
+  {
+    "input": "AWS",
+    "expected": "Ắ"
+  },
+  {
+    "input": "UOWR",
+    "expected": "Ử"
+  },
+  {
+    "input": "OOWX",
+    "expected": "Ỡ"
+  },
+  {
+    "input": "DD",
+    "expected": "Đ"
+  },
+  {
+    "input": "OW",
+    "expected": "Ơ"
+  },
+  {
+    "input": "UW",
+    "expected": "Ư"
+  },
+  {
+    "input": "w",
+    "expected": "ư"
+  },
+  {
+    "input": "aa",
+    "expected": "aa"
+  },
+  {
+    "input": "anh",
+    "expected": "anh"
+  },
+  {
+    "input": "em",
+    "expected": "em"
+  },
+  {
+    "input": "cha",
+    "expected": "cha"
+  },
+  {
+    "input": "mẹ",
+    "expected": "mẹ"
+  },
+  {
+    "input": "con",
+    "expected": "con"
+  },
+  {
+    "input": "bà",
+    "expected": "bà"
+  },
+  {
+    "input": "ông",
+    "expected": "ông"
+  },
+  {
+    "input": "cô",
+    "expected": "cô"
+  },
+  {
+    "input": "chú",
+    "expected": "chú"
+  },
+  {
+    "input": "bác",
+    "expected": "bác"
+  },
+  {
+    "input": "đất",
+    "expected": "đất"
+  },
+  {
+    "input": "nước",
+    "expected": "nước"
+  },
+  {
+    "input": "trời",
+    "expected": "trời"
+  },
+  {
+    "input": "mây",
+    "expected": "mây"
+  },
+  {
+    "input": "mưa",
+    "expected": "mưa"
+  },
+  {
+    "input": "gió",
+    "expected": "gió"
+  },
+  {
+    "input": "nắng",
+    "expected": "nắng"
+  },
+  {
+    "input": "biển",
+    "expected": "biển"
+  },
+  {
+    "input": "sông",
+    "expected": "sông"
+  },
+  {
+    "input": "núi",
+    "expected": "núi"
+  },
+  {
+    "input": "rừng",
+    "expected": "rừng"
+  },
+  {
+    "input": "cây",
+    "expected": "cây"
+  },
+  {
+    "input": "hoa",
+    "expected": "hoa"
+  },
+  {
+    "input": "lá",
+    "expected": "lá"
+  },
+  {
+    "input": "quả",
+    "expected": "quả"
+  },
+  {
+    "input": "chim",
+    "expected": "chim"
+  },
+  {
+    "input": "cá",
+    "expected": "cá"
+  },
+  {
+    "input": "hổ",
+    "expected": "hổ"
+  },
+  {
+    "input": "báo",
+    "expected": "báo"
+  },
+  {
+    "input": "hươu",
+    "expected": "hươu"
+  },
+  {
+    "input": "chó",
+    "expected": "chó"
+  },
+  {
+    "input": "mèo",
+    "expected": "mèo"
+  },
+  {
+    "input": "gà",
+    "expected": "gà"
+  },
+  {
+    "input": "vịt",
+    "expected": "vịt"
+  },
+  {
+    "input": "trâu",
+    "expected": "trâu"
+  },
+  {
+    "input": "bò",
+    "expected": "bò"
+  },
+  {
+    "input": "ngựa",
+    "expected": "ngựa"
+  },
+  {
+    "input": "về",
+    "expected": "về"
+  },
+  {
+    "input": "đi",
+    "expected": "đi"
+  },
+  {
+    "input": "đến",
+    "expected": "đến"
+  },
+  {
+    "input": "ở",
+    "expected": "ở"
+  },
+  {
+    "input": "lại",
+    "expected": "lại"
+  },
+  {
+    "input": "ăn",
+    "expected": "ăn"
+  },
+  {
+    "input": "uống",
+    "expected": "uống"
+  },
+  {
+    "input": "ngủ",
+    "expected": "ngủ"
+  },
+  {
+    "input": "ngộ",
+    "expected": "ngộ"
+  },
+  {
+    "input": "học",
+    "expected": "học"
+  },
+  {
+    "input": "hạt",
+    "expected": "hạt"
+  },
+  {
+    "input": "viết",
+    "expected": "viết"
+  },
+  {
+    "input": "đọc",
+    "expected": "đọc"
+  },
+  {
+    "input": "nghe",
+    "expected": "nghe"
+  },
+  {
+    "input": "nó",
+    "expected": "nó"
+  },
+  {
+    "input": "nói",
+    "expected": "nói"
+  },
+  {
+    "input": "cười",
+    "expected": "cười"
+  },
+  {
+    "input": "khóc",
+    "expected": "khóc"
+  },
+  {
+    "input": "yêu",
+    "expected": "yêu"
+  },
+  {
+    "input": "nhớ",
+    "expected": "nhớ"
+  },
+  {
+    "input": "mong",
+    "expected": "mong"
+  },
+  {
+    "input": "chờ",
+    "expected": "chờ"
+  },
+  {
+    "input": "biết",
+    "expected": "biết"
+  },
+  {
+    "input": "hiểu",
+    "expected": "hiểu"
+  },
+  {
+    "input": "nghĩ",
+    "expected": "nghĩ"
+  },
+  {
+    "input": "tin",
+    "expected": "tin"
+  },
+  {
+    "input": "tượng",
+    "expected": "tượng"
+  },
+  {
+    "input": "làm",
+    "expected": "làm"
+  },
+  {
+    "input": "việc",
+    "expected": "việc"
+  },
+  {
+    "input": "nghiệp",
+    "expected": "nghiệp"
+  },
+  {
+    "input": "công",
+    "expected": "công"
+  },
+  {
+    "input": "ty",
+    "expected": "ty"
+  },
+  {
+    "input": "lớp",
+    "expected": "lớp"
+  },
+  {
+    "input": "bàn",
+    "expected": "bàn"
+  },
+  {
+    "input": "bạn",
+    "expected": "bạn"
+  },
+  {
+    "input": "thầy",
+    "expected": "thầy"
+  },
+  {
+    "input": "sách",
+    "expected": "sách"
+  },
+  {
+    "input": "vở",
+    "expected": "vở"
+  },
+  {
+    "input": "bút",
+    "expected": "bút"
+  },
+  {
+    "input": "mực",
+    "expected": "mực"
+  },
+  {
+    "input": "thước",
+    "expected": "thước"
+  },
+  {
+    "input": "bảng",
+    "expected": "bảng"
+  },
+  {
+    "input": "phấn",
+    "expected": "phấn"
+  },
+  {
+    "input": "toán",
+    "expected": "toán"
+  },
+  {
+    "input": "văn",
+    "expected": "văn"
+  },
+  {
+    "input": "sử",
+    "expected": "sử"
+  },
+  {
+    "input": "địa",
+    "expected": "địa"
+  },
+  {
+    "input": "lý",
+    "expected": "lý"
+  },
+  {
+    "input": "hoá",
+    "expected": "hoá"
+  },
+  {
+    "input": "sinh",
+    "expected": "sinh"
+  },
+  {
+    "input": "xanh",
+    "expected": "xanh"
+  },
+  {
+    "input": "đỏ",
+    "expected": "đỏ"
+  },
+  {
+    "input": "vàng",
+    "expected": "vàng"
+  },
+  {
+    "input": "trắng",
+    "expected": "trắng"
+  },
+  {
+    "input": "đen",
+    "expected": "đen"
+  },
+  {
+    "input": "tím",
+    "expected": "tím"
+  },
+  {
+    "input": "hồng",
+    "expected": "hồng"
+  },
+  {
+    "input": "cam",
+    "expected": "cam"
+  },
+  {
+    "input": "nâu",
+    "expected": "nâu"
+  },
+  {
+    "input": "xám",
+    "expected": "xám"
+  },
+  {
+    "input": "đẹp",
+    "expected": "đẹp"
+  },
+  {
+    "input": "xấu",
+    "expected": "xấu"
+  },
+  {
+    "input": "to",
+    "expected": "to"
+  },
+  {
+    "input": "nhỏ",
+    "expected": "nhỏ"
+  },
+  {
+    "input": "cao",
+    "expected": "cao"
+  },
+  {
+    "input": "thấp",
+    "expected": "thấp"
+  },
+  {
+    "input": "dài",
+    "expected": "dài"
+  },
+  {
+    "input": "ngắn",
+    "expected": "ngắn"
+  },
+  {
+    "input": "rộng",
+    "expected": "rộng"
+  },
+  {
+    "input": "hẹp",
+    "expected": "hẹp"
+  },
+  {
+    "input": "nhanh",
+    "expected": "nhanh"
+  },
+  {
+    "input": "chậm",
+    "expected": "chậm"
+  },
+  {
+    "input": "mới",
+    "expected": "mới"
+  },
+  {
+    "input": "cũ",
+    "expected": "cũ"
+  },
+  {
+    "input": "tốt",
+    "expected": "tốt"
+  },
+  {
+    "input": "đúng",
+    "expected": "đúng"
+  },
+  {
+    "input": "sai",
+    "expected": "sai"
+  },
+  {
+    "input": "khô",
+    "expected": "khô"
+  },
+  {
+    "input": "ướt",
+    "expected": "ướt"
+  },
+  {
+    "input": "nóng",
+    "expected": "nóng"
+  },
+  {
+    "input": "lạnh",
+    "expected": "lạnh"
+  },
+  {
+    "input": "ấm",
+    "expected": "ấm"
+  },
+  {
+    "input": "mát",
+    "expected": "mát"
+  },
+  {
+    "input": "sáng",
+    "expected": "sáng"
+  },
+  {
+    "input": "tối",
+    "expected": "tối"
+  },
+  {
+    "input": "ngày",
+    "expected": "ngày"
+  },
+  {
+    "input": "đêm",
+    "expected": "đêm"
+  },
+  {
+    "input": "sương",
+    "expected": "sương"
+  },
+  {
+    "input": "khói",
+    "expected": "khói"
+  },
+  {
+    "input": "lửa",
+    "expected": "lửa"
+  },
+  {
+    "input": "đá",
+    "expected": "đá"
+  },
+  {
+    "input": "cát",
+    "expected": "cát"
+  },
+  {
+    "input": "bụi",
+    "expected": "bụi"
+  },
+  {
+    "input": "đường",
+    "expected": "đường"
+  },
+  {
+    "input": "phố",
+    "expected": "phố"
+  },
+  {
+    "input": "làng",
+    "expected": "làng"
+  },
+  {
+    "input": "xã",
+    "expected": "xã"
+  },
+  {
+    "input": "huyện",
+    "expected": "huyện"
+  },
+  {
+    "input": "tỉnh",
+    "expected": "tỉnh"
+  },
+  {
+    "input": "thành",
+    "expected": "thành"
+  },
+  {
+    "input": "nhà",
+    "expected": "nhà"
+  },
+  {
+    "input": "cửa",
+    "expected": "cửa"
+  },
+  {
+    "input": "sổ",
+    "expected": "sổ"
+  },
+  {
+    "input": "giường",
+    "expected": "giường"
+  },
+  {
+    "input": "chén",
+    "expected": "chén"
+  },
+  {
+    "input": "bát",
+    "expected": "bát"
+  },
+  {
+    "input": "đũa",
+    "expected": "đũa"
+  },
+  {
+    "input": "thìa",
+    "expected": "thìa"
+  },
+  {
+    "input": "nồi",
+    "expected": "nồi"
+  },
+  {
+    "input": "chảo",
+    "expected": "chảo"
+  },
+  {
+    "input": "bếp",
+    "expected": "bếp"
+  },
+  {
+    "input": "gạo",
+    "expected": "gạo"
+  },
+  {
+    "input": "cơm",
+    "expected": "cơm"
+  },
+  {
+    "input": "canh",
+    "expected": "canh"
+  },
+  {
+    "input": "thịt",
+    "expected": "thịt"
+  },
+  {
+    "input": "củ",
+    "expected": "củ"
+  },
+  {
+    "input": "rau",
+    "expected": "rau"
+  },
+  {
+    "input": "muối",
+    "expected": "muối"
+  },
+  {
+    "input": "tiêu",
+    "expected": "tiêu"
+  },
+  {
+    "input": "ớt",
+    "expected": "ớt"
+  },
+  {
+    "input": "tỏi",
+    "expected": "tỏi"
+  },
+  {
+    "input": "hành",
+    "expected": "hành"
+  },
+  {
+    "input": "chanh",
+    "expected": "chanh"
+  },
+  {
+    "input": "chuối",
+    "expected": "chuối"
+  },
+  {
+    "input": "quýt",
+    "expected": "quýt"
+  },
+  {
+    "input": "bưởi",
+    "expected": "bưởi"
+  },
+  {
+    "input": "xoài",
+    "expected": "xoài"
+  },
+  {
+    "input": "ổi",
+    "expected": "ổi"
+  },
+  {
+    "input": "mận",
+    "expected": "mận"
+  },
+  {
+    "input": "đào",
+    "expected": "đào"
+  },
+  {
+    "input": "lê",
+    "expected": "lê"
+  },
+  {
+    "input": "táo",
+    "expected": "táo"
+  },
+  {
+    "input": "nho",
+    "expected": "nho"
+  },
+  {
+    "input": "dưa",
+    "expected": "dưa"
+  },
+  {
+    "input": "hấu",
+    "expected": "hấu"
+  },
+  {
+    "input": "khó",
+    "expected": "khó"
+  },
+  {
+    "input": "dễ",
+    "expected": "dễ"
+  },
+  {
+    "input": "giỏi",
+    "expected": "giỏi"
+  },
+  {
+    "input": "kém",
+    "expected": "kém"
+  },
+  {
+    "input": "vui",
+    "expected": "vui"
+  },
+  {
+    "input": "buồn",
+    "expected": "buồn"
+  },
+  {
+    "input": "sướng",
+    "expected": "sướng"
+  },
+  {
+    "input": "khổ",
+    "expected": "khổ"
+  },
+  {
+    "input": "khoẻ",
+    "expected": "khoẻ"
+  },
+  {
+    "input": "yếu",
+    "expected": "yếu"
+  },
+  {
+    "input": "giàu",
+    "expected": "giàu"
+  },
+  {
+    "input": "nghèo",
+    "expected": "nghèo"
+  },
+  {
+    "input": "sạch",
+    "expected": "sạch"
+  },
+  {
+    "input": "bẩn",
+    "expected": "bẩn"
+  },
+  {
+    "input": "mạnh",
+    "expected": "mạnh"
+  },
+  {
+    "input": "nhẹ",
+    "expected": "nhẹ"
+  },
+  {
+    "input": "nặng",
+    "expected": "nặng"
+  },
+  {
+    "input": "sâu",
+    "expected": "sâu"
+  },
+  {
+    "input": "nông",
+    "expected": "nông"
+  },
+  {
+    "input": "đầy",
+    "expected": "đầy"
+  },
+  {
+    "input": "vơi",
+    "expected": "vơi"
+  },
+  {
+    "input": "gần",
+    "expected": "gần"
+  },
+  {
+    "input": "xa",
+    "expected": "xa"
+  },
+  {
+    "input": "trước",
+    "expected": "trước"
+  },
+  {
+    "input": "sau",
+    "expected": "sau"
+  },
+  {
+    "input": "trên",
+    "expected": "trên"
+  },
+  {
+    "input": "dưới",
+    "expected": "dưới"
+  },
+  {
+    "input": "trong",
+    "expected": "trong"
+  },
+  {
+    "input": "ngoài",
+    "expected": "ngoài"
+  },
+  {
+    "input": "giữa",
+    "expected": "giữa"
+  },
+  {
+    "input": "bên",
+    "expected": "bên"
+  },
+  {
+    "input": "phải",
+    "expected": "phải"
+  },
+  {
+    "input": "trái",
+    "expected": "trái"
+  },
+  {
+    "input": "ngang",
+    "expected": "ngang"
+  },
+  {
+    "input": "dọc",
+    "expected": "dọc"
+  },
+  {
+    "input": "thẳng",
+    "expected": "thẳng"
+  },
+  {
+    "input": "cong",
+    "expected": "cong"
+  },
+  {
+    "input": "tròn",
+    "expected": "tròn"
+  },
+  {
+    "input": "vuông",
+    "expected": "vuông"
+  },
+  {
+    "input": "tam",
+    "expected": "tam"
+  },
+  {
+    "input": "giác",
+    "expected": "giác"
+  },
+  {
+    "input": "chữ",
+    "expected": "chữ"
+  },
+  {
+    "input": "nhật",
+    "expected": "nhật"
+  },
+  {
+    "input": "hình",
+    "expected": "hình"
+  }
+]

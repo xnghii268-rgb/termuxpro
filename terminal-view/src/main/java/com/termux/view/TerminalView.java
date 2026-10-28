@@ -318,136 +318,57 @@ public final class TerminalView extends View {
         return true;
     }
 
+    private TerminalInputConnection mTerminalInputConnection;
+
+    public TerminalInputConnection getTerminalInputConnection() {
+        return mTerminalInputConnection;
+    }
+
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        // Ensure that inputType is only set if TerminalView is selected view with the keyboard and
-        // an alternate view is not selected, like an EditText. This is necessary if an activity is
-        // initially started with the alternate view or if activity is returned to from another app
-        // and the alternate view was the one selected the last time.
-        if (mClient.isTerminalViewSelected()) {
-            if (mClient.shouldEnforceCharBasedInput()) {
-                // Some keyboards seems do not reset the internal state on TYPE_NULL.
-                // Affects mostly Samsung stock keyboards.
-                // https://github.com/termux/termux-app/issues/686
-                // However, this is not a valid value as per AOSP since `InputType.TYPE_CLASS_*` is
-                // not set and it logs a warning:
-                // W/InputAttributes: Unexpected input class: inputType=0x00080090 imeOptions=0x02000000
-                // https://cs.android.com/android/platform/superproject/+/android-11.0.0_r40:packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/InputAttributes.java;l=79
-                outAttrs.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-            } else {
-                // Using InputType.NULL is the most correct input type and avoids issues with other hacks.
-                //
-                // Previous keyboard issues:
-                // https://github.com/termux/termux-packages/issues/25
-                // https://github.com/termux/termux-app/issues/87.
-                // https://github.com/termux/termux-app/issues/126.
-                // https://github.com/termux/termux-app/issues/137 (japanese chars and TYPE_NULL).
-                outAttrs.inputType = InputType.TYPE_NULL;
-            }
-        } else {
-            // Corresponds to android:inputType="text"
-            outAttrs.inputType =  InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL;
-        }
-
-        // Note that IME_ACTION_NONE cannot be used as that makes it impossible to input newlines using the on-screen
-        // keyboard on Android TV (see https://github.com/termux/termux-app/issues/221).
-        outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN;
+        // High-compatibility AOSP configuration: never TYPE_NULL or VISIBLE_PASSWORD
+        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+        outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_NONE;
 
         String[] mimeTypes = new String[]{
             "image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif", "image/*"
         };
         EditorInfoCompat.setContentMimeTypes(outAttrs, mimeTypes);
 
-        InputConnection baseInputConnection = new BaseInputConnection(this, true) {
-
+        mTerminalInputConnection = new TerminalInputConnection(this, new TerminalInputConnection.TerminalInputListener() {
             @Override
-            public boolean finishComposingText() {
-                if (TERMINAL_VIEW_KEY_LOGGING_ENABLED) mClient.logInfo(LOG_TAG, "IME: finishComposingText()");
-                super.finishComposingText();
-
-                sendTextToTerminal(getEditable());
-                getEditable().clear();
-                return true;
-            }
-
-            @Override
-            public boolean commitText(CharSequence text, int newCursorPosition) {
-                if (TERMINAL_VIEW_KEY_LOGGING_ENABLED) {
-                    mClient.logInfo(LOG_TAG, "IME: commitText(\"" + text + "\", " + newCursorPosition + ")");
-                }
-                super.commitText(text, newCursorPosition);
-
-                if (mEmulator == null) return true;
-
-                Editable content = getEditable();
-                sendTextToTerminal(content);
-                content.clear();
-                return true;
-            }
-
-            @Override
-            public boolean deleteSurroundingText(int leftLength, int rightLength) {
-                if (TERMINAL_VIEW_KEY_LOGGING_ENABLED) {
-                    mClient.logInfo(LOG_TAG, "IME: deleteSurroundingText(" + leftLength + ", " + rightLength + ")");
-                }
-                if (mTelexEngine != null) {
-                    for (int i = 0; i < leftLength; i++) mTelexEngine.handleBackspace();
-                }
-                // The stock Samsung keyboard with 'Auto check spelling' enabled sends leftLength > 1.
-                KeyEvent deleteKey = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
-                for (int i = 0; i < leftLength; i++) sendKeyEvent(deleteKey);
-                return super.deleteSurroundingText(leftLength, rightLength);
-            }
-
-            void sendTextToTerminal(CharSequence text) {
+            public void onCommitText(String text) {
+                if (mEmulator == null) return;
                 stopTextSelectionMode();
-                final int textLengthInChars = text.length();
-                for (int i = 0; i < textLengthInChars; i++) {
+                final int len = text.length();
+                for (int i = 0; i < len; i++) {
                     char firstChar = text.charAt(i);
                     int codePoint;
                     if (Character.isHighSurrogate(firstChar)) {
-                        if (++i < textLengthInChars) {
+                        if (++i < len) {
                             codePoint = Character.toCodePoint(firstChar, text.charAt(i));
                         } else {
-                            // At end of string, with no low surrogate following the high:
                             codePoint = TerminalEmulator.UNICODE_REPLACEMENT_CHAR;
                         }
                     } else {
                         codePoint = firstChar;
                     }
 
-                    // Check onKeyDown() for details.
-                    if (mClient.readShiftKey())
+                    if (mClient != null && mClient.readShiftKey())
                         codePoint = Character.toUpperCase(codePoint);
 
                     boolean ctrlHeld = false;
                     if (codePoint <= 31 && codePoint != 27) {
                         if (codePoint == '\n') {
-                            // The AOSP keyboard and descendants seems to send \n as text when the enter key is pressed,
-                            // instead of a key event like most other keyboard apps. A terminal expects \r for the enter
-                            // key (although when icrnl is enabled this doesn't make a difference - run 'stty -icrnl' to
-                            // check the behaviour).
                             codePoint = '\r';
                         }
-
-                        // E.g. penti keyboard for ctrl input.
                         ctrlHeld = true;
                         switch (codePoint) {
-                            case 31:
-                                codePoint = '_';
-                                break;
-                            case 30:
-                                codePoint = '^';
-                                break;
-                            case 29:
-                                codePoint = ']';
-                                break;
-                            case 28:
-                                codePoint = '\\';
-                                break;
-                            default:
-                                codePoint += 96;
-                                break;
+                            case 31: codePoint = '_'; break;
+                            case 30: codePoint = '^'; break;
+                            case 29: codePoint = ']'; break;
+                            case 28: codePoint = '\\'; break;
+                            default: codePoint += 96; break;
                         }
                     }
 
@@ -455,7 +376,27 @@ public final class TerminalView extends View {
                 }
             }
 
-        };
+            @Override
+            public void onDeleteCodePoints(int codePoints) {
+                if (mEmulator == null) return;
+                stopTextSelectionMode();
+                for (int i = 0; i < codePoints; i++) {
+                    inputCodePoint(KEY_EVENT_SOURCE_SOFT_KEYBOARD, 127, false, false);
+                }
+            }
+
+            @Override
+            public void onSendKeyEvent(KeyEvent event) {
+                dispatchKeyEvent(event);
+            }
+
+            @Override
+            public void onComposingStateChanged(String composingText) {
+                // Composing feedback
+            }
+        });
+
+        InputConnection baseInputConnection = mTerminalInputConnection;
 
         InputConnectionCompat.OnCommitContentListener callback = (inputContentInfo, flags, opts) -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 &&
@@ -677,6 +618,14 @@ public final class TerminalView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (mEmulator == null) return true;
         final int action = event.getAction();
+
+        if (event.getPointerCount() == 4 && (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)) {
+            boolean newState = !TerminalInputConnection.isDebugLogEnabled();
+            TerminalInputConnection.setDebugLogEnabled(newState);
+            if (mClient != null) {
+                mClient.logInfo(LOG_TAG, "IME Debug Overlay toggled: " + newState);
+            }
+        }
 
         if (isSelectingText()) {
             updateFloatingToolbarVisibility(event);

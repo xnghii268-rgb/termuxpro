@@ -1,3 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Liquid Glass Art Direction Palette (Premium iOS 26/27 inspired) -->
+    <!-- Base Background: Warm Graphite / Near-Black -->
+    <color name="bg_obsidian_base">#0E0F11</color>
+    <color name="bg_obsidian_surface">#14161B</color>
+
+    <!-- Typography: Warm Cream -->
+    <color name="text_cream_primary">#F2EDE4</color>
+    <color name="text_cream_secondary">#9E988F</color>
+    <color name="text_cream_tertiary">#6B665E</color>
+
+    <!-- SINGLE Brand Accent: Terminal Mint Green -->
+    <color name="accent_mint_primary">#3DDC97</color>
+    <color name="accent_mint_light">#5CE8AB</color>
+    <color name="accent_mint_dark">#28B878</color>
+    <color name="accent_mint_glow">#333DDC97</color>
+    <color name="accent_mint_surface">#1A3DDC97</color>
+
+    <!-- Premium Detail Accent: Champagne Tint -->
+    <color name="accent_champagne">#CDB89A</color>
+    <color name="accent_champagne_light">#E0D0BA</color>
+    <color name="accent_champagne_surface">#1FCDB89A</color>
+
+    <!-- Liquid Glass Layers -->
+    <!-- Level 1: Base Cards -->
+    <color name="glass_base_fill">#D914161B</color>
+    <color name="glass_base_border">#24FFFFFF</color>
+
+    <!-- Level 2: Raised Cards & Sheets -->
+    <color name="glass_raised_fill">#E61A1D24</color>
+    <color name="glass_raised_border">#33FFFFFF</color>
+    <color name="glass_raised_specular">#24FFFFFF</color>
+
+    <!-- Level 3: Floating Tab Bar & Pills -->
+    <color name="glass_floating_fill">#F21E222A</color>
+    <color name="glass_floating_border">#40FFFFFF</color>
+
+    <!-- Functional States -->
+    <color name="status_running_mint">#3DDC97</color>
+    <color name="status_exited_muted">#6B7280</color>
+
+    <!-- Launcher Base -->
+    <color name="ic_launcher_background">#0E0F11</color>
 </resources>

@@ -27,6 +27,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <!-- Living Glass Background Layer (Subtle orbs, scanlines, gyro parallax) -->
+                <com.termux.app.ui.LiquidBackdropView
+                    android:id="@+id/liquid_backdrop_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
                 <!-- Top Slim Glass Session Chips Bar -->
                 <HorizontalScrollView
                     android:id="@+id/session_chips_scroll_view"
@@ -57,7 +63,7 @@
                     android:scrollbars="vertical"
                     tools:ignore="UnusedAttribute" />
 
-                <!-- Liquid Glass Menu Hub Screen -->
+                <!-- Liquid Glass Menu Hub Screen (Bento Grid, No Dead Area) -->
                 <ScrollView
                     android:id="@+id/menu_hub_layout"
                     android:layout_width="match_parent"
@@ -100,16 +106,16 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Termux Pro"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="20sp"
+                                    android:textColor="#F2EDE4"
+                                    android:textSize="32sp"
                                     android:textStyle="bold"
-                                    android:letterSpacing="0.02" />
+                                    android:letterSpacing="-0.02" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Liquid Glass Pro Edition"
-                                    android:textColor="#94A3B8"
+                                    android:text="Liquid Glass Edition"
+                                    android:textColor="#9E988F"
                                     android:textSize="12sp"
                                     android:layout_marginTop="1dp" />
                             </LinearLayout>
@@ -118,24 +124,24 @@
                                 android:id="@+id/menu_hub_session_badge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1 PHIEN HOAT DONG"
-                                android:textColor="#10B981"
-                                android:textSize="10.5sp"
+                                android:text="1 phiên đang chạy"
+                                android:textColor="#3DDC97"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_menu_badge_active"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp" />
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp" />
                         </LinearLayout>
 
-                        <!-- Hero Card: Active Session -->
+                        <!-- Hero Card: Active Session (Raised Glass) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:background="@drawable/bg_menu_hero_card"
-                            android:padding="18dp"
+                            android:padding="20dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginBottom="18dp">
+                            android:layout_marginBottom="16dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -147,8 +153,8 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="PHIEN TERMINAL HIEN TAI"
-                                    android:textColor="#38BDF8"
+                                    android:text="PHIÊN TERMINAL HIỆN TẠI"
+                                    android:textColor="#3DDC97"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:letterSpacing="0.06" />
@@ -157,9 +163,9 @@
                                     android:id="@+id/menu_hero_status_dot"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="READY"
-                                    android:textColor="#10B981"
-                                    android:textSize="10sp"
+                                    android:text="Sẵn sàng"
+                                    android:textColor="#3DDC97"
+                                    android:textSize="11sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
 
@@ -168,15 +174,31 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Phiên 1 : bash"
-                                android:textColor="#FFFFFF"
-                                android:textSize="18sp"
+                                android:textColor="#F2EDE4"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="6dp"
-                                android:layout_marginBottom="16dp" />
+                                android:layout_marginTop="6dp" />
+
+                            <!-- Live Terminal Output Preview -->
+                            <TextView
+                                android:id="@+id/menu_hero_terminal_preview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="54dp"
+                                android:maxLines="4"
+                                android:ellipsize="end"
+                                android:background="#26000000"
+                                android:padding="10dp"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginBottom="16dp"
+                                android:fontFamily="monospace"
+                                android:textSize="12sp"
+                                android:textColor="#9E988F"
+                                android:text="~ $ \n~ $ Termux Pro Liquid Glass ready.\n~ $ bash session active." />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="48dp"
+                                android:layout_height="52dp"
                                 android:orientation="horizontal">
 
                                 <LinearLayout
@@ -191,18 +213,18 @@
                                     android:focusable="true">
 
                                     <ImageView
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:src="@drawable/ic_play_arrow"
-                                        app:tint="#FFFFFF"
-                                        android:layout_marginEnd="6dp" />
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_prompt_chevron"
+                                        app:tint="#0E0F11"
+                                        android:layout_marginEnd="8dp" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Vao Terminal"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="14sp"
+                                        android:text="Vào Terminal"
+                                        android:textColor="#0E0F11"
+                                        android:textSize="15sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
 
@@ -217,18 +239,18 @@
                                     android:focusable="true">
 
                                     <ImageView
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:src="@drawable/ic_new_session"
-                                        app:tint="#38BDF8"
-                                        android:layout_marginEnd="4dp" />
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_plus_new"
+                                        app:tint="#F2EDE4"
+                                        android:layout_marginEnd="6dp" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Phiên Mới"
-                                        android:textColor="#38BDF8"
-                                        android:textSize="13sp"
+                                        android:textColor="#F2EDE4"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -238,190 +260,255 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TRUNG TAM TIEN ICH &amp; TAC VU"
-                            android:textColor="#64748B"
-                            android:textSize="11sp"
+                            android:text="TRUNG TÂM TIỆN ÍCH &amp; TÁC VỤ"
+                            android:textColor="#9E988F"
+                            android:textSize="11.5sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.08"
                             android:layout_marginBottom="12dp" />
 
-                        <!-- Grid Row 1: Command Palette & AI Agent -->
+                        <!-- Bento Row 1: Command Palette (Wide Card) -->
+                        <LinearLayout
+                            android:id="@+id/menu_card_commands"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_menu_hub_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:layout_marginBottom="12dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="34dp"
+                                    android:layout_height="34dp"
+                                    android:background="@drawable/bg_menu_secondary_btn"
+                                    android:padding="7dp"
+                                    android:src="@drawable/ic_nav_command"
+                                    app:tint="#F2EDE4" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Kho Lệnh Nhanh"
+                                        android:textColor="#F2EDE4"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Truy cập và thực thi lệnh tiện ích"
+                                        android:textColor="#9E988F"
+                                        android:textSize="12sp"
+                                        android:layout_marginTop="1dp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="MỞ"
+                                    android:textColor="#3DDC97"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Command Chips Preview -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="pkg update &amp;&amp; pkg upgrade"
+                                    android:background="@drawable/bg_menu_cmd_chip"
+                                    android:textColor="#9E988F"
+                                    android:textSize="11sp"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="5dp"
+                                    android:layout_marginEnd="8dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="git status"
+                                    android:background="@drawable/bg_menu_cmd_chip"
+                                    android:textColor="#9E988F"
+                                    android:textSize="11sp"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="5dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Bento Row 2: AI Hub (Tall Left) + Stacked Right (Sessions & Image) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:layout_marginBottom="12dp">
 
-                            <!-- Card: Command Palette -->
-                            <LinearLayout
-                                android:id="@+id/menu_card_commands"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="6dp"
-                                android:background="@drawable/bg_menu_hub_card"
-                                android:orientation="vertical"
-                                android:padding="14dp"
-                                android:clickable="true"
-                                android:focusable="true">
-
-                                <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_cyan"
-                                    android:padding="8dp"
-                                    android:src="@drawable/ic_nav_command"
-                                    app:tint="#06B6D4" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Kho Lệnh Nhanh"
-                                    android:textColor="#F8FAFC"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Palette lệnh tiện ích"
-                                    android:textColor="#94A3B8"
-                                    android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
-                            </LinearLayout>
-
-                            <!-- Card: AI Coding Agent -->
+                            <!-- AI Coding Hub (Tall Card) -->
                             <LinearLayout
                                 android:id="@+id/menu_card_ai"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="6dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1.1"
+                                android:layout_marginEnd="6dp"
                                 android:background="@drawable/bg_menu_hub_card"
                                 android:orientation="vertical"
-                                android:padding="14dp"
+                                android:padding="16dp"
                                 android:clickable="true"
                                 android:focusable="true">
 
                                 <ImageView
                                     android:layout_width="36dp"
                                     android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_purple"
+                                    android:background="@drawable/bg_menu_secondary_btn"
                                     android:padding="8dp"
                                     android:src="@drawable/ic_ai_agent"
-                                    app:tint="#A855F7" />
+                                    app:tint="#F2EDE4" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="AI Coding Hub"
-                                    android:textColor="#F8FAFC"
-                                    android:textSize="14sp"
+                                    android:textColor="#F2EDE4"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
+                                    android:layout_marginTop="12dp" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Antigravity &amp; Gemini"
-                                    android:textColor="#94A3B8"
+                                    android:text="Antigravity &amp; Gemini CLI trợ lý lập trình"
+                                    android:textColor="#9E988F"
+                                    android:textSize="12sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="CHẠY NGAY"
+                                    android:textColor="#3DDC97"
                                     android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="8dp" />
+                            </LinearLayout>
+
+                            <!-- Stacked Right Column: Sessions & Image Helper -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1.0"
+                                android:layout_marginStart="6dp"
+                                android:orientation="vertical">
+
+                                <!-- Sessions Manager Card -->
+                                <LinearLayout
+                                    android:id="@+id/menu_card_sessions"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_menu_hub_card"
+                                    android:orientation="vertical"
+                                    android:padding="14dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:clickable="true"
+                                    android:focusable="true">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:background="@drawable/bg_menu_secondary_btn"
+                                        android:padding="7dp"
+                                        android:src="@drawable/ic_nav_sessions"
+                                        app:tint="#F2EDE4" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Quản Lý Phiên"
+                                        android:textColor="#F2EDE4"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"
+                                        android:layout_marginTop="8dp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Chuyển đổi &amp; đổi tên"
+                                        android:textColor="#9E988F"
+                                        android:textSize="11sp"
+                                        android:layout_marginTop="1dp" />
+                                </LinearLayout>
+
+                                <!-- Image & Media Card -->
+                                <LinearLayout
+                                    android:id="@+id/menu_card_image"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_menu_hub_card"
+                                    android:orientation="vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:background="@drawable/bg_menu_secondary_btn"
+                                        android:padding="7dp"
+                                        android:src="@drawable/ic_nav_image"
+                                        app:tint="#F2EDE4" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Ảnh &amp; Media"
+                                        android:textColor="#F2EDE4"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"
+                                        android:layout_marginTop="8dp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Dán screenshot, OCR"
+                                        android:textColor="#9E988F"
+                                        android:textSize="11sp"
+                                        android:layout_marginTop="1dp" />
+                                </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Grid Row 2: Sessions & Image Helper -->
+                        <!-- Bento Row 3: Themes & Settings -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:layout_marginBottom="12dp">
-
-                            <!-- Card: Sessions Manager -->
-                            <LinearLayout
-                                android:id="@+id/menu_card_sessions"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="6dp"
-                                android:background="@drawable/bg_menu_hub_card"
-                                android:orientation="vertical"
-                                android:padding="14dp"
-                                android:clickable="true"
-                                android:focusable="true">
-
-                                <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_pink"
-                                    android:padding="8dp"
-                                    android:src="@drawable/ic_nav_sessions"
-                                    app:tint="#F43F5E" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Quản Lý Phiên"
-                                    android:textColor="#F8FAFC"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Chuyển &amp; đổi tên phiên"
-                                    android:textColor="#94A3B8"
-                                    android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
-                            </LinearLayout>
-
-                            <!-- Card: Image Clipboard Helper -->
-                            <LinearLayout
-                                android:id="@+id/menu_card_image"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="6dp"
-                                android:background="@drawable/bg_menu_hub_card"
-                                android:orientation="vertical"
-                                android:padding="14dp"
-                                android:clickable="true"
-                                android:focusable="true">
-
-                                <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_amber"
-                                    android:padding="8dp"
-                                    android:src="@drawable/ic_nav_image"
-                                    app:tint="#F59E0B" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Ảnh &amp; Media"
-                                    android:textColor="#F8FAFC"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Dán screenshot, OCR"
-                                    android:textColor="#94A3B8"
-                                    android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- Grid Row 3: Themes & Settings -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
 
                             <!-- Card: Themes & Glass -->
                             <LinearLayout
@@ -437,29 +524,29 @@
                                 android:focusable="true">
 
                                 <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_purple"
-                                    android:padding="8dp"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="@drawable/bg_menu_secondary_btn"
+                                    android:padding="7dp"
                                     android:src="@drawable/ic_palette_theme"
-                                    app:tint="#C084FC" />
+                                    app:tint="#F2EDE4" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Theme &amp; Giao Diện"
-                                    android:textColor="#F8FAFC"
+                                    android:textColor="#F2EDE4"
                                     android:textSize="14sp"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
+                                    android:layout_marginTop="8dp" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Liquid Glass Pro"
-                                    android:textColor="#94A3B8"
+                                    android:textColor="#9E988F"
                                     android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_marginTop="1dp" />
                             </LinearLayout>
 
                             <!-- Card: Settings -->
@@ -476,165 +563,73 @@
                                 android:focusable="true">
 
                                 <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@drawable/bg_menu_icon_box_cyan"
-                                    android:padding="8dp"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="@drawable/bg_menu_secondary_btn"
+                                    android:padding="7dp"
                                     android:src="@drawable/ic_settings"
-                                    app:tint="#38BDF8" />
+                                    app:tint="#F2EDE4" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Cài Đặt Hệ Thống"
-                                    android:textColor="#F8FAFC"
+                                    android:textColor="#F2EDE4"
                                     android:textSize="14sp"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="10dp" />
+                                    android:layout_marginTop="8dp" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Bàn phím, Shell, Sao lưu"
-                                    android:textColor="#94A3B8"
+                                    android:textColor="#9E988F"
                                     android:textSize="11sp"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_marginTop="1dp" />
                             </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Bottom Glass Strip: Helpful tip (fills the space naturally) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_menu_cmd_chip"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mẹo:"
+                                android:textColor="#3DDC97"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:layout_marginEnd="6dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Chạm đúp vào màn hình terminal để sao chép nhanh văn bản."
+                                android:textColor="#9E988F"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                     </LinearLayout>
                 </ScrollView>
 
-                <!-- Liquid Glass Floating Bottom Navigation Bar -->
-                <LinearLayout
-                    android:id="@+id/floating_bottom_nav_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="52dp"
+                <!-- Liquid Drop Floating Glass Tab Bar -->
+                <com.termux.app.ui.LiquidTabBar
+                    android:id="@+id/liquid_tab_bar"
+                    android:layout_width="320dp"
+                    android:layout_height="54dp"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="12dp"
-                    android:elevation="8dp"
-                    android:background="@drawable/bg_floating_glass_nav"
-                    android:paddingHorizontal="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- 1. Menu -->
-                    <LinearLayout
-                        android:id="@+id/nav_item_menu"
-                        android:layout_width="54dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:background="?attr/selectableItemBackgroundBorderless">
-                        <ImageView
-                            android:id="@+id/nav_icon_menu"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_dashboard"
-                            app:tint="#FF3C70" />
-                        <TextView
-                            android:id="@+id/nav_text_menu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Menu"
-                            android:textColor="#FF3C70"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- 2. Terminal -->
-                    <LinearLayout
-                        android:id="@+id/nav_item_terminal"
-                        android:layout_width="54dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:background="?attr/selectableItemBackgroundBorderless">
-                        <ImageView
-                            android:id="@+id/nav_icon_terminal"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_terminal"
-                            app:tint="#9CA3AF" />
-                        <TextView
-                            android:id="@+id/nav_text_terminal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Terminal"
-                            android:textColor="#9CA3AF"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-
-                    <!-- 3. Lệnh -->
-                    <LinearLayout
-                        android:id="@+id/nav_item_command"
-                        android:layout_width="54dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:background="?attr/selectableItemBackgroundBorderless">
-                        <ImageView
-                            android:id="@+id/nav_icon_command"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_command"
-                            app:tint="#9CA3AF" />
-                        <TextView
-                            android:id="@+id/nav_text_command"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Lệnh"
-                            android:textColor="#9CA3AF"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-
-                    <!-- 4. Ảnh -->
-                    <LinearLayout
-                        android:id="@+id/nav_item_image"
-                        android:layout_width="54dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:background="?attr/selectableItemBackgroundBorderless">
-                        <ImageView
-                            android:id="@+id/nav_icon_image"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_image"
-                            app:tint="#9CA3AF" />
-                        <TextView
-                            android:id="@+id/nav_text_image"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ảnh"
-                            android:textColor="#9CA3AF"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-
-                    <!-- 5. Phiên -->
-                    <LinearLayout
-                        android:id="@+id/nav_item_sessions"
-                        android:layout_width="54dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:background="?attr/selectableItemBackgroundBorderless">
-                        <ImageView
-                            android:id="@+id/nav_icon_sessions"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_sessions"
-                            app:tint="#9CA3AF" />
-                        <TextView
-                            android:id="@+id/nav_text_sessions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Phiên"
-                            android:textColor="#9CA3AF"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_marginBottom="14dp"
+                    android:elevation="10dp" />
 
             </RelativeLayout>
 
