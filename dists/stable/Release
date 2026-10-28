@@ -9,6 +9,6 @@ Description: Official APT repository for Termux Pro (com.termuxpro.app)
 Date: Wed, 21 Oct 2026 12:00:00 UTC
 SHA256:
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
- 0dd4a9bf5abb1faebc7f5b58eb77952e97a625a84201ba22138bf1129bcf69e7 29 main/binary-all/Packages.gz
+ dd9acba9263689c80e7e0c926f99e8cd12028e6f1dd3116af338f5beefe9273c 29 main/binary-all/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
- 0dd4a9bf5abb1faebc7f5b58eb77952e97a625a84201ba22138bf1129bcf69e7 29 main/binary-aarch64/Packages.gz
+ dd9acba9263689c80e7e0c926f99e8cd12028e6f1dd3116af338f5beefe9273c 29 main/binary-aarch64/Packages.gz
