@@ -1,5 +1,6 @@
 package com.termux.app.theme;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -108,6 +109,47 @@ public class TermuxProThemeManager {
     public static void setCurrentThemeId(Context context, String themeId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putString(KEY_CURRENT_THEME, themeId).apply();
+    }
+
+    public static boolean applyTheme(Activity activity, String themeId) {
+        if (activity instanceof TermuxActivity) {
+            return applyTheme((TermuxActivity) activity, themeId);
+        }
+        init(activity);
+        ThemeItem theme = sThemes.get(themeId);
+        if (theme == null) {
+            theme = sThemes.get(DEFAULT_THEME_ID);
+            if (theme == null) return false;
+        }
+
+        try {
+            Properties props = new Properties();
+            props.setProperty("background", theme.background);
+            props.setProperty("foreground", theme.foreground);
+            props.setProperty("cursor", theme.cursor);
+            for (Map.Entry<String, String> entry : theme.colors.entrySet()) {
+                props.setProperty(entry.getKey(), entry.getValue());
+            }
+            TerminalColors.COLOR_SCHEME.updateWith(props);
+
+            int bgColor = android.graphics.Color.parseColor(theme.background);
+            Window window = activity.getWindow();
+            if (window != null && window.getDecorView() != null) {
+                window.getDecorView().setBackgroundColor(bgColor);
+                androidx.core.view.WindowInsetsControllerCompat insetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(window, window.getDecorView());
+                if (insetsController != null) {
+                    insetsController.setAppearanceLightStatusBars(!theme.isDark);
+                    insetsController.setAppearanceLightNavigationBars(!theme.isDark);
+                }
+            }
+
+            setCurrentThemeId(activity, theme.id);
+            return true;
+        } catch (Exception e) {
+            Logger.logError(LOG_TAG, "Error applying theme " + themeId + ": " + e.getMessage());
+            return false;
+        }
     }
 
     public static boolean applyTheme(TermuxActivity activity, String themeId) {
