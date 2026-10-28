@@ -34,6 +34,8 @@ public class TerminalInputConnection extends BaseInputConnection {
     private final TerminalInputListener mListener;
     private final SpannableStringBuilder mComposingBuffer = new SpannableStringBuilder();
     private final SpannableStringBuilder mMirroredText = new SpannableStringBuilder();
+    private final StringBuilder mCommitWordBuffer = new StringBuilder();
+    private String mLastCommittedWordDisplay = "";
     private String mComposingOnPty = "";
     private VietnameseEngine mEngine;
     private int mBatchDepth = 0;
@@ -160,6 +162,9 @@ public class TerminalInputConnection extends BaseInputConnection {
             return true;
         }
 
+        mCommitWordBuffer.setLength(0);
+        mLastCommittedWordDisplay = "";
+
         mComposingBuffer.clear();
         if (!str.isEmpty()) {
             mComposingBuffer.append(str);
@@ -212,6 +217,8 @@ public class TerminalInputConnection extends BaseInputConnection {
             mComposingOnPty = "";
         }
         mComposingBuffer.clear();
+        mCommitWordBuffer.setLength(0);
+        mLastCommittedWordDisplay = "";
         if (mListener != null) {
             mListener.onComposingStateChanged("");
         }
@@ -236,9 +243,10 @@ public class TerminalInputConnection extends BaseInputConnection {
             mListener.onComposingStateChanged("");
         }
 
-        String target = transformComposingText(rawStr);
-
         if (mComposingOnPty.length() > 0) {
+            mCommitWordBuffer.setLength(0);
+            mLastCommittedWordDisplay = "";
+            String target = transformComposingText(rawStr);
             int common = 0;
             int min = Math.min(mComposingOnPty.length(), target.length());
             while (common < min && mComposingOnPty.charAt(common) == target.charAt(common)) {
@@ -256,18 +264,53 @@ public class TerminalInputConnection extends BaseInputConnection {
                 }
             }
             mComposingOnPty = "";
+
+            mMirroredText.append(target);
+            if (mMirroredText.length() > 2000) {
+                mMirroredText.delete(0, mMirroredText.length() - 1000);
+            }
+            Selection.setSelection(mMirroredText, mMirroredText.length());
         } else {
-            if (mListener != null && !target.isEmpty()) {
-                mListener.onCommitText(target);
+            // Direct commit mode (per-character commit or whole word commit from suggestion)
+            if (rawStr.length() == 1 && Character.isLetter(rawStr.charAt(0)) && mEngine != null && mEngine.isEnabled() && (mListener == null || !mListener.isBypassInputEngine())) {
+                mCommitWordBuffer.append(rawStr.charAt(0));
+                String targetWord = transformComposingText(mCommitWordBuffer.toString());
+                int common = 0;
+                int min = Math.min(mLastCommittedWordDisplay.length(), targetWord.length());
+                while (common < min && mLastCommittedWordDisplay.charAt(common) == targetWord.charAt(common)) {
+                    common++;
+                }
+                int backspaces = mLastCommittedWordDisplay.length() - common;
+                String append = targetWord.substring(common);
+
+                if (mListener != null) {
+                    if (backspaces > 0) {
+                        mListener.onDeleteCodePoints(backspaces);
+                    }
+                    if (!append.isEmpty()) {
+                        mListener.onCommitTextRaw(append);
+                    }
+                }
+                mLastCommittedWordDisplay = targetWord;
+
+                mMirroredText.append(append);
+                if (mMirroredText.length() > 2000) {
+                    mMirroredText.delete(0, mMirroredText.length() - 1000);
+                }
+                Selection.setSelection(mMirroredText, mMirroredText.length());
+            } else {
+                mCommitWordBuffer.setLength(0);
+                mLastCommittedWordDisplay = "";
+                if (mListener != null && !rawStr.isEmpty()) {
+                    mListener.onCommitTextRaw(rawStr);
+                }
+                mMirroredText.append(rawStr);
+                if (mMirroredText.length() > 2000) {
+                    mMirroredText.delete(0, mMirroredText.length() - 1000);
+                }
+                Selection.setSelection(mMirroredText, mMirroredText.length());
             }
         }
-
-        // Update mirrored context model
-        mMirroredText.append(target);
-        if (mMirroredText.length() > 2000) {
-            mMirroredText.delete(0, mMirroredText.length() - 1000);
-        }
-        Selection.setSelection(mMirroredText, mMirroredText.length());
 
         mBatchModified = true;
         return true;
@@ -293,6 +336,33 @@ public class TerminalInputConnection extends BaseInputConnection {
                 mListener.onComposingStateChanged(newTarget);
             }
             leftLength -= del;
+        } else if (mCommitWordBuffer.length() > 0) {
+            mCommitWordBuffer.deleteCharAt(mCommitWordBuffer.length() - 1);
+            if (mCommitWordBuffer.length() == 0) {
+                mLastCommittedWordDisplay = "";
+                if (mListener != null) {
+                    mListener.onDeleteCodePoints(1);
+                }
+            } else {
+                String targetWord = transformComposingText(mCommitWordBuffer.toString());
+                int common = 0;
+                int min = Math.min(mLastCommittedWordDisplay.length(), targetWord.length());
+                while (common < min && mLastCommittedWordDisplay.charAt(common) == targetWord.charAt(common)) {
+                    common++;
+                }
+                int backspaces = mLastCommittedWordDisplay.length() - common;
+                String append = targetWord.substring(common);
+                if (mListener != null) {
+                    if (backspaces > 0) {
+                        mListener.onDeleteCodePoints(backspaces);
+                    }
+                    if (!append.isEmpty()) {
+                        mListener.onCommitTextRaw(append);
+                    }
+                }
+                mLastCommittedWordDisplay = targetWord;
+            }
+            leftLength -= 1;
         }
 
         if (leftLength > 0) {

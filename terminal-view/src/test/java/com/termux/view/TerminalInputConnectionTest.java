@@ -210,4 +210,44 @@ public class TerminalInputConnectionTest {
         mConnection.commitText("đeer", 1);
         Assert.assertEquals("để", mTerminalBuffer.toString());
     }
+
+    @Test
+    public void testPerCharacterDirectCommitDau() {
+        setUp();
+        String[] keys = {"d", "a", "a", "u", "s", " "};
+        for (String k : keys) {
+            mConnection.commitText(k, 1);
+        }
+        Assert.assertEquals("dấu ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testPerCharacterDirectCommitThuong() {
+        setUp();
+        String[] keys = {"t", "h", "u", "o", "n", "g", "w", " "};
+        for (String k : keys) {
+            mConnection.commitText(k, 1);
+        }
+        Assert.assertEquals("thương ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testPerCharacterDirectCommitTriet() {
+        setUp();
+        String[] keys = {"t", "r", "i", "e", "e", "j", "t", " "};
+        for (String k : keys) {
+            mConnection.commitText(k, 1);
+        }
+        Assert.assertEquals("triệt ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testPerCharacterDirectCommitEnglish() {
+        setUp();
+        String[] keys = {"f", "i", "x", " "};
+        for (String k : keys) {
+            mConnection.commitText(k, 1);
+        }
+        Assert.assertEquals("fix ", mTerminalBuffer.toString());
+    }
 }

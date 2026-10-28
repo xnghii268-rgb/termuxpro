@@ -357,7 +357,7 @@ public final class TerminalView extends View {
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         // High-compatibility AOSP configuration: never TYPE_NULL or VISIBLE_PASSWORD
-        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_NONE;
 
         String[] mimeTypes = new String[]{
@@ -371,18 +371,12 @@ public final class TerminalView extends View {
                 if (mEmulator == null || text == null || text.isEmpty()) return;
                 stopTextSelectionMode();
                 onCommitTextRaw(text);
-                if (mTelexEngine != null) {
-                    mTelexEngine.reset();
-                }
             }
 
             @Override
             public void onCommitTextRaw(String text) {
                 if (mEmulator == null || text == null || text.isEmpty()) return;
                 stopTextSelectionMode();
-                if (mTelexEngine != null) {
-                    mTelexEngine.reset();
-                }
                 final int len = text.length();
                 for (int i = 0; i < len; i++) {
                     char firstChar = text.charAt(i);
