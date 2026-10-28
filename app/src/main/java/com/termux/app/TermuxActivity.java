@@ -33,6 +33,7 @@ import android.widget.Toast;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -273,9 +274,13 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         setFloatingBottomNavBar();
 
+        setupMenuHub();
+
         setTopSessionChipsBar();
 
         setupWindowInsetsAndFloatingNav();
+
+        showMenuHub();
 
         TermuxInstaller.setupDefaultShellConfigFiles(this);
 
@@ -492,6 +497,10 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         // Update the {@link TerminalSession} and {@link TerminalEmulator} clients.
         mTermuxService.setTermuxTerminalSessionClient(mTermuxTerminalSessionActivityClient);
+
+        if (mIsMenuHubVisible) {
+            showMenuHub();
+        }
     }
 
     @Override
@@ -662,6 +671,16 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private View mFloatingBottomNavBar;
     private LinearLayout mSessionChipsContainer;
 
+    private View mMenuHubLayout;
+    private TextView mMenuHubSessionBadge;
+    private TextView mMenuHeroSessionTitle;
+    private TextView mMenuHeroStatusDot;
+    private ImageView mNavIconMenu;
+    private ImageView mNavIconTerminal;
+    private TextView mNavTextMenu;
+    private TextView mNavTextTerminal;
+    private boolean mIsMenuHubVisible = true;
+
     private void applyTouchFeedback(View view) {
         if (view == null) return;
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
@@ -670,21 +689,241 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }).start();
     }
 
+    private void setupMenuHub() {
+        mMenuHubLayout = findViewById(R.id.menu_hub_layout);
+        mMenuHubSessionBadge = findViewById(R.id.menu_hub_session_badge);
+        mMenuHeroSessionTitle = findViewById(R.id.menu_hero_session_title);
+        mMenuHeroStatusDot = findViewById(R.id.menu_hero_status_dot);
+
+        View btnResume = findViewById(R.id.menu_btn_resume_terminal);
+        if (btnResume != null) {
+            btnResume.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                showTerminalView(true);
+            });
+        }
+
+        View btnNewSession = findViewById(R.id.menu_btn_new_session);
+        if (btnNewSession != null) {
+            btnNewSession.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                if (mTermuxTerminalSessionActivityClient != null) {
+                    mTermuxTerminalSessionActivityClient.addNewSession(false, null);
+                }
+                showTerminalView(true);
+            });
+        }
+
+        View cardCommands = findViewById(R.id.menu_card_commands);
+        if (cardCommands != null) {
+            cardCommands.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                com.termux.app.features.TermuxProPaletteManager.showCommandPalette(TermuxActivity.this);
+            });
+        }
+
+        View cardAi = findViewById(R.id.menu_card_ai);
+        if (cardAi != null) {
+            cardAi.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                showAiAgentDialog();
+            });
+        }
+
+        View cardSessions = findViewById(R.id.menu_card_sessions);
+        if (cardSessions != null) {
+            cardSessions.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                if (getDrawer() != null) {
+                    getDrawer().openDrawer(GravityCompat.START);
+                }
+            });
+        }
+
+        View cardImage = findViewById(R.id.menu_card_image);
+        if (cardImage != null) {
+            cardImage.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                showImageActionSheet();
+            });
+        }
+
+        View cardTheme = findViewById(R.id.menu_card_theme);
+        if (cardTheme != null) {
+            cardTheme.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                com.termux.app.theme.TermuxProThemeManager.showThemeDialog(TermuxActivity.this);
+            });
+        }
+
+        View cardSettings = findViewById(R.id.menu_card_settings);
+        if (cardSettings != null) {
+            cardSettings.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                ActivityUtils.startActivity(this, new Intent(this, SettingsActivity.class));
+            });
+        }
+    }
+
+    private void showAiAgentDialog() {
+        List<String> options = java.util.Arrays.asList(
+            "Khởi chạy Antigravity CLI (agy)",
+            "Khởi chạy Gemini AI Assistant",
+            "Cài đặt Antigravity Framework",
+            "Xem trạng thái phiên AI Agent"
+        );
+        com.termux.app.ui.GlassSheet.showListSheet(
+            this,
+            "AI Coding Agent Hub",
+            options,
+            -1,
+            which -> {
+                showTerminalView(true);
+                TerminalSession session = getCurrentSession();
+                if (session == null) return;
+                String cmd = null;
+                if (which == 0) {
+                    cmd = "antigravity\n";
+                } else if (which == 1) {
+                    cmd = "gemini\n";
+                } else if (which == 2) {
+                    cmd = "pip install antigravity-cli --upgrade\n";
+                } else if (which == 3) {
+                    cmd = "echo '[TermuxPro AI Hub] Antigravity ready.'\n";
+                }
+                if (cmd != null) {
+                    session.write(cmd);
+                }
+            }
+        );
+    }
+
+    public void showMenuHub() {
+        mIsMenuHubVisible = true;
+        if (mMenuHubLayout != null) {
+            mMenuHubLayout.setVisibility(View.VISIBLE);
+        }
+        if (mTerminalView != null) {
+            mTerminalView.setVisibility(View.GONE);
+        }
+        View sessionScroll = findViewById(R.id.session_chips_scroll_view);
+        if (sessionScroll != null) {
+            sessionScroll.setVisibility(View.GONE);
+        }
+        if (mTerminalToolbarViewPager != null) {
+            mTerminalToolbarViewPager.setVisibility(View.GONE);
+        }
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
+        updateNavActiveTab(true);
+        updateMenuHubSessionInfo();
+    }
+
+    public void showTerminalView(boolean openKeyboard) {
+        mIsMenuHubVisible = false;
+        if (mMenuHubLayout != null) {
+            mMenuHubLayout.setVisibility(View.GONE);
+        }
+        if (mTerminalView != null) {
+            mTerminalView.setVisibility(View.VISIBLE);
+            mTerminalView.requestFocus();
+        }
+        View sessionScroll = findViewById(R.id.session_chips_scroll_view);
+        if (sessionScroll != null) {
+            sessionScroll.setVisibility(View.VISIBLE);
+        }
+        if (mTerminalToolbarViewPager != null && mProperties != null && mProperties.shouldExtraKeysRowBeVisible()) {
+            mTerminalToolbarViewPager.setVisibility(View.VISIBLE);
+        }
+
+        updateNavActiveTab(false);
+
+        if (openKeyboard && mTerminalView != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(mTerminalView, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }
+    }
+
+    private void updateNavActiveTab(boolean isMenu) {
+        int activeColor = 0xFFFF3C70;
+        int inactiveColor = 0xFF9CA3AF;
+
+        if (mNavIconMenu != null) {
+            mNavIconMenu.setColorFilter(isMenu ? activeColor : inactiveColor);
+        }
+        if (mNavTextMenu != null) {
+            mNavTextMenu.setTextColor(isMenu ? activeColor : inactiveColor);
+            mNavTextMenu.setTypeface(null, isMenu ? Typeface.BOLD : Typeface.NORMAL);
+        }
+        if (mNavIconTerminal != null) {
+            mNavIconTerminal.setColorFilter(isMenu ? inactiveColor : activeColor);
+        }
+        if (mNavTextTerminal != null) {
+            mNavTextTerminal.setTextColor(isMenu ? inactiveColor : activeColor);
+            mNavTextTerminal.setTypeface(null, isMenu ? Typeface.NORMAL : Typeface.BOLD);
+        }
+    }
+
+    public void updateMenuHubSessionInfo() {
+        runOnUiThread(() -> {
+            if (mTermuxService == null) return;
+            TerminalSession currentSession = getCurrentSession();
+            int total = mTermuxService.getTermuxSessionsSize();
+
+            if (mMenuHubSessionBadge != null) {
+                mMenuHubSessionBadge.setText(total + (total > 1 ? " PHIÊN ĐANG CHẠY" : " PHIÊN ĐANG CHẠY"));
+            }
+
+            if (mMenuHeroSessionTitle != null) {
+                if (currentSession != null) {
+                    String title = (currentSession.mSessionName != null && !currentSession.mSessionName.trim().isEmpty()) ?
+                        currentSession.mSessionName : ("Phiên " + (mTermuxService.getIndexOfSession(currentSession) + 1));
+                    mMenuHeroSessionTitle.setText(title);
+                } else {
+                    mMenuHeroSessionTitle.setText("Phiên 1 : bash");
+                }
+            }
+
+            if (mMenuHeroStatusDot != null) {
+                if (currentSession != null && !currentSession.isRunning()) {
+                    mMenuHeroStatusDot.setText("EXITED");
+                    mMenuHeroStatusDot.setTextColor(0xFFEF4444);
+                } else {
+                    mMenuHeroStatusDot.setText("READY");
+                    mMenuHeroStatusDot.setTextColor(0xFF10B981);
+                }
+            }
+        });
+    }
+
     private void setFloatingBottomNavBar() {
         mFloatingBottomNavBar = findViewById(R.id.floating_bottom_nav_bar);
         if (mFloatingBottomNavBar == null) return;
+
+        mNavIconMenu = findViewById(R.id.nav_icon_menu);
+        mNavTextMenu = findViewById(R.id.nav_text_menu);
+        mNavIconTerminal = findViewById(R.id.nav_icon_terminal);
+        mNavTextTerminal = findViewById(R.id.nav_text_terminal);
+
+        View navMenu = findViewById(R.id.nav_item_menu);
+        if (navMenu != null) {
+            navMenu.setOnClickListener(v -> {
+                applyTouchFeedback(v);
+                showMenuHub();
+            });
+        }
 
         View navTerminal = findViewById(R.id.nav_item_terminal);
         if (navTerminal != null) {
             navTerminal.setOnClickListener(v -> {
                 applyTouchFeedback(v);
-                if (mTerminalView != null) {
-                    mTerminalView.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.showSoftInput(mTerminalView, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                }
+                showTerminalView(true);
             });
         }
 
@@ -723,13 +962,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             });
         }
 
-        View navSettings = findViewById(R.id.nav_item_settings);
-        if (navSettings != null) {
-            navSettings.setOnClickListener(v -> {
-                applyTouchFeedback(v);
-                ActivityUtils.startActivity(this, new Intent(this, SettingsActivity.class));
-            });
-        }
+        updateNavActiveTab(mIsMenuHubVisible);
     }
 
     private void showImageActionSheet() {
@@ -798,6 +1031,16 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 int targetTop = statusBarTop + basePad;
                 if (sessionScroll.getPaddingTop() != targetTop) {
                     sessionScroll.setPadding(sidePad, targetTop, sidePad, basePad);
+                }
+            }
+
+            if (mMenuHubLayout != null) {
+                float density = getResources().getDisplayMetrics().density;
+                int padSide = (int)(16 * density + 0.5f);
+                int padBottom = (int)(96 * density + 0.5f);
+                int targetTop = statusBarTop + (int)(12 * density + 0.5f);
+                if (mMenuHubLayout.getPaddingTop() != targetTop) {
+                    mMenuHubLayout.setPadding(padSide, targetTop, padSide, padBottom);
                 }
             }
 
@@ -928,6 +1171,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     public void updateTopSessionChips() {
         runOnUiThread(() -> {
+            updateMenuHubSessionInfo();
+            if (mIsMenuHubVisible) {
+                if (mTerminalView != null) mTerminalView.setVisibility(View.GONE);
+                HorizontalScrollView sessionScroll = findViewById(R.id.session_chips_scroll_view);
+                if (sessionScroll != null) sessionScroll.setVisibility(View.GONE);
+            }
             if (mSessionChipsContainer == null || mTermuxService == null) return;
             mSessionChipsContainer.removeAllViews();
 
@@ -1095,6 +1344,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     public void onBackPressed() {
         if (getDrawer().isDrawerOpen(Gravity.LEFT)) {
             getDrawer().closeDrawers();
+        } else if (!mIsMenuHubVisible) {
+            showMenuHub();
         } else {
             finishActivityIfNotFinishing();
         }

@@ -57,6 +57,454 @@
                     android:scrollbars="vertical"
                     tools:ignore="UnusedAttribute" />
 
+                <!-- Liquid Glass Menu Hub Screen -->
+                <ScrollView
+                    android:id="@+id/menu_hub_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:fillViewport="true"
+                    android:scrollbars="none"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="96dp">
+
+                        <!-- Glass App Header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="8dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@mipmap/ic_launcher"
+                                android:contentDescription="Termux Pro Logo" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="14dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Termux Pro"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:letterSpacing="0.02" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Liquid Glass Pro Edition"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="12sp"
+                                    android:layout_marginTop="1dp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/menu_hub_session_badge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1 PHIEN HOAT DONG"
+                                android:textColor="#10B981"
+                                android:textSize="10.5sp"
+                                android:textStyle="bold"
+                                android:background="@drawable/bg_menu_badge_active"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="5dp" />
+                        </LinearLayout>
+
+                        <!-- Hero Card: Active Session -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_menu_hero_card"
+                            android:padding="18dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="18dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="PHIEN TERMINAL HIEN TAI"
+                                    android:textColor="#38BDF8"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:letterSpacing="0.06" />
+
+                                <TextView
+                                    android:id="@+id/menu_hero_status_dot"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="READY"
+                                    android:textColor="#10B981"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/menu_hero_session_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Phiên 1 : bash"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="6dp"
+                                android:layout_marginBottom="16dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:id="@+id/menu_btn_resume_terminal"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1.3"
+                                    android:layout_marginEnd="10dp"
+                                    android:background="@drawable/bg_menu_hero_btn"
+                                    android:gravity="center"
+                                    android:clickable="true"
+                                    android:focusable="true">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_play_arrow"
+                                        app:tint="#FFFFFF"
+                                        android:layout_marginEnd="6dp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Vao Terminal"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/menu_btn_new_session"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1.0"
+                                    android:background="@drawable/bg_menu_secondary_btn"
+                                    android:gravity="center"
+                                    android:clickable="true"
+                                    android:focusable="true">
+
+                                    <ImageView
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_new_session"
+                                        app:tint="#38BDF8"
+                                        android:layout_marginEnd="4dp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Phiên Mới"
+                                        android:textColor="#38BDF8"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Section: Quick Actions Hub -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TRUNG TAM TIEN ICH &amp; TAC VU"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08"
+                            android:layout_marginBottom="12dp" />
+
+                        <!-- Grid Row 1: Command Palette & AI Agent -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <!-- Card: Command Palette -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_commands"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_cyan"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_nav_command"
+                                    app:tint="#06B6D4" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Kho Lệnh Nhanh"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Palette lệnh tiện ích"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Card: AI Coding Agent -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_ai"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_purple"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_ai_agent"
+                                    app:tint="#A855F7" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="AI Coding Hub"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Antigravity &amp; Gemini"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Grid Row 2: Sessions & Image Helper -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <!-- Card: Sessions Manager -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_sessions"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_pink"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_nav_sessions"
+                                    app:tint="#F43F5E" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Quản Lý Phiên"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Chuyển &amp; đổi tên phiên"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Card: Image Clipboard Helper -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_image"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_amber"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_nav_image"
+                                    app:tint="#F59E0B" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Ảnh &amp; Media"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Dán screenshot, OCR"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Grid Row 3: Themes & Settings -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- Card: Themes & Glass -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_theme"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_purple"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_palette_theme"
+                                    app:tint="#C084FC" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Theme &amp; Giao Diện"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Liquid Glass Pro"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Card: Settings -->
+                            <LinearLayout
+                                android:id="@+id/menu_card_settings"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="6dp"
+                                android:background="@drawable/bg_menu_hub_card"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_menu_icon_box_cyan"
+                                    android:padding="8dp"
+                                    android:src="@drawable/ic_settings"
+                                    app:tint="#38BDF8" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cài Đặt Hệ Thống"
+                                    android:textColor="#F8FAFC"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="10dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Bàn phím, Shell, Sao lưu"
+                                    android:textColor="#94A3B8"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </ScrollView>
+
                 <!-- Liquid Glass Floating Bottom Navigation Bar -->
                 <LinearLayout
                     android:id="@+id/floating_bottom_nav_bar"
@@ -67,49 +515,53 @@
                     android:layout_marginBottom="12dp"
                     android:elevation="8dp"
                     android:background="@drawable/bg_floating_glass_nav"
-                    android:paddingHorizontal="14dp"
+                    android:paddingHorizontal="10dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <!-- 1. Terminal -->
+                    <!-- 1. Menu -->
                     <LinearLayout
-                        android:id="@+id/nav_item_terminal"
-                        android:layout_width="56dp"
+                        android:id="@+id/nav_item_menu"
+                        android:layout_width="54dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:background="?attr/selectableItemBackgroundBorderless">
                         <ImageView
+                            android:id="@+id/nav_icon_menu"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_terminal"
+                            android:src="@drawable/ic_nav_dashboard"
                             app:tint="#FF3C70" />
                         <TextView
+                            android:id="@+id/nav_text_menu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Terminal"
+                            android:text="Menu"
                             android:textColor="#FF3C70"
                             android:textSize="10sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
-                    <!-- 2. Phiên -->
+                    <!-- 2. Terminal -->
                     <LinearLayout
-                        android:id="@+id/nav_item_sessions"
-                        android:layout_width="56dp"
+                        android:id="@+id/nav_item_terminal"
+                        android:layout_width="54dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:background="?attr/selectableItemBackgroundBorderless">
                         <ImageView
+                            android:id="@+id/nav_icon_terminal"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_nav_sessions"
+                            android:src="@drawable/ic_nav_terminal"
                             app:tint="#9CA3AF" />
                         <TextView
+                            android:id="@+id/nav_text_terminal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Phiên"
+                            android:text="Terminal"
                             android:textColor="#9CA3AF"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -117,17 +569,19 @@
                     <!-- 3. Lệnh -->
                     <LinearLayout
                         android:id="@+id/nav_item_command"
-                        android:layout_width="56dp"
+                        android:layout_width="54dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:background="?attr/selectableItemBackgroundBorderless">
                         <ImageView
+                            android:id="@+id/nav_icon_command"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_nav_command"
                             app:tint="#9CA3AF" />
                         <TextView
+                            android:id="@+id/nav_text_command"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Lệnh"
@@ -138,17 +592,19 @@
                     <!-- 4. Ảnh -->
                     <LinearLayout
                         android:id="@+id/nav_item_image"
-                        android:layout_width="56dp"
+                        android:layout_width="54dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:background="?attr/selectableItemBackgroundBorderless">
                         <ImageView
+                            android:id="@+id/nav_icon_image"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_nav_image"
                             app:tint="#9CA3AF" />
                         <TextView
+                            android:id="@+id/nav_text_image"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ảnh"
@@ -156,23 +612,25 @@
                             android:textSize="10sp" />
                     </LinearLayout>
 
-                    <!-- 5. Cài đặt -->
+                    <!-- 5. Phiên -->
                     <LinearLayout
-                        android:id="@+id/nav_item_settings"
-                        android:layout_width="56dp"
+                        android:id="@+id/nav_item_sessions"
+                        android:layout_width="54dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:background="?attr/selectableItemBackgroundBorderless">
                         <ImageView
+                            android:id="@+id/nav_icon_sessions"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_settings"
+                            android:src="@drawable/ic_nav_sessions"
                             app:tint="#9CA3AF" />
                         <TextView
+                            android:id="@+id/nav_text_sessions"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Cài đặt"
+                            android:text="Phiên"
                             android:textColor="#9CA3AF"
                             android:textSize="10sp" />
                     </LinearLayout>
