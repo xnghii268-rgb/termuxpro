@@ -810,8 +810,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (sessionScroll != null) {
             sessionScroll.setVisibility(View.GONE);
         }
-        if (mTerminalToolbarViewPager != null) {
-            mTerminalToolbarViewPager.setVisibility(View.GONE);
+        ViewPager toolbarPager = getTerminalToolbarViewPager();
+        if (toolbarPager != null) {
+            toolbarPager.setVisibility(View.GONE);
         }
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -836,8 +837,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (sessionScroll != null) {
             sessionScroll.setVisibility(View.VISIBLE);
         }
-        if (mTerminalToolbarViewPager != null && mProperties != null && mProperties.shouldExtraKeysRowBeVisible()) {
-            mTerminalToolbarViewPager.setVisibility(View.VISIBLE);
+        ViewPager toolbarPager = getTerminalToolbarViewPager();
+        if (toolbarPager != null && mPreferences != null && mPreferences.shouldShowTerminalToolbar()) {
+            toolbarPager.setVisibility(View.VISIBLE);
         }
 
         updateNavActiveTab(false);
