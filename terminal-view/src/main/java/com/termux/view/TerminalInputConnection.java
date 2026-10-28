@@ -28,6 +28,7 @@ public class TerminalInputConnection extends BaseInputConnection {
         void onSendKeyEvent(KeyEvent event);
         void onComposingStateChanged(String composingText);
         boolean isBypassInputEngine();
+        default boolean isControlOrAltActive() { return false; }
     }
 
     private final TerminalInputListener mListener;
@@ -152,6 +153,13 @@ public class TerminalInputConnection extends BaseInputConnection {
         String str = (text != null) ? text.toString() : "";
         logEvent("setComposingText(\"" + str + "\", " + newCursorPosition + ")");
 
+        if (mListener != null && mListener.isControlOrAltActive()) {
+            if (!str.isEmpty()) {
+                mListener.onCommitTextRaw(str);
+            }
+            return true;
+        }
+
         mComposingBuffer.clear();
         if (!str.isEmpty()) {
             mComposingBuffer.append(str);
@@ -215,6 +223,13 @@ public class TerminalInputConnection extends BaseInputConnection {
         if (text == null) return false;
         String rawStr = text.toString();
         logEvent("commitText(\"" + rawStr + "\", " + newCursorPosition + ")");
+
+        if (mListener != null && mListener.isControlOrAltActive()) {
+            if (!rawStr.isEmpty()) {
+                mListener.onCommitTextRaw(rawStr);
+            }
+            return true;
+        }
 
         mComposingBuffer.clear();
         if (mListener != null) {

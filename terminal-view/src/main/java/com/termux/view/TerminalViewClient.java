@@ -58,6 +58,14 @@ public interface TerminalViewClient {
 
     boolean readFnKey();
 
+    default boolean isControlActive() {
+        return false;
+    }
+
+    default boolean isAltActive() {
+        return false;
+    }
+
 
 
     boolean onCodePoint(int codePoint, boolean ctrlDown, TerminalSession session);

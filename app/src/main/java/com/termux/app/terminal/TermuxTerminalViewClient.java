@@ -340,6 +340,20 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
         return readExtraKeysSpecialButton(SpecialButton.FN);
     }
 
+    @Override
+    public boolean isControlActive() {
+        if (mActivity.getExtraKeysView() == null) return mVirtualControlKeyDown;
+        Boolean state = mActivity.getExtraKeysView().readSpecialButton(SpecialButton.CTRL, false);
+        return (state != null && state) || mVirtualControlKeyDown;
+    }
+
+    @Override
+    public boolean isAltActive() {
+        if (mActivity.getExtraKeysView() == null) return false;
+        Boolean state = mActivity.getExtraKeysView().readSpecialButton(SpecialButton.ALT, false);
+        return (state != null && state);
+    }
+
     public boolean readExtraKeysSpecialButton(SpecialButton specialButton) {
         if (mActivity.getExtraKeysView() == null) return false;
         Boolean state = mActivity.getExtraKeysView().readSpecialButton(specialButton, true);

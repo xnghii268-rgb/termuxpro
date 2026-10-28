@@ -77,6 +77,16 @@ public class TermuxTerminalViewClientBase implements TerminalViewClient {
         return false;
     }
 
+    @Override
+    public boolean isControlActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isAltActive() {
+        return false;
+    }
+
 
 
     @Override

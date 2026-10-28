@@ -397,15 +397,56 @@ public final class TerminalView extends View {
                         codePoint = firstChar;
                     }
 
+                    final boolean controlDown = (mClient != null && mClient.readControlKey());
+                    final boolean altDown = (mClient != null && mClient.readAltKey());
+
                     if (mClient != null && mClient.readShiftKey())
                         codePoint = Character.toUpperCase(codePoint);
+
+                    boolean ctrlHeld = controlDown;
+                    if (codePoint <= 31 && codePoint != 27) {
+                        if (codePoint == '\n') {
+                            codePoint = '\r';
+                        } else {
+                            ctrlHeld = true;
+                            switch (codePoint) {
+                                case 31: codePoint = '_'; break;
+                                case 30: codePoint = '^'; break;
+                                case 29: codePoint = ']'; break;
+                                case 28: codePoint = '\\'; break;
+                                default: codePoint += 96; break;
+                            }
+                        }
+                    }
+
+                    if (ctrlHeld) {
+                        if (codePoint >= 'a' && codePoint <= 'z') {
+                            codePoint = codePoint - 'a' + 1;
+                        } else if (codePoint >= 'A' && codePoint <= 'Z') {
+                            codePoint = codePoint - 'A' + 1;
+                        } else if (codePoint == ' ' || codePoint == '2') {
+                            codePoint = 0;
+                        } else if (codePoint == '[' || codePoint == '3') {
+                            codePoint = 27; // ^[ (Esc)
+                        } else if (codePoint == '\\' || codePoint == '4') {
+                            codePoint = 28;
+                        } else if (codePoint == ']' || codePoint == '5') {
+                            codePoint = 29;
+                        } else if (codePoint == '^' || codePoint == '6') {
+                            codePoint = 30; // control-^
+                        } else if (codePoint == '_' || codePoint == '7' || codePoint == '/') {
+                            codePoint = 31;
+                        } else if (codePoint == '8') {
+                            codePoint = 127; // DEL
+                        }
+                    }
 
                     if (codePoint == '\n') {
                         codePoint = '\r';
                     }
 
                     if (mTermSession != null) {
-                        mTermSession.writeCodePoint(false, codePoint);
+                        mTermSession.writeCodePoint(altDown, codePoint);
                     }
                 }
             }
@@ -434,6 +475,11 @@ public final class TerminalView extends View {
                 boolean isAltScreen = (mEmulator != null && mEmulator.isAlternateBufferActive());
                 boolean isPassword = isPasswordPromptActive(mTermSession, mEmulator);
                 return isAltScreen || isPassword;
+            }
+
+            @Override
+            public boolean isControlOrAltActive() {
+                return mClient != null && (mClient.isControlActive() || mClient.isAltActive());
             }
         });
 
