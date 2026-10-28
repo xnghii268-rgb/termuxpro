@@ -12,17 +12,17 @@ Description: Official APT repository for Termux Pro (com.termuxpro.app)
 Date: Wed, 21 Oct 2026 12:00:00 UTC
 SHA256:
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-aarch64/Packages
- 62bf2b7a51b056947086128ea5259b6cea1d97d0ca570764cf25ba868dab30d4 29 main/binary-aarch64/Packages.gz
+ 85249117149794b9eea7a5501167d2439a412171b7ca2dc8c7dd8fe7d708acb9 29 main/binary-aarch64/Packages.gz
  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-all/Packages
- 62bf2b7a51b056947086128ea5259b6cea1d97d0ca570764cf25ba868dab30d4 29 main/binary-all/Packages.gz
+ 85249117149794b9eea7a5501167d2439a412171b7ca2dc8c7dd8fe7d708acb9 29 main/binary-all/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmriAwkSHGFwdEB0ZXJt
-dXhwcm8uYXBwAAoJEHN/SDR5E+C7k6AIAMEhG3dUqhuOtfrtY2cGQQry2Wy/8AHz
-5wwvGHZ0UE8NmULBCxmakuaUHen5sMXAkIm8zlhZToKeuhEapwExAdrzcolIARuD
-du9flZfxTTaKmuTS1veTro6hmThibb+z/iDOR0JBhWsRQvSXgHVwgqK59HwnLbjS
-WQdP9i5Q7ZQeAGRoit+j6azB8MprsxtRGBfgV4GhIe51nXaFMRbPMsa/dOBkMDXC
-dxjk4ho7cCmzirUfCY564goFAW37QbMmn0cpXPppHqBqyC1c7IdYks6FGJxkJkGU
-gwXrndKd2HItbqfYzJcsUZyT3FVicAaPnskhdySRojP8AfS1wbxLtXQ=
-=Q9pr
+iQFGBAEBCgAwFiEEzTQsR4uu6te9UGtBc39INHkT4LsFAmriBzsSHGFwdEB0ZXJt
+dXhwcm8uYXBwAAoJEHN/SDR5E+C7h3gIAJGdnTLMtB2atFO/cjjxTAebfL5qJkcQ
+9/mCKlncrrFnNlTg8+jIa4OmZC41Oifra1kOyvtEN5ZAtKP8Gq3udn7T4KK0dB9o
+b2NqTNYF9MF+rtV3GSDiF3HS6CGpeSssJMDNXybwgMkXUCOPty1qcQK21WdYEe5p
+bG4UTiNiEsnQF2VQ7IPZ6v63j3FTcfBRUzw56kUpiK/SCJ94vMlSFmAAjEwRX/X8
+KbMY7fSh8PvXXSFqnfEAuOPCPjxOfjuecYWoenKo0ghOXmFQTXyUh4r8CA735Q/3
+txRS0Tc9WKcmipVww1tPJuvjRfN109WKr981tR4b9x8IbwbTMyFzW8Q=
+=Qjwr
 -----END PGP SIGNATURE-----
