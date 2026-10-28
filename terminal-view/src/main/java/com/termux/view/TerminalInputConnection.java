@@ -8,6 +8,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 
+import com.termux.view.input.VietnameseEngine;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +23,18 @@ public class TerminalInputConnection extends BaseInputConnection {
 
     public interface TerminalInputListener {
         void onCommitText(String text);
+        void onCommitTextRaw(String text);
         void onDeleteCodePoints(int codePoints);
         void onSendKeyEvent(KeyEvent event);
         void onComposingStateChanged(String composingText);
+        boolean isBypassInputEngine();
     }
 
     private final TerminalInputListener mListener;
     private final SpannableStringBuilder mComposingBuffer = new SpannableStringBuilder();
     private final SpannableStringBuilder mMirroredText = new SpannableStringBuilder();
+    private String mComposingOnPty = "";
+    private VietnameseEngine mEngine;
     private int mBatchDepth = 0;
     private boolean mBatchModified = false;
     private static boolean sDebugLogEnabled = false;
@@ -37,6 +43,14 @@ public class TerminalInputConnection extends BaseInputConnection {
     public TerminalInputConnection(View targetView, TerminalInputListener listener) {
         super(targetView, true);
         this.mListener = listener;
+    }
+
+    public void setVietnameseEngine(VietnameseEngine engine) {
+        this.mEngine = engine;
+    }
+
+    public VietnameseEngine getVietnameseEngine() {
+        return mEngine;
     }
 
     public static void setDebugLogEnabled(boolean enabled) {
@@ -107,6 +121,36 @@ public class TerminalInputConnection extends BaseInputConnection {
         return super.endBatchEdit();
     }
 
+    public String transformComposingText(String input) {
+        if (input == null || input.isEmpty()) return "";
+        String nfc = Normalizer.normalize(input, Normalizer.Form.NFC);
+        if (mListener != null && mListener.isBypassInputEngine()) {
+            return nfc;
+        }
+        if (mEngine == null || !mEngine.isEnabled()) {
+            return nfc;
+        }
+        if (!isPureAscii(nfc)) {
+            // Already contains accented characters composed by external IME
+            return nfc;
+        }
+        int end = nfc.length();
+        while (end > 0 && Character.isWhitespace(nfc.charAt(end - 1))) {
+            end--;
+        }
+        String wordPart = nfc.substring(0, end);
+        String wsPart = nfc.substring(end);
+        VietnameseEngine.Result r = VietnameseEngine.process(wordPart, mEngine.getOptions());
+        return r.text + wsPart;
+    }
+
+    private static boolean isPureAscii(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) > 127) return false;
+        }
+        return true;
+    }
+
     @Override
     public boolean setComposingText(CharSequence text, int newCursorPosition) {
         String str = (text != null) ? text.toString() : "";
@@ -121,6 +165,27 @@ public class TerminalInputConnection extends BaseInputConnection {
             mListener.onComposingStateChanged(str);
         }
 
+        String target = transformComposingText(str);
+
+        int common = 0;
+        int min = Math.min(mComposingOnPty.length(), target.length());
+        while (common < min && mComposingOnPty.charAt(common) == target.charAt(common)) {
+            common++;
+        }
+
+        int backspaces = mComposingOnPty.length() - common;
+        String append = target.substring(common);
+
+        if (mListener != null) {
+            if (backspaces > 0) {
+                mListener.onDeleteCodePoints(backspaces);
+            }
+            if (!append.isEmpty()) {
+                mListener.onCommitTextRaw(append);
+            }
+        }
+
+        mComposingOnPty = target;
         mBatchModified = true;
         return true;
     }
@@ -134,8 +199,13 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public boolean finishComposingText() {
         logEvent("finishComposingText()");
-        if (mComposingBuffer.length() > 0) {
-            commitText(mComposingBuffer.toString(), 1);
+        if (mComposingOnPty.length() > 0) {
+            mMirroredText.append(mComposingOnPty);
+            if (mMirroredText.length() > 2000) {
+                mMirroredText.delete(0, mMirroredText.length() - 1000);
+            }
+            Selection.setSelection(mMirroredText, mMirroredText.length());
+            mComposingOnPty = "";
         }
         mComposingBuffer.clear();
         if (mListener != null) {
@@ -155,19 +225,38 @@ public class TerminalInputConnection extends BaseInputConnection {
             mListener.onComposingStateChanged("");
         }
 
-        // Canonical Decomposition & Re-composition into NFC (single-cell Vietnamese glyphs)
-        String nfcStr = Normalizer.normalize(rawStr, Normalizer.Form.NFC);
+        String target = transformComposingText(rawStr);
+
+        if (mComposingOnPty.length() > 0) {
+            int common = 0;
+            int min = Math.min(mComposingOnPty.length(), target.length());
+            while (common < min && mComposingOnPty.charAt(common) == target.charAt(common)) {
+                common++;
+            }
+            int backspaces = mComposingOnPty.length() - common;
+            String append = target.substring(common);
+
+            if (mListener != null) {
+                if (backspaces > 0) {
+                    mListener.onDeleteCodePoints(backspaces);
+                }
+                if (!append.isEmpty()) {
+                    mListener.onCommitTextRaw(append);
+                }
+            }
+            mComposingOnPty = "";
+        } else {
+            if (mListener != null && !target.isEmpty()) {
+                mListener.onCommitText(target);
+            }
+        }
 
         // Update mirrored context model
-        mMirroredText.append(nfcStr);
+        mMirroredText.append(target);
         if (mMirroredText.length() > 2000) {
             mMirroredText.delete(0, mMirroredText.length() - 1000);
         }
         Selection.setSelection(mMirroredText, mMirroredText.length());
-
-        if (mListener != null && !nfcStr.isEmpty()) {
-            mListener.onCommitText(nfcStr);
-        }
 
         mBatchModified = true;
         return true;
@@ -178,13 +267,21 @@ public class TerminalInputConnection extends BaseInputConnection {
         logEvent("deleteSurroundingText(" + leftLength + ", " + rightLength + ")");
         if (leftLength <= 0 && rightLength <= 0) return true;
 
-        if (mComposingBuffer.length() > 0) {
-            int deleteCount = Math.min(leftLength, mComposingBuffer.length());
-            mComposingBuffer.delete(mComposingBuffer.length() - deleteCount, mComposingBuffer.length());
-            if (mListener != null) {
-                mListener.onComposingStateChanged(mComposingBuffer.toString());
+        if (mComposingOnPty.length() > 0) {
+            int del = Math.min(leftLength, mComposingOnPty.length());
+            String newTarget = mComposingOnPty.substring(0, mComposingOnPty.length() - del);
+            if (mListener != null && del > 0) {
+                mListener.onDeleteCodePoints(del);
             }
-            leftLength -= deleteCount;
+            mComposingOnPty = newTarget;
+            mComposingBuffer.clear();
+            if (!newTarget.isEmpty()) {
+                mComposingBuffer.append(newTarget);
+            }
+            if (mListener != null) {
+                mListener.onComposingStateChanged(newTarget);
+            }
+            leftLength -= del;
         }
 
         if (leftLength > 0) {
@@ -277,6 +374,7 @@ public class TerminalInputConnection extends BaseInputConnection {
     }
 
     public void resetContext() {
+        mComposingOnPty = "";
         mComposingBuffer.clear();
         mMirroredText.clear();
         if (mListener != null) {

@@ -366,9 +366,10 @@ public final class VietnameseEngine {
     }
 
     private static ParsedBody parseBody(String remainder, String initial, Options options, boolean isVni) {
+        String nfdRemainder = Normalizer.normalize(remainder, Normalizer.Form.NFD);
         List<Character> rawChars = new ArrayList<>();
-        for (int i = 0; i < remainder.length(); i++) {
-            rawChars.add(remainder.charAt(i));
+        for (int i = 0; i < nfdRemainder.length(); i++) {
+            rawChars.add(nfdRemainder.charAt(i));
         }
 
         // Shorthand rule: "duocj" -> "được", "Vietj" -> "Việt"
@@ -394,6 +395,8 @@ public final class VietnameseEngine {
         StringBuilder finalBuf = new StringBuilder();
         int tone = 0;
         boolean toneSet = false;
+        boolean toneFromCombiningMark = false;
+        boolean toneFromKey = false;
         boolean uoHorn = false;
         boolean aBreve = false;
         boolean aCircumflex = false;
@@ -408,14 +411,42 @@ public final class VietnameseEngine {
             char ch = rawChars.get(i);
             char chl = Character.toLowerCase(ch);
 
+            // Unicode Combining Marks (from precomposed or NFD Vietnamese input)
+            if (ch == 0x0301) { tone = 1; toneSet = true; toneFromCombiningMark = true; continue; } // Sắc
+            if (ch == 0x0300) { tone = 2; toneSet = true; toneFromCombiningMark = true; continue; } // Huyền
+            if (ch == 0x0309) { tone = 3; toneSet = true; toneFromCombiningMark = true; continue; } // Hỏi
+            if (ch == 0x0303) { tone = 4; toneSet = true; toneFromCombiningMark = true; continue; } // Ngã
+            if (ch == 0x0323) { tone = 5; toneSet = true; toneFromCombiningMark = true; continue; } // Nặng
+            if (ch == 0x0302) { // Circumflex (mũ)
+                String v = vowelBuf.toString().toLowerCase();
+                if (v.contains("a")) aCircumflex = true;
+                else if (v.contains("e")) eCircumflex = true;
+                else if (v.contains("o")) oCircumflex = true;
+                continue;
+            }
+            if (ch == 0x0306) { aBreve = true; continue; } // Breve (trăng)
+            if (ch == 0x031b) { // Horn (móc)
+                char prev = (i > 0) ? Character.toLowerCase(rawChars.get(i - 1)) : 0;
+                if (prev == 'u') {
+                    uHorn = true;
+                } else if (prev == 'o') {
+                    if (uHorn) {
+                        uoHorn = true;
+                    } else {
+                        oHorn = true;
+                    }
+                }
+                continue;
+            }
+
             if (!isVni) {
                 // Telex Modifiers
-                if (chl == 's') { tone = 1; toneSet = true; continue; }
-                if (chl == 'f') { tone = 2; toneSet = true; continue; }
-                if (chl == 'r') { tone = 3; toneSet = true; continue; }
-                if (chl == 'x') { tone = 4; toneSet = true; continue; }
-                if (chl == 'j') { tone = 5; toneSet = true; continue; }
-                if (chl == 'z') { tone = 0; toneSet = false; continue; }
+                if (chl == 's') { tone = 1; toneSet = true; toneFromKey = true; continue; }
+                if (chl == 'f') { tone = 2; toneSet = true; toneFromKey = true; continue; }
+                if (chl == 'r') { tone = 3; toneSet = true; toneFromKey = true; continue; }
+                if (chl == 'x') { tone = 4; toneSet = true; toneFromKey = true; continue; }
+                if (chl == 'j') { tone = 5; toneSet = true; toneFromKey = true; continue; }
+                if (chl == 'z') { tone = 0; toneSet = false; toneFromKey = false; toneFromCombiningMark = false; continue; }
 
                 if (chl == 'w') {
                     // Check compound "uo" -> "ươ"
@@ -449,12 +480,12 @@ public final class VietnameseEngine {
                 }
             } else {
                 // VNI Modifiers: 1-5 tones, 6 mũ, 7 móc, 8 trăng, 0 xóa
-                if (chl == '1') { tone = 1; toneSet = true; continue; }
-                if (chl == '2') { tone = 2; toneSet = true; continue; }
-                if (chl == '3') { tone = 3; toneSet = true; continue; }
-                if (chl == '4') { tone = 4; toneSet = true; continue; }
-                if (chl == '5') { tone = 5; toneSet = true; continue; }
-                if (chl == '0') { tone = 0; toneSet = false; continue; }
+                if (chl == '1') { tone = 1; toneSet = true; toneFromKey = true; continue; }
+                if (chl == '2') { tone = 2; toneSet = true; toneFromKey = true; continue; }
+                if (chl == '3') { tone = 3; toneSet = true; toneFromKey = true; continue; }
+                if (chl == '4') { tone = 4; toneSet = true; toneFromKey = true; continue; }
+                if (chl == '5') { tone = 5; toneSet = true; toneFromKey = true; continue; }
+                if (chl == '0') { tone = 0; toneSet = false; toneFromKey = false; toneFromCombiningMark = false; continue; }
                 if (chl == '6') {
                     String v = vowelBuf.toString().toLowerCase();
                     if (v.contains("a")) aCircumflex = true;
@@ -482,8 +513,9 @@ public final class VietnameseEngine {
                     return null;
                 }
                 if (toneSet) {
-                    // Allow only trailing 'i' after 'uo' + horn (e.g. "nguowfi" -> "người")
-                    if (uoHorn && chl == 'i') {
+                    if (toneFromCombiningMark && vowelBuf.length() < 3) {
+                        vowelBuf.append(ch);
+                    } else if (uoHorn && chl == 'i') {
                         vowelBuf.append(ch);
                     } else {
                         // Vowel after tone in any other context (e.g. "meson", "user") -> English word
@@ -607,8 +639,13 @@ public final class VietnameseEngine {
         }
 
         // Diphthongs without final:
-        // ia, ya, ua, ưa: tone on first vowel (mía, của, lửa)
-        if (vLower.equals("ia") || vLower.equals("ya") || vLower.equals("ua") || vLower.equals("ưa")) {
+        // Most Vietnamese diphthongs place tone on first vowel:
+        // (núi, mái, cháu, kéo, kêu, rìu, đói, củi, mía, của, lửa)
+        if (vLower.equals("ai") || vLower.equals("ao") || vLower.equals("au") || vLower.equals("ay") ||
+            vLower.equals("eo") || vLower.equals("êu") || vLower.equals("iu") ||
+            vLower.equals("oi") || vLower.equals("ôi") || vLower.equals("ơi") ||
+            vLower.equals("ui") || vLower.equals("ưi") || vLower.equals("ưu") ||
+            vLower.equals("ia") || vLower.equals("ya") || vLower.equals("ua") || vLower.equals("ưa")) {
             return 0;
         }
 

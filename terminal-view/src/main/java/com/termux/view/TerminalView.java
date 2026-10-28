@@ -92,6 +92,9 @@ public final class TerminalView extends View {
                 opt.wFirstToU = sp.getBoolean("w_first_to_u", false);
                 engine.setEnabled(opt.mode != VietnameseEngine.Options.Mode.OFF);
             }
+            if (mTerminalInputConnection != null && engine != null) {
+                mTerminalInputConnection.setVietnameseEngine(engine);
+            }
         } catch (Throwable ignored) {}
     }
 
@@ -365,7 +368,51 @@ public final class TerminalView extends View {
         mTerminalInputConnection = new TerminalInputConnection(this, new TerminalInputConnection.TerminalInputListener() {
             @Override
             public void onCommitText(String text) {
-                if (mEmulator == null) return;
+                if (mEmulator == null || text == null || text.isEmpty()) return;
+                stopTextSelectionMode();
+
+                boolean hasNonAscii = false;
+                for (int i = 0; i < text.length(); i++) {
+                    if (text.charAt(i) > 127) {
+                        hasNonAscii = true;
+                        break;
+                    }
+                }
+
+                if (hasNonAscii || text.length() > 1) {
+                    onCommitTextRaw(text);
+                    if (mTelexEngine != null) {
+                        mTelexEngine.reset();
+                    }
+                    return;
+                }
+
+                char firstChar = text.charAt(0);
+                int codePoint = firstChar;
+                if (mClient != null && mClient.readShiftKey())
+                    codePoint = Character.toUpperCase(codePoint);
+
+                boolean ctrlHeld = false;
+                if (codePoint <= 31 && codePoint != 27) {
+                    if (codePoint == '\n') {
+                        codePoint = '\r';
+                    }
+                    ctrlHeld = true;
+                    switch (codePoint) {
+                        case 31: codePoint = '_'; break;
+                        case 30: codePoint = '^'; break;
+                        case 29: codePoint = ']'; break;
+                        case 28: codePoint = '\\'; break;
+                        default: codePoint += 96; break;
+                    }
+                }
+
+                inputCodePoint(KEY_EVENT_SOURCE_SOFT_KEYBOARD, codePoint, ctrlHeld, false);
+            }
+
+            @Override
+            public void onCommitTextRaw(String text) {
+                if (mEmulator == null || text == null || text.isEmpty()) return;
                 stopTextSelectionMode();
                 final int len = text.length();
                 for (int i = 0; i < len; i++) {
@@ -384,22 +431,13 @@ public final class TerminalView extends View {
                     if (mClient != null && mClient.readShiftKey())
                         codePoint = Character.toUpperCase(codePoint);
 
-                    boolean ctrlHeld = false;
-                    if (codePoint <= 31 && codePoint != 27) {
-                        if (codePoint == '\n') {
-                            codePoint = '\r';
-                        }
-                        ctrlHeld = true;
-                        switch (codePoint) {
-                            case 31: codePoint = '_'; break;
-                            case 30: codePoint = '^'; break;
-                            case 29: codePoint = ']'; break;
-                            case 28: codePoint = '\\'; break;
-                            default: codePoint += 96; break;
-                        }
+                    if (codePoint == '\n') {
+                        codePoint = '\r';
                     }
 
-                    inputCodePoint(KEY_EVENT_SOURCE_SOFT_KEYBOARD, codePoint, ctrlHeld, false);
+                    if (mTermSession != null) {
+                        mTermSession.writeCodePoint(false, codePoint);
+                    }
                 }
             }
 
@@ -421,7 +459,18 @@ public final class TerminalView extends View {
             public void onComposingStateChanged(String composingText) {
                 // Composing feedback
             }
+
+            @Override
+            public boolean isBypassInputEngine() {
+                boolean isAltScreen = (mEmulator != null && mEmulator.isAlternateBufferActive());
+                boolean isPassword = (mTermSession != null && !mTermSession.isPtyEcho());
+                return isAltScreen || isPassword;
+            }
         });
+
+        if (mTelexEngine != null) {
+            mTerminalInputConnection.setVietnameseEngine(mTelexEngine.getUnderlyingEngine());
+        }
 
         try {
             String defaultIme = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);

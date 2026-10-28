@@ -26,6 +26,11 @@ public class TerminalInputConnectionTest {
             }
 
             @Override
+            public void onCommitTextRaw(String text) {
+                mTerminalBuffer.append(text);
+            }
+
+            @Override
             public void onDeleteCodePoints(int codePoints) {
                 mDeletedPoints.add(codePoints);
                 for (int i = 0; i < codePoints && mTerminalBuffer.length() > 0; i++) {
@@ -43,7 +48,13 @@ public class TerminalInputConnectionTest {
             public void onComposingStateChanged(String composingText) {
                 // Mock
             }
+
+            @Override
+            public boolean isBypassInputEngine() {
+                return false;
+            }
         });
+        mConnection.setVietnameseEngine(new com.termux.view.input.VietnameseEngine());
     }
 
     @Test
@@ -112,5 +123,49 @@ public class TerminalInputConnectionTest {
         // Backspace another character should delete "ờ", leaving "ngư"
         mConnection.deleteSurroundingText(1, 0);
         Assert.assertEquals("ngư", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testLiveComposingVietnameseGboardDau() {
+        setUp();
+        mConnection.setComposingText("d", 1);
+        Assert.assertEquals("d", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("da", 1);
+        Assert.assertEquals("da", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("dâ", 1);
+        Assert.assertEquals("dâ", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("dâu", 1);
+        Assert.assertEquals("dâu", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("dấu", 1);
+        Assert.assertEquals("dấu", mTerminalBuffer.toString());
+
+        mConnection.commitText("dấu ", 1);
+        Assert.assertEquals("dấu ", mTerminalBuffer.toString());
+    }
+
+    @Test
+    public void testLiveComposingEnglishTelexDaaus() {
+        setUp();
+        mConnection.setComposingText("d", 1);
+        Assert.assertEquals("d", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("da", 1);
+        Assert.assertEquals("da", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("daa", 1);
+        Assert.assertEquals("dâ", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("daau", 1);
+        Assert.assertEquals("dâu", mTerminalBuffer.toString());
+
+        mConnection.setComposingText("daaus", 1);
+        Assert.assertEquals("dấu", mTerminalBuffer.toString());
+
+        mConnection.commitText("daaus ", 1);
+        Assert.assertEquals("dấu ", mTerminalBuffer.toString());
     }
 }
