@@ -1,0 +1,44 @@
+[
+  {
+    "step": 1,
+    "imeCall": "setComposingText(\"d\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "d"
+  },
+  {
+    "step": 2,
+    "imeCall": "setComposingText(\"đ\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "đ"
+  },
+  {
+    "step": 3,
+    "imeCall": "setComposingText(\"dd\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "dd"
+  },
+  {
+    "step": 4,
+    "imeCall": "setComposingText(\"ddd\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "ddd"
+  },
+  {
+    "step": 5,
+    "imeCall": "setComposingText(\"dddd\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "dddd"
+  },
+  {
+    "step": 6,
+    "imeCall": "setComposingText(\"ddddd\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "ddddd"
+  },
+  {
+    "step": 7,
+    "imeCall": "setComposingText(\"dddddd\", 1)",
+    "producer": "COMPOSER",
+    "expectedTerminal": "dddddd"
+  }
+]

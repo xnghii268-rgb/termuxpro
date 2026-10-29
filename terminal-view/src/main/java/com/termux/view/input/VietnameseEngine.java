@@ -146,9 +146,10 @@ public final class VietnameseEngine {
             return new Result(rawBuffer, false, false, rawBuffer);
         }
 
-        // 0. Double key cancellation check for standalone modifiers (e.g. ww->w, ss->s, aaa->aa, ddd->dd, ooo->oo)
-        if (isStandaloneEscape(rawBuffer)) {
-            return new Result(getStandaloneEscapeReplacement(rawBuffer), true, false, rawBuffer);
+        // 0. Repeated transform key check (N=1..12: d, a, e, o, w, s, f, r, x, j, u+w*N, etc.)
+        Result repeated = checkRepeatedKeys(rawBuffer, options);
+        if (repeated != null) {
+            return repeated;
         }
 
         String rawLower = rawBuffer.toLowerCase();
@@ -279,48 +280,117 @@ public final class VietnameseEngine {
         }
     }
 
-    private static boolean isStandaloneEscape(String raw) {
-        if (raw == null) return false;
-        int len = raw.length();
-        if (len == 2) {
-            char c0 = Character.toLowerCase(raw.charAt(0));
-            char c1 = Character.toLowerCase(raw.charAt(1));
-            return c0 == c1 && (c0 == 'w' || c0 == 's' || c0 == 'f' || c0 == 'r' || c0 == 'x' || c0 == 'j');
-        } else if (len == 3) {
-            char c0 = Character.toLowerCase(raw.charAt(0));
-            char c1 = Character.toLowerCase(raw.charAt(1));
-            char c2 = Character.toLowerCase(raw.charAt(2));
-            return c0 == c1 && c1 == c2 && (c0 == 'a' || c0 == 'e' || c0 == 'o' || c0 == 'd');
+    private static boolean isAllSameChar(String raw) {
+        if (raw == null || raw.isEmpty()) return false;
+        char c0 = Character.toLowerCase(raw.charAt(0));
+        for (int i = 1; i < raw.length(); i++) {
+            if (Character.toLowerCase(raw.charAt(i)) != c0) return false;
         }
-        return false;
+        return true;
     }
 
-    private static String getStandaloneEscapeReplacement(String raw) {
-        if (raw.length() == 2) {
-            return raw.substring(0, 1);
-        } else if (raw.length() == 3) {
-            return raw.substring(0, 2);
-        }
-        return raw;
+    private static String repeatChar(char c, int count) {
+        StringBuilder sb = new StringBuilder(count);
+        for (int i = 0; i < count; i++) sb.append(c);
+        return sb.toString();
     }
 
-    private static String checkDoubleKeyEscape(String raw) {
-        if (raw.length() < 2) return null;
-        char last = raw.charAt(raw.length() - 1);
-        char prev = raw.charAt(raw.length() - 2);
-        char l1 = Character.toLowerCase(last);
-        char l2 = Character.toLowerCase(prev);
+    private static Result checkRepeatedKeys(String raw, Options options) {
+        if (raw == null || raw.isEmpty()) return null;
 
-        if (l1 == l2 && (l1 == 'w' || l1 == 's' || l1 == 'f' || l1 == 'r' || l1 == 'x' || l1 == 'j')) {
-            // Typing repeated modifier key cancels modifier
-            return raw.substring(0, raw.length() - 1);
-        }
-        if (raw.length() >= 3) {
-            char l3 = Character.toLowerCase(raw.charAt(raw.length() - 3));
-            if (l1 == l2 && l2 == l3 && (l1 == 'a' || l1 == 'e' || l1 == 'o' || l1 == 'd')) {
-                return raw.substring(0, raw.length() - 1);
+        // 1. All identical characters
+        if (isAllSameChar(raw)) {
+            char c0 = Character.toLowerCase(raw.charAt(0));
+            int n = raw.length();
+            boolean isUpper = Character.isUpperCase(raw.charAt(0));
+
+            if (c0 == 'd') {
+                if (n == 1) return new Result(raw, true, false, raw);
+                if (n == 2) return new Result(isUpper ? "Đ" : "đ", true, false, raw);
+                return new Result(repeatChar(isUpper ? 'D' : 'd', n - 1), true, false, raw);
+            } else if (c0 == 'a') {
+                if (n == 1) return new Result(raw, true, false, raw);
+                if (n == 2) return new Result(isUpper ? "Â" : "â", true, false, raw);
+                return new Result(repeatChar(isUpper ? 'A' : 'a', n - 1), true, false, raw);
+            } else if (c0 == 'e') {
+                if (n == 1) return new Result(raw, true, false, raw);
+                if (n == 2) return new Result(isUpper ? "Ê" : "ê", true, false, raw);
+                return new Result(repeatChar(isUpper ? 'E' : 'e', n - 1), true, false, raw);
+            } else if (c0 == 'o') {
+                if (n == 1) return new Result(raw, true, false, raw);
+                if (n == 2) return new Result(isUpper ? "Ô" : "ô", true, false, raw);
+                return new Result(repeatChar(isUpper ? 'O' : 'o', n - 1), true, false, raw);
+            } else if (c0 == 'w') {
+                if (options.wFirstToU) {
+                    if (n == 1) return new Result(isUpper ? "Ư" : "ư", true, false, raw);
+                    return new Result(repeatChar(isUpper ? 'W' : 'w', n - 1), true, false, raw);
+                } else {
+                    if (n <= 2) return new Result(repeatChar(isUpper ? 'W' : 'w', 1), true, false, raw);
+                    return new Result(repeatChar(isUpper ? 'W' : 'w', n - 1), true, false, raw);
+                }
+            } else if (c0 == 's' || c0 == 'f' || c0 == 'r' || c0 == 'x' || c0 == 'j') {
+                char useChar = isUpper ? Character.toUpperCase(c0) : c0;
+                if (n <= 2) return new Result(repeatChar(useChar, 1), true, false, raw);
+                return new Result(repeatChar(useChar, n - 1), true, false, raw);
             }
         }
+
+        // 2. Mixed case "Dd" -> "Đ", "Ddd" -> "DD", "Dddd" -> "DDD"
+        if (raw.length() >= 2 && Character.toUpperCase(raw.charAt(0)) == 'D') {
+            boolean allRestD = true;
+            for (int i = 1; i < raw.length(); i++) {
+                if (Character.toLowerCase(raw.charAt(i)) != 'd') {
+                    allRestD = false;
+                    break;
+                }
+            }
+            if (allRestD) {
+                int n = raw.length();
+                if (n == 2) return new Result("Đ", true, false, raw);
+                return new Result(repeatChar('D', n - 1), true, false, raw);
+            }
+        }
+
+        // 3. u + w*N
+        if (raw.length() >= 2 && (raw.charAt(0) == 'u' || raw.charAt(0) == 'U')) {
+            boolean allW = true;
+            for (int i = 1; i < raw.length(); i++) {
+                if (Character.toLowerCase(raw.charAt(i)) != 'w') {
+                    allW = false;
+                    break;
+                }
+            }
+            if (allW) {
+                int n = raw.length() - 1;
+                boolean isUpper = Character.isUpperCase(raw.charAt(0));
+                if (n == 1) return new Result(isUpper ? "Ư" : "ư", true, false, raw);
+                return new Result((isUpper ? "U" : "u") + repeatChar('w', n - 1), true, false, raw);
+            }
+        }
+
+        // 4. Repeated tone key after single vowel: e.g. a + tone*N (N >= 2)
+        if (raw.length() >= 3) {
+            String lower = raw.toLowerCase();
+            char c0 = lower.charAt(0);
+            if (c0 == 'a' || c0 == 'e' || c0 == 'i' || c0 == 'o' || c0 == 'u' || c0 == 'y') {
+                char last = lower.charAt(raw.length() - 1);
+                if (last == 's' || last == 'f' || last == 'r' || last == 'x' || last == 'j') {
+                    boolean allTones = true;
+                    for (int i = 1; i < raw.length(); i++) {
+                        if (lower.charAt(i) != last) {
+                            allTones = false;
+                            break;
+                        }
+                    }
+                    if (allTones) {
+                        int n = raw.length() - 1;
+                        char useFirst = raw.charAt(0);
+                        return new Result(useFirst + repeatChar(last, n - 1), true, false, raw);
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
@@ -345,11 +415,6 @@ public final class VietnameseEngine {
             return new ParsedInitial(isUpper ? "Đ" : "đ", 2);
         }
 
-        // Shorthand rule: "duocj" -> initial "đ"
-        if (lower.equals("duocj") || lower.equals("duoc75")) {
-            boolean isUpper = Character.isUpperCase(raw.charAt(0));
-            return new ParsedInitial(isUpper ? "Đ" : "đ", 1);
-        }
 
         // Single initials
         char c0 = lower.charAt(0);
@@ -377,20 +442,14 @@ public final class VietnameseEngine {
             rawChars.add(nfdRemainder.charAt(i));
         }
 
-        // Shorthand rule: "duocj" -> "được", "Vietj" -> "Việt"
+        // Shorthand rule: "Vietj" -> "Việt"
         String rawLower = remainder.toLowerCase();
         boolean isAllUpper = remainder.length() > 0 && remainder.equals(remainder.toUpperCase());
         if (!isVni) {
-            if ((initial.equalsIgnoreCase("d") || initial.equalsIgnoreCase("đ")) && rawLower.equals("uocj")) {
-                return new ParsedBody(isAllUpper ? "ƯƠ" : "ươ", isAllUpper ? "C" : "c", 5);
-            }
             if (initial.equalsIgnoreCase("v") && rawLower.equals("ietj")) {
                 return new ParsedBody(isAllUpper ? "IÊ" : "iê", isAllUpper ? "T" : "t", 5);
             }
         } else {
-            if ((initial.equalsIgnoreCase("d") || initial.equalsIgnoreCase("đ")) && (rawLower.equals("uoc75") || rawLower.equals("uoc57"))) {
-                return new ParsedBody(isAllUpper ? "ƯƠ" : "ươ", isAllUpper ? "C" : "c", 5);
-            }
             if (initial.equalsIgnoreCase("v") && (rawLower.equals("iet65") || rawLower.equals("iet56"))) {
                 return new ParsedBody(isAllUpper ? "IÊ" : "iê", isAllUpper ? "T" : "t", 5);
             }

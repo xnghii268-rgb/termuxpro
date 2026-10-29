@@ -1,0 +1,44 @@
+[
+  {
+    "step": 1,
+    "imeCall": "commitText(\"d\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "d"
+  },
+  {
+    "step": 2,
+    "imeCall": "commitText(\"d\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "đ"
+  },
+  {
+    "step": 3,
+    "imeCall": "commitText(\"u\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "đu"
+  },
+  {
+    "step": 4,
+    "imeCall": "commitText(\"o\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "đuo"
+  },
+  {
+    "step": 5,
+    "imeCall": "commitText(\"w\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "đươ"
+  },
+  {
+    "step": 6,
+    "imeCall": "commitText(\"c\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "dduowc"
+  },
+  {
+    "step": 7,
+    "imeCall": "commitText(\"j\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "được"
+  }
+]

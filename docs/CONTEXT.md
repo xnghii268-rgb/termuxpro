@@ -34,8 +34,7 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - **Kiểm thử tự động**: 4940 assertions đạt 100% pass qua `tools/input_test.sh` (1032 engine cases, 418 English words, 3200 Vietnamese words, 249 legacy cases).
 
 ## 5. Trạng thái Dự án
-- [x] **Phase 0 - 5**: Sửa status bar, brand redesign, GlassSheet, IME animation, tối ưu Vsync, Command Palette iOS-27.
-- [x] **Phase 6 (Liquid Glass Round 1)**: Living backdrop, LiquidTabBar drop lens, Live Terminal Preview.
-- [x] **Phase 7 (Liquid Glass Round 2 & Terminal Chrome)**: SettingsActivity GlassScreen, ThemePickerSheet carousel, AiAgentHubSheet, Floating Top Bar, Extra keys Liquid Glass, MOTD dynamic cols.
-- [x] **Phase 8 (Vietnamese Input Round 2)**: Built-in pure JVM Telex/VNI engine, auto-restore English safety net, alt-screen/password bypass, VI/EN toggle, 4940 regression assertions pass.
-- [x] **Phase 9 (Round 3 Verify & Polish)**: GlassToggle thumb squash, drop width autosize, PTY margin translation, single "+" button, line-icon arrows & swipe page 2, build identity HUD.
+- [x] **Phase 0 - 7**: Brand redesign, Liquid Glass system, GlassScreen, Floating Top Bar, 6 Vietnamese themes.
+- [x] **Phase 8 (Vietnamese Input Round 2)**: Pure JVM engine, English auto-restore, alt-screen/password bypass.
+- [x] **Phase 9 (Single-Writer Pipeline v3)**: InputModel mirror, RegionWriter PTY sole-writer, InputProducer RAW vs COMPOSER, latency <= 16ms, repeat-key undo table N=1..12.
+- [x] **Phase 10 (Real-Keyboard Self-Test & Built-in Keyboard)**: ImeSelfTestActivity 14-phrases, live HUD, JSON trace export, BuiltinKeyboardView glass layout. 6877/6877 test assertions pass 100%.

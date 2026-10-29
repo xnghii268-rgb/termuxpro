@@ -45,8 +45,12 @@ import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import com.termux.app.perf.TermuxProPerfMonitor;
+import com.termux.app.ui.BuiltinKeyboardView;
 import com.termux.app.ui.LiquidTabBar;
 import com.termux.app.ui.MotionKit;
+import com.termux.view.input.VietnameseEngine;
+import android.view.KeyEvent;
+import android.content.SharedPreferences;
 import java.util.List;
 
 import com.termux.R;
@@ -363,6 +367,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         sCurrentActivity = new java.lang.ref.WeakReference<>(this);
         checkHardwareKeyboardAndSelection();
 
+        if (mTerminalView != null) {
+            mTerminalView.reloadVietnameseEnginePreferences();
+        }
+        setupBuiltinKeyboard();
+
         com.termux.app.theme.TermuxProThemeManager.applyTheme(this, com.termux.app.theme.TermuxProThemeManager.getCurrentThemeId(this));
 
         TermuxProPerfMonitor.getInstance().start("foreground_session");
@@ -580,6 +589,73 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         if (mTermuxTerminalSessionActivityClient != null)
             mTermuxTerminalSessionActivityClient.onCreate();
+
+        setupBuiltinKeyboard();
+    }
+
+    private void setupBuiltinKeyboard() {
+        BuiltinKeyboardView builtinKb = findViewById(R.id.builtin_keyboard_view);
+        if (builtinKb == null) return;
+
+        SharedPreferences sp = getSharedPreferences("termuxpro_settings", Context.MODE_PRIVATE);
+        int inputMethodMode = sp.getInt("input_method_mode", 0);
+        if (inputMethodMode == 2) {
+            builtinKb.setVisibility(View.VISIBLE);
+        } else {
+            builtinKb.setVisibility(View.GONE);
+        }
+
+        builtinKb.setKeyboardActionListener(new BuiltinKeyboardView.KeyboardActionListener() {
+            @Override
+            public void onText(String text) {
+                if (mTerminalView != null && mTerminalView.getTerminalInputConnection() != null) {
+                    mTerminalView.getTerminalInputConnection().commitText(text, 1);
+                }
+            }
+
+            @Override
+            public void onBackspace() {
+                if (mTerminalView != null && mTerminalView.getTerminalInputConnection() != null) {
+                    mTerminalView.getTerminalInputConnection().deleteSurroundingText(1, 0);
+                }
+            }
+
+            @Override
+            public void onEnter() {
+                if (mTerminalView != null && mTerminalView.getTerminalInputConnection() != null) {
+                    mTerminalView.getTerminalInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
+                }
+            }
+
+            @Override
+            public void onCursorMove(int direction) {
+                int code = (direction < 0) ? KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT;
+                if (mTerminalView != null) {
+                    mTerminalView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, code));
+                    mTerminalView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, code));
+                }
+            }
+
+            @Override
+            public void onGlobeClick() {
+                builtinKb.setVisibility(View.GONE);
+                if (mTerminalView != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        mTerminalView.requestFocus();
+                        imm.showSoftInput(mTerminalView, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            }
+
+            @Override
+            public void onViToggleClick(boolean viActive) {
+                if (mTerminalView != null && mTerminalView.getTerminalInputConnection() != null) {
+                    VietnameseEngine eng = mTerminalView.getTerminalInputConnection().getVietnameseEngine();
+                    if (eng != null) eng.setEnabled(viActive);
+                }
+            }
+        });
     }
 
     private void setTermuxSessionsListView() {

@@ -509,7 +509,7 @@ public final class ExtraKeysView extends GridLayout {
         if ("RIGHT".equalsIgnoreCase(display) || "RIGHT".equalsIgnoreCase(key)) return "→";
 
         // Pro special keys
-        if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(display)) return "Dán ảnh";
+        if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(display) || "ẢNH".equalsIgnoreCase(display)) return "Ảnh";
         if ("RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(display)) return "Ảnh mới";
         if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(display)) return "Lệnh";
         if ("THEME".equalsIgnoreCase(key) || "GIAO DIỆN".equalsIgnoreCase(display)) return "Giao diện";

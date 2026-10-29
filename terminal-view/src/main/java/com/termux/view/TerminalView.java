@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.termux.view.input.PtyWriter;
 import com.termux.view.input.VietnameseEngine;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
@@ -76,6 +77,8 @@ public final class TerminalView extends View {
         if (mTelexEngine == null) return;
         try {
             SharedPreferences sp = getContext().getSharedPreferences("termuxpro_settings", Context.MODE_PRIVATE);
+            int inputMethodMode = sp.getInt("input_method_mode", 0);
+            setInputMethodMode(inputMethodMode);
             VietnameseEngine engine = mTelexEngine.getUnderlyingEngine();
             if (engine != null) {
                 VietnameseEngine.Options opt = engine.getOptions();
@@ -349,15 +352,31 @@ public final class TerminalView extends View {
     }
 
     private TerminalInputConnection mTerminalInputConnection;
+    private PtyWriter mPtyWriter;
+    private int mInputMethodMode = 0; // 0 = app engine, 1 = keyboard ime, 2 = builtin keyboard
 
     public TerminalInputConnection getTerminalInputConnection() {
         return mTerminalInputConnection;
     }
 
+    public void setInputMethodMode(int mode) {
+        this.mInputMethodMode = mode;
+        if (mTerminalInputConnection != null) {
+            mTerminalInputConnection.setInputMethodMode(mode);
+        }
+    }
+
+    public int getInputMethodMode() {
+        return mInputMethodMode;
+    }
+
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        // High-compatibility AOSP configuration: never TYPE_NULL or VISIBLE_PASSWORD
-        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        if (mInputMethodMode == 0) {
+            outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+        } else {
+            outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        }
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_NONE;
 
         String[] mimeTypes = new String[]{
@@ -365,95 +384,25 @@ public final class TerminalView extends View {
         };
         EditorInfoCompat.setContentMimeTypes(outAttrs, mimeTypes);
 
-        mTerminalInputConnection = new TerminalInputConnection(this, new TerminalInputConnection.TerminalInputListener() {
+        mPtyWriter = new PtyWriter() {
             @Override
-            public void onCommitText(String text) {
-                if (mEmulator == null || text == null || text.isEmpty()) return;
-                stopTextSelectionMode();
-                onCommitTextRaw(text);
-            }
-
-            @Override
-            public void onCommitTextRaw(String text) {
-                if (mEmulator == null || text == null || text.isEmpty()) return;
-                stopTextSelectionMode();
-                final int len = text.length();
-                for (int i = 0; i < len; i++) {
-                    char firstChar = text.charAt(i);
-                    int codePoint;
-                    if (Character.isHighSurrogate(firstChar)) {
-                        if (++i < len) {
-                            codePoint = Character.toCodePoint(firstChar, text.charAt(i));
-                        } else {
-                            codePoint = TerminalEmulator.UNICODE_REPLACEMENT_CHAR;
-                        }
-                    } else {
-                        codePoint = firstChar;
-                    }
-
-                    final boolean controlDown = (mClient != null && mClient.readControlKey());
-                    final boolean altDown = (mClient != null && mClient.readAltKey());
-
-                    if (mClient != null && mClient.readShiftKey())
-                        codePoint = Character.toUpperCase(codePoint);
-
-                    boolean ctrlHeld = controlDown;
-                    if (codePoint <= 31 && codePoint != 27) {
-                        if (codePoint == '\n') {
-                            codePoint = '\r';
-                        } else {
-                            ctrlHeld = true;
-                            switch (codePoint) {
-                                case 31: codePoint = '_'; break;
-                                case 30: codePoint = '^'; break;
-                                case 29: codePoint = ']'; break;
-                                case 28: codePoint = '\\'; break;
-                                default: codePoint += 96; break;
-                            }
-                        }
-                    }
-
-                    if (ctrlHeld) {
-                        if (codePoint >= 'a' && codePoint <= 'z') {
-                            codePoint = codePoint - 'a' + 1;
-                        } else if (codePoint >= 'A' && codePoint <= 'Z') {
-                            codePoint = codePoint - 'A' + 1;
-                        } else if (codePoint == ' ' || codePoint == '2') {
-                            codePoint = 0;
-                        } else if (codePoint == '[' || codePoint == '3') {
-                            codePoint = 27; // ^[ (Esc)
-                        } else if (codePoint == '\\' || codePoint == '4') {
-                            codePoint = 28;
-                        } else if (codePoint == ']' || codePoint == '5') {
-                            codePoint = 29;
-                        } else if (codePoint == '^' || codePoint == '6') {
-                            codePoint = 30; // control-^
-                        } else if (codePoint == '_' || codePoint == '7' || codePoint == '/') {
-                            codePoint = 31;
-                        } else if (codePoint == '8') {
-                            codePoint = 127; // DEL
-                        }
-                    }
-
-                    if (codePoint == '\n') {
-                        codePoint = '\r';
-                    }
-
-                    if (mTermSession != null) {
-                        mTermSession.writeCodePoint(altDown, codePoint);
-                    }
+            public void write(byte[] data) {
+                if (mTermSession != null && data != null && data.length > 0) {
+                    stopTextSelectionMode();
+                    mTermSession.write(data, 0, data.length);
                 }
             }
 
             @Override
-            public void onDeleteCodePoints(int codePoints) {
-                if (mEmulator == null || mTermSession == null) return;
-                stopTextSelectionMode();
-                for (int i = 0; i < codePoints; i++) {
-                    mTermSession.writeCodePoint(false, 0x7F);
+            public void writeCodePoint(boolean altDown, int codePoint) {
+                if (mTermSession != null) {
+                    stopTextSelectionMode();
+                    mTermSession.writeCodePoint(altDown, codePoint);
                 }
             }
+        };
 
+        mTerminalInputConnection = new TerminalInputConnection(this, mPtyWriter, new TerminalInputConnection.TerminalInputListener() {
             @Override
             public void onSendKeyEvent(KeyEvent event) {
                 dispatchKeyEvent(event);
@@ -476,6 +425,7 @@ public final class TerminalView extends View {
                 return mClient != null && (mClient.isControlActive() || mClient.isAltActive());
             }
         });
+        mTerminalInputConnection.setInputMethodMode(mInputMethodMode);
 
         if (mTelexEngine != null) {
             mTerminalInputConnection.setVietnameseEngine(mTelexEngine.getUnderlyingEngine());
@@ -884,6 +834,9 @@ public final class TerminalView extends View {
         if (mEmulator == null) return true;
         if (isSelectingText()) {
             stopTextSelectionMode();
+        }
+        if (mTerminalInputConnection != null) {
+            mTerminalInputConnection.commitActiveRegion();
         }
 
         if (mClient.onKeyDown(keyCode, event, mTermSession)) {

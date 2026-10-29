@@ -51,6 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_HAPTICS = "haptics_enabled";
     private static final String KEY_TELEX_MODE = "telex_mode";
     public static final String KEY_INPUT_ENGINE_MODE = "input_engine_mode";
+    public static final String KEY_INPUT_METHOD_MODE = "input_method_mode";
     public static final String KEY_AUTO_RESTORE_ENGLISH = "auto_restore_english";
     public static final String KEY_TONE_PLACEMENT = "tone_placement";
     public static final String KEY_W_FIRST_TO_U = "w_first_to_u";
@@ -144,6 +145,8 @@ public class SettingsActivity extends AppCompatActivity {
         // 2. BÀN PHÍM & NHẬP LIỆU
         addSectionHeader(container, "Bàn phím & Nhập liệu");
         LinearLayout cardInput = createGlassCard(container);
+        addSegmentedRow(cardInput, "Chế độ nhập", new String[]{"Bộ gõ ứng dụng", "Bộ gõ bàn phím", "Bàn phím Pro"}, KEY_INPUT_METHOD_MODE, 0);
+        addDivider(cardInput);
         addSegmentedRow(cardInput, "Bộ gõ tích hợp", new String[]{"Tự động", "Telex", "VNI", "Tắt"}, KEY_INPUT_ENGINE_MODE, 0);
         addDivider(cardInput);
         addToggleRow(cardInput, "Tự khôi phục từ tiếng Anh", "Tự động hoàn tác khi gõ lệnh hoặc từ tiếng Anh (fix, curl, git)", KEY_AUTO_RESTORE_ENGLISH, true);
@@ -155,6 +158,10 @@ public class SettingsActivity extends AppCompatActivity {
         addToggleRow(cardInput, "Tắt trong app toàn màn hình", "Tự động tắt trong vim, nano, less, htop", KEY_DISABLE_IN_ALT_SCREEN, true);
         addDivider(cardInput);
         addToggleRow(cardInput, "Tắt khi nhập mật khẩu", "Bảo vệ mật khẩu khi PTY tắt echo", KEY_DISABLE_ON_PASSWORD, true);
+        addDivider(cardInput);
+        addNavigationRow(cardInput, "Tự kiểm tra bộ gõ", "Gõ 14 bài mẫu kiểm tra độ trễ & ghi vết log", R.drawable.ic_nav_command, v -> {
+            startActivity(new Intent(this, ImeSelfTestActivity.class));
+        });
         addDivider(cardInput);
         addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", com.termux.BuildConfig.INPUT_TEST_COUNT + " · " + com.termux.BuildConfig.INPUT_ENGINE_VERSION, R.drawable.ic_nav_command, v -> {
             GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "1032 engine, 418 English, 3200 Vietnamese, 249 legacy. 100% OK.");

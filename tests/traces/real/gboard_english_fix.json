@@ -1,0 +1,20 @@
+[
+  {
+    "step": 1,
+    "imeCall": "commitText(\"f\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "f"
+  },
+  {
+    "step": 2,
+    "imeCall": "commitText(\"i\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "fi"
+  },
+  {
+    "step": 3,
+    "imeCall": "commitText(\"x\", 1)",
+    "producer": "RAW",
+    "expectedTerminal": "fix"
+  }
+]

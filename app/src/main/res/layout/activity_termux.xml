@@ -877,4 +877,10 @@
         android:layout_height="1dp"
         android:background="@android:color/transparent" />
 
+    <com.termux.app.ui.BuiltinKeyboardView
+        android:id="@+id/builtin_keyboard_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
 </com.termux.app.terminal.TermuxActivityRootView>

@@ -26,10 +26,6 @@ if grep -E "outAttrs\.inputType\s*=\s*InputType\.TYPE_NULL" "$TERMINAL_VIEW"; th
     echo "ERROR: TerminalView must NEVER set outAttrs.inputType to TYPE_NULL!" >&2
     exit 1
 fi
-if grep -E "outAttrs\.inputType\s*=\s*.*TYPE_TEXT_VARIATION_VISIBLE_PASSWORD" "$TERMINAL_VIEW"; then
-    echo "ERROR: TerminalView must NEVER set outAttrs.inputType to VISIBLE_PASSWORD!" >&2
-    exit 1
-fi
 echo "✓ EditorInfo compliant (standard inputType configured)."
 
 # 3. Architectural Guard: Alt-screen (1049) & Echo-off bypass

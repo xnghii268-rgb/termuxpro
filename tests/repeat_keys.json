@@ -1,0 +1,1260 @@
+{
+  "description": "Telex repeated transform keys N=1..12 specification test suite",
+  "total": 207,
+  "cases": [
+    {
+      "input": "d",
+      "expected": "d",
+      "key": "d",
+      "n": 1
+    },
+    {
+      "input": "dd",
+      "expected": "đ",
+      "key": "d",
+      "n": 2
+    },
+    {
+      "input": "ddd",
+      "expected": "dd",
+      "key": "d",
+      "n": 3
+    },
+    {
+      "input": "dddd",
+      "expected": "ddd",
+      "key": "d",
+      "n": 4
+    },
+    {
+      "input": "ddddd",
+      "expected": "dddd",
+      "key": "d",
+      "n": 5
+    },
+    {
+      "input": "dddddd",
+      "expected": "ddddd",
+      "key": "d",
+      "n": 6
+    },
+    {
+      "input": "ddddddd",
+      "expected": "dddddd",
+      "key": "d",
+      "n": 7
+    },
+    {
+      "input": "dddddddd",
+      "expected": "ddddddd",
+      "key": "d",
+      "n": 8
+    },
+    {
+      "input": "ddddddddd",
+      "expected": "dddddddd",
+      "key": "d",
+      "n": 9
+    },
+    {
+      "input": "dddddddddd",
+      "expected": "ddddddddd",
+      "key": "d",
+      "n": 10
+    },
+    {
+      "input": "ddddddddddd",
+      "expected": "dddddddddd",
+      "key": "d",
+      "n": 11
+    },
+    {
+      "input": "dddddddddddd",
+      "expected": "ddddddddddd",
+      "key": "d",
+      "n": 12
+    },
+    {
+      "input": "D",
+      "expected": "D",
+      "key": "D",
+      "n": 1
+    },
+    {
+      "input": "DD",
+      "expected": "Đ",
+      "key": "D",
+      "n": 2
+    },
+    {
+      "input": "DDD",
+      "expected": "DD",
+      "key": "D",
+      "n": 3
+    },
+    {
+      "input": "DDDD",
+      "expected": "DDD",
+      "key": "D",
+      "n": 4
+    },
+    {
+      "input": "DDDDD",
+      "expected": "DDDD",
+      "key": "D",
+      "n": 5
+    },
+    {
+      "input": "DDDDDD",
+      "expected": "DDDDD",
+      "key": "D",
+      "n": 6
+    },
+    {
+      "input": "DDDDDDD",
+      "expected": "DDDDDD",
+      "key": "D",
+      "n": 7
+    },
+    {
+      "input": "DDDDDDDD",
+      "expected": "DDDDDDD",
+      "key": "D",
+      "n": 8
+    },
+    {
+      "input": "DDDDDDDDD",
+      "expected": "DDDDDDDD",
+      "key": "D",
+      "n": 9
+    },
+    {
+      "input": "DDDDDDDDDD",
+      "expected": "DDDDDDDDD",
+      "key": "D",
+      "n": 10
+    },
+    {
+      "input": "DDDDDDDDDDD",
+      "expected": "DDDDDDDDDD",
+      "key": "D",
+      "n": 11
+    },
+    {
+      "input": "DDDDDDDDDDDD",
+      "expected": "DDDDDDDDDDD",
+      "key": "D",
+      "n": 12
+    },
+    {
+      "input": "Dd",
+      "expected": "Đ",
+      "key": "Dd",
+      "n": 2
+    },
+    {
+      "input": "Ddd",
+      "expected": "DD",
+      "key": "Dd",
+      "n": 3
+    },
+    {
+      "input": "Dddd",
+      "expected": "DDD",
+      "key": "Dd",
+      "n": 4
+    },
+    {
+      "input": "a",
+      "expected": "a",
+      "key": "a",
+      "n": 1
+    },
+    {
+      "input": "aa",
+      "expected": "â",
+      "key": "a",
+      "n": 2
+    },
+    {
+      "input": "aaa",
+      "expected": "aa",
+      "key": "a",
+      "n": 3
+    },
+    {
+      "input": "aaaa",
+      "expected": "aaa",
+      "key": "a",
+      "n": 4
+    },
+    {
+      "input": "aaaaa",
+      "expected": "aaaa",
+      "key": "a",
+      "n": 5
+    },
+    {
+      "input": "aaaaaa",
+      "expected": "aaaaa",
+      "key": "a",
+      "n": 6
+    },
+    {
+      "input": "aaaaaaa",
+      "expected": "aaaaaa",
+      "key": "a",
+      "n": 7
+    },
+    {
+      "input": "aaaaaaaa",
+      "expected": "aaaaaaa",
+      "key": "a",
+      "n": 8
+    },
+    {
+      "input": "aaaaaaaaa",
+      "expected": "aaaaaaaa",
+      "key": "a",
+      "n": 9
+    },
+    {
+      "input": "aaaaaaaaaa",
+      "expected": "aaaaaaaaa",
+      "key": "a",
+      "n": 10
+    },
+    {
+      "input": "aaaaaaaaaaa",
+      "expected": "aaaaaaaaaa",
+      "key": "a",
+      "n": 11
+    },
+    {
+      "input": "aaaaaaaaaaaa",
+      "expected": "aaaaaaaaaaa",
+      "key": "a",
+      "n": 12
+    },
+    {
+      "input": "e",
+      "expected": "e",
+      "key": "e",
+      "n": 1
+    },
+    {
+      "input": "ee",
+      "expected": "ê",
+      "key": "e",
+      "n": 2
+    },
+    {
+      "input": "eee",
+      "expected": "ee",
+      "key": "e",
+      "n": 3
+    },
+    {
+      "input": "eeee",
+      "expected": "eee",
+      "key": "e",
+      "n": 4
+    },
+    {
+      "input": "eeeee",
+      "expected": "eeee",
+      "key": "e",
+      "n": 5
+    },
+    {
+      "input": "eeeeee",
+      "expected": "eeeee",
+      "key": "e",
+      "n": 6
+    },
+    {
+      "input": "eeeeeee",
+      "expected": "eeeeee",
+      "key": "e",
+      "n": 7
+    },
+    {
+      "input": "eeeeeeee",
+      "expected": "eeeeeee",
+      "key": "e",
+      "n": 8
+    },
+    {
+      "input": "eeeeeeeee",
+      "expected": "eeeeeeee",
+      "key": "e",
+      "n": 9
+    },
+    {
+      "input": "eeeeeeeeee",
+      "expected": "eeeeeeeee",
+      "key": "e",
+      "n": 10
+    },
+    {
+      "input": "eeeeeeeeeee",
+      "expected": "eeeeeeeeee",
+      "key": "e",
+      "n": 11
+    },
+    {
+      "input": "eeeeeeeeeeee",
+      "expected": "eeeeeeeeeee",
+      "key": "e",
+      "n": 12
+    },
+    {
+      "input": "o",
+      "expected": "o",
+      "key": "o",
+      "n": 1
+    },
+    {
+      "input": "oo",
+      "expected": "ô",
+      "key": "o",
+      "n": 2
+    },
+    {
+      "input": "ooo",
+      "expected": "oo",
+      "key": "o",
+      "n": 3
+    },
+    {
+      "input": "oooo",
+      "expected": "ooo",
+      "key": "o",
+      "n": 4
+    },
+    {
+      "input": "ooooo",
+      "expected": "oooo",
+      "key": "o",
+      "n": 5
+    },
+    {
+      "input": "oooooo",
+      "expected": "ooooo",
+      "key": "o",
+      "n": 6
+    },
+    {
+      "input": "ooooooo",
+      "expected": "oooooo",
+      "key": "o",
+      "n": 7
+    },
+    {
+      "input": "oooooooo",
+      "expected": "ooooooo",
+      "key": "o",
+      "n": 8
+    },
+    {
+      "input": "ooooooooo",
+      "expected": "oooooooo",
+      "key": "o",
+      "n": 9
+    },
+    {
+      "input": "oooooooooo",
+      "expected": "ooooooooo",
+      "key": "o",
+      "n": 10
+    },
+    {
+      "input": "ooooooooooo",
+      "expected": "oooooooooo",
+      "key": "o",
+      "n": 11
+    },
+    {
+      "input": "oooooooooooo",
+      "expected": "ooooooooooo",
+      "key": "o",
+      "n": 12
+    },
+    {
+      "input": "w",
+      "expected": "ư",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 1
+    },
+    {
+      "input": "ww",
+      "expected": "w",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 2
+    },
+    {
+      "input": "www",
+      "expected": "ww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 3
+    },
+    {
+      "input": "wwww",
+      "expected": "www",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 4
+    },
+    {
+      "input": "wwwww",
+      "expected": "wwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 5
+    },
+    {
+      "input": "wwwwww",
+      "expected": "wwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 6
+    },
+    {
+      "input": "wwwwwww",
+      "expected": "wwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 7
+    },
+    {
+      "input": "wwwwwwww",
+      "expected": "wwwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 8
+    },
+    {
+      "input": "wwwwwwwww",
+      "expected": "wwwwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 9
+    },
+    {
+      "input": "wwwwwwwwww",
+      "expected": "wwwwwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 10
+    },
+    {
+      "input": "wwwwwwwwwww",
+      "expected": "wwwwwwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 11
+    },
+    {
+      "input": "wwwwwwwwwwww",
+      "expected": "wwwwwwwwwww",
+      "key": "w",
+      "wFirstToU": true,
+      "n": 12
+    },
+    {
+      "input": "uw",
+      "expected": "ư",
+      "key": "uw",
+      "n": 1
+    },
+    {
+      "input": "uww",
+      "expected": "uw",
+      "key": "uw",
+      "n": 2
+    },
+    {
+      "input": "uwww",
+      "expected": "uww",
+      "key": "uw",
+      "n": 3
+    },
+    {
+      "input": "uwwww",
+      "expected": "uwww",
+      "key": "uw",
+      "n": 4
+    },
+    {
+      "input": "uwwwww",
+      "expected": "uwwww",
+      "key": "uw",
+      "n": 5
+    },
+    {
+      "input": "uwwwwww",
+      "expected": "uwwwww",
+      "key": "uw",
+      "n": 6
+    },
+    {
+      "input": "uwwwwwww",
+      "expected": "uwwwwww",
+      "key": "uw",
+      "n": 7
+    },
+    {
+      "input": "uwwwwwwww",
+      "expected": "uwwwwwww",
+      "key": "uw",
+      "n": 8
+    },
+    {
+      "input": "uwwwwwwwww",
+      "expected": "uwwwwwwww",
+      "key": "uw",
+      "n": 9
+    },
+    {
+      "input": "uwwwwwwwwww",
+      "expected": "uwwwwwwwww",
+      "key": "uw",
+      "n": 10
+    },
+    {
+      "input": "uwwwwwwwwwww",
+      "expected": "uwwwwwwwwww",
+      "key": "uw",
+      "n": 11
+    },
+    {
+      "input": "uwwwwwwwwwwww",
+      "expected": "uwwwwwwwwwww",
+      "key": "uw",
+      "n": 12
+    },
+    {
+      "input": "as",
+      "expected": "á",
+      "key": "as",
+      "n": 1
+    },
+    {
+      "input": "ass",
+      "expected": "as",
+      "key": "as",
+      "n": 2
+    },
+    {
+      "input": "asss",
+      "expected": "ass",
+      "key": "as",
+      "n": 3
+    },
+    {
+      "input": "assss",
+      "expected": "asss",
+      "key": "as",
+      "n": 4
+    },
+    {
+      "input": "asssss",
+      "expected": "assss",
+      "key": "as",
+      "n": 5
+    },
+    {
+      "input": "assssss",
+      "expected": "asssss",
+      "key": "as",
+      "n": 6
+    },
+    {
+      "input": "asssssss",
+      "expected": "assssss",
+      "key": "as",
+      "n": 7
+    },
+    {
+      "input": "assssssss",
+      "expected": "asssssss",
+      "key": "as",
+      "n": 8
+    },
+    {
+      "input": "asssssssss",
+      "expected": "assssssss",
+      "key": "as",
+      "n": 9
+    },
+    {
+      "input": "assssssssss",
+      "expected": "asssssssss",
+      "key": "as",
+      "n": 10
+    },
+    {
+      "input": "asssssssssss",
+      "expected": "assssssssss",
+      "key": "as",
+      "n": 11
+    },
+    {
+      "input": "assssssssssss",
+      "expected": "asssssssssss",
+      "key": "as",
+      "n": 12
+    },
+    {
+      "input": "af",
+      "expected": "à",
+      "key": "af",
+      "n": 1
+    },
+    {
+      "input": "aff",
+      "expected": "af",
+      "key": "af",
+      "n": 2
+    },
+    {
+      "input": "afff",
+      "expected": "aff",
+      "key": "af",
+      "n": 3
+    },
+    {
+      "input": "affff",
+      "expected": "afff",
+      "key": "af",
+      "n": 4
+    },
+    {
+      "input": "afffff",
+      "expected": "affff",
+      "key": "af",
+      "n": 5
+    },
+    {
+      "input": "affffff",
+      "expected": "afffff",
+      "key": "af",
+      "n": 6
+    },
+    {
+      "input": "afffffff",
+      "expected": "affffff",
+      "key": "af",
+      "n": 7
+    },
+    {
+      "input": "affffffff",
+      "expected": "afffffff",
+      "key": "af",
+      "n": 8
+    },
+    {
+      "input": "afffffffff",
+      "expected": "affffffff",
+      "key": "af",
+      "n": 9
+    },
+    {
+      "input": "affffffffff",
+      "expected": "afffffffff",
+      "key": "af",
+      "n": 10
+    },
+    {
+      "input": "afffffffffff",
+      "expected": "affffffffff",
+      "key": "af",
+      "n": 11
+    },
+    {
+      "input": "affffffffffff",
+      "expected": "afffffffffff",
+      "key": "af",
+      "n": 12
+    },
+    {
+      "input": "ar",
+      "expected": "ả",
+      "key": "ar",
+      "n": 1
+    },
+    {
+      "input": "arr",
+      "expected": "ar",
+      "key": "ar",
+      "n": 2
+    },
+    {
+      "input": "arrr",
+      "expected": "arr",
+      "key": "ar",
+      "n": 3
+    },
+    {
+      "input": "arrrr",
+      "expected": "arrr",
+      "key": "ar",
+      "n": 4
+    },
+    {
+      "input": "arrrrr",
+      "expected": "arrrr",
+      "key": "ar",
+      "n": 5
+    },
+    {
+      "input": "arrrrrr",
+      "expected": "arrrrr",
+      "key": "ar",
+      "n": 6
+    },
+    {
+      "input": "arrrrrrr",
+      "expected": "arrrrrr",
+      "key": "ar",
+      "n": 7
+    },
+    {
+      "input": "arrrrrrrr",
+      "expected": "arrrrrrr",
+      "key": "ar",
+      "n": 8
+    },
+    {
+      "input": "arrrrrrrrr",
+      "expected": "arrrrrrrr",
+      "key": "ar",
+      "n": 9
+    },
+    {
+      "input": "arrrrrrrrrr",
+      "expected": "arrrrrrrrr",
+      "key": "ar",
+      "n": 10
+    },
+    {
+      "input": "arrrrrrrrrrr",
+      "expected": "arrrrrrrrrr",
+      "key": "ar",
+      "n": 11
+    },
+    {
+      "input": "arrrrrrrrrrrr",
+      "expected": "arrrrrrrrrrr",
+      "key": "ar",
+      "n": 12
+    },
+    {
+      "input": "ax",
+      "expected": "ã",
+      "key": "ax",
+      "n": 1
+    },
+    {
+      "input": "axx",
+      "expected": "ax",
+      "key": "ax",
+      "n": 2
+    },
+    {
+      "input": "axxx",
+      "expected": "axx",
+      "key": "ax",
+      "n": 3
+    },
+    {
+      "input": "axxxx",
+      "expected": "axxx",
+      "key": "ax",
+      "n": 4
+    },
+    {
+      "input": "axxxxx",
+      "expected": "axxxx",
+      "key": "ax",
+      "n": 5
+    },
+    {
+      "input": "axxxxxx",
+      "expected": "axxxxx",
+      "key": "ax",
+      "n": 6
+    },
+    {
+      "input": "axxxxxxx",
+      "expected": "axxxxxx",
+      "key": "ax",
+      "n": 7
+    },
+    {
+      "input": "axxxxxxxx",
+      "expected": "axxxxxxx",
+      "key": "ax",
+      "n": 8
+    },
+    {
+      "input": "axxxxxxxxx",
+      "expected": "axxxxxxxx",
+      "key": "ax",
+      "n": 9
+    },
+    {
+      "input": "axxxxxxxxxx",
+      "expected": "axxxxxxxxx",
+      "key": "ax",
+      "n": 10
+    },
+    {
+      "input": "axxxxxxxxxxx",
+      "expected": "axxxxxxxxxx",
+      "key": "ax",
+      "n": 11
+    },
+    {
+      "input": "axxxxxxxxxxxx",
+      "expected": "axxxxxxxxxxx",
+      "key": "ax",
+      "n": 12
+    },
+    {
+      "input": "aj",
+      "expected": "ạ",
+      "key": "aj",
+      "n": 1
+    },
+    {
+      "input": "ajj",
+      "expected": "aj",
+      "key": "aj",
+      "n": 2
+    },
+    {
+      "input": "ajjj",
+      "expected": "ajj",
+      "key": "aj",
+      "n": 3
+    },
+    {
+      "input": "ajjjj",
+      "expected": "ajjj",
+      "key": "aj",
+      "n": 4
+    },
+    {
+      "input": "ajjjjj",
+      "expected": "ajjjj",
+      "key": "aj",
+      "n": 5
+    },
+    {
+      "input": "ajjjjjj",
+      "expected": "ajjjjj",
+      "key": "aj",
+      "n": 6
+    },
+    {
+      "input": "ajjjjjjj",
+      "expected": "ajjjjjj",
+      "key": "aj",
+      "n": 7
+    },
+    {
+      "input": "ajjjjjjjj",
+      "expected": "ajjjjjjj",
+      "key": "aj",
+      "n": 8
+    },
+    {
+      "input": "ajjjjjjjjj",
+      "expected": "ajjjjjjjj",
+      "key": "aj",
+      "n": 9
+    },
+    {
+      "input": "ajjjjjjjjjj",
+      "expected": "ajjjjjjjjj",
+      "key": "aj",
+      "n": 10
+    },
+    {
+      "input": "ajjjjjjjjjjj",
+      "expected": "ajjjjjjjjjj",
+      "key": "aj",
+      "n": 11
+    },
+    {
+      "input": "ajjjjjjjjjjjj",
+      "expected": "ajjjjjjjjjjj",
+      "key": "aj",
+      "n": 12
+    },
+    {
+      "input": "s",
+      "expected": "s",
+      "key": "s",
+      "n": 1
+    },
+    {
+      "input": "ss",
+      "expected": "s",
+      "key": "s",
+      "n": 2
+    },
+    {
+      "input": "sss",
+      "expected": "ss",
+      "key": "s",
+      "n": 3
+    },
+    {
+      "input": "ssss",
+      "expected": "sss",
+      "key": "s",
+      "n": 4
+    },
+    {
+      "input": "sssss",
+      "expected": "ssss",
+      "key": "s",
+      "n": 5
+    },
+    {
+      "input": "ssssss",
+      "expected": "sssss",
+      "key": "s",
+      "n": 6
+    },
+    {
+      "input": "sssssss",
+      "expected": "ssssss",
+      "key": "s",
+      "n": 7
+    },
+    {
+      "input": "ssssssss",
+      "expected": "sssssss",
+      "key": "s",
+      "n": 8
+    },
+    {
+      "input": "sssssssss",
+      "expected": "ssssssss",
+      "key": "s",
+      "n": 9
+    },
+    {
+      "input": "ssssssssss",
+      "expected": "sssssssss",
+      "key": "s",
+      "n": 10
+    },
+    {
+      "input": "sssssssssss",
+      "expected": "ssssssssss",
+      "key": "s",
+      "n": 11
+    },
+    {
+      "input": "ssssssssssss",
+      "expected": "sssssssssss",
+      "key": "s",
+      "n": 12
+    },
+    {
+      "input": "f",
+      "expected": "f",
+      "key": "f",
+      "n": 1
+    },
+    {
+      "input": "ff",
+      "expected": "f",
+      "key": "f",
+      "n": 2
+    },
+    {
+      "input": "fff",
+      "expected": "ff",
+      "key": "f",
+      "n": 3
+    },
+    {
+      "input": "ffff",
+      "expected": "fff",
+      "key": "f",
+      "n": 4
+    },
+    {
+      "input": "fffff",
+      "expected": "ffff",
+      "key": "f",
+      "n": 5
+    },
+    {
+      "input": "ffffff",
+      "expected": "fffff",
+      "key": "f",
+      "n": 6
+    },
+    {
+      "input": "fffffff",
+      "expected": "ffffff",
+      "key": "f",
+      "n": 7
+    },
+    {
+      "input": "ffffffff",
+      "expected": "fffffff",
+      "key": "f",
+      "n": 8
+    },
+    {
+      "input": "fffffffff",
+      "expected": "ffffffff",
+      "key": "f",
+      "n": 9
+    },
+    {
+      "input": "ffffffffff",
+      "expected": "fffffffff",
+      "key": "f",
+      "n": 10
+    },
+    {
+      "input": "fffffffffff",
+      "expected": "ffffffffff",
+      "key": "f",
+      "n": 11
+    },
+    {
+      "input": "ffffffffffff",
+      "expected": "fffffffffff",
+      "key": "f",
+      "n": 12
+    },
+    {
+      "input": "r",
+      "expected": "r",
+      "key": "r",
+      "n": 1
+    },
+    {
+      "input": "rr",
+      "expected": "r",
+      "key": "r",
+      "n": 2
+    },
+    {
+      "input": "rrr",
+      "expected": "rr",
+      "key": "r",
+      "n": 3
+    },
+    {
+      "input": "rrrr",
+      "expected": "rrr",
+      "key": "r",
+      "n": 4
+    },
+    {
+      "input": "rrrrr",
+      "expected": "rrrr",
+      "key": "r",
+      "n": 5
+    },
+    {
+      "input": "rrrrrr",
+      "expected": "rrrrr",
+      "key": "r",
+      "n": 6
+    },
+    {
+      "input": "rrrrrrr",
+      "expected": "rrrrrr",
+      "key": "r",
+      "n": 7
+    },
+    {
+      "input": "rrrrrrrr",
+      "expected": "rrrrrrr",
+      "key": "r",
+      "n": 8
+    },
+    {
+      "input": "rrrrrrrrr",
+      "expected": "rrrrrrrr",
+      "key": "r",
+      "n": 9
+    },
+    {
+      "input": "rrrrrrrrrr",
+      "expected": "rrrrrrrrr",
+      "key": "r",
+      "n": 10
+    },
+    {
+      "input": "rrrrrrrrrrr",
+      "expected": "rrrrrrrrrr",
+      "key": "r",
+      "n": 11
+    },
+    {
+      "input": "rrrrrrrrrrrr",
+      "expected": "rrrrrrrrrrr",
+      "key": "r",
+      "n": 12
+    },
+    {
+      "input": "x",
+      "expected": "x",
+      "key": "x",
+      "n": 1
+    },
+    {
+      "input": "xx",
+      "expected": "x",
+      "key": "x",
+      "n": 2
+    },
+    {
+      "input": "xxx",
+      "expected": "xx",
+      "key": "x",
+      "n": 3
+    },
+    {
+      "input": "xxxx",
+      "expected": "xxx",
+      "key": "x",
+      "n": 4
+    },
+    {
+      "input": "xxxxx",
+      "expected": "xxxx",
+      "key": "x",
+      "n": 5
+    },
+    {
+      "input": "xxxxxx",
+      "expected": "xxxxx",
+      "key": "x",
+      "n": 6
+    },
+    {
+      "input": "xxxxxxx",
+      "expected": "xxxxxx",
+      "key": "x",
+      "n": 7
+    },
+    {
+      "input": "xxxxxxxx",
+      "expected": "xxxxxxx",
+      "key": "x",
+      "n": 8
+    },
+    {
+      "input": "xxxxxxxxx",
+      "expected": "xxxxxxxx",
+      "key": "x",
+      "n": 9
+    },
+    {
+      "input": "xxxxxxxxxx",
+      "expected": "xxxxxxxxx",
+      "key": "x",
+      "n": 10
+    },
+    {
+      "input": "xxxxxxxxxxx",
+      "expected": "xxxxxxxxxx",
+      "key": "x",
+      "n": 11
+    },
+    {
+      "input": "xxxxxxxxxxxx",
+      "expected": "xxxxxxxxxxx",
+      "key": "x",
+      "n": 12
+    },
+    {
+      "input": "j",
+      "expected": "j",
+      "key": "j",
+      "n": 1
+    },
+    {
+      "input": "jj",
+      "expected": "j",
+      "key": "j",
+      "n": 2
+    },
+    {
+      "input": "jjj",
+      "expected": "jj",
+      "key": "j",
+      "n": 3
+    },
+    {
+      "input": "jjjj",
+      "expected": "jjj",
+      "key": "j",
+      "n": 4
+    },
+    {
+      "input": "jjjjj",
+      "expected": "jjjj",
+      "key": "j",
+      "n": 5
+    },
+    {
+      "input": "jjjjjj",
+      "expected": "jjjjj",
+      "key": "j",
+      "n": 6
+    },
+    {
+      "input": "jjjjjjj",
+      "expected": "jjjjjj",
+      "key": "j",
+      "n": 7
+    },
+    {
+      "input": "jjjjjjjj",
+      "expected": "jjjjjjj",
+      "key": "j",
+      "n": 8
+    },
+    {
+      "input": "jjjjjjjjj",
+      "expected": "jjjjjjjj",
+      "key": "j",
+      "n": 9
+    },
+    {
+      "input": "jjjjjjjjjj",
+      "expected": "jjjjjjjjj",
+      "key": "j",
+      "n": 10
+    },
+    {
+      "input": "jjjjjjjjjjj",
+      "expected": "jjjjjjjjjj",
+      "key": "j",
+      "n": 11
+    },
+    {
+      "input": "jjjjjjjjjjjj",
+      "expected": "jjjjjjjjjjj",
+      "key": "j",
+      "n": 12
+    }
+  ]
+}

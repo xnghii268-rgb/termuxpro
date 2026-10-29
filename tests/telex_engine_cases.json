@@ -17,6 +17,14 @@
   },
   {
     "input": "duocj",
+    "expected": "duọc"
+  },
+  {
+    "input": "dduowcj",
+    "expected": "được"
+  },
+  {
+    "input": "dduwowcj",
     "expected": "được"
   },
   {
@@ -109,7 +117,7 @@
   },
   {
     "input": "duoc75",
-    "expected": "được"
+    "expected": "dược"
   },
   {
     "input": "nhung74",
