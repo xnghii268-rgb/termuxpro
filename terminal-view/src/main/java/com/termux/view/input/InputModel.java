@@ -98,8 +98,16 @@ public class InputModel {
             mText.delete(delStart, delEnd);
             mSelectionStart = mSelectionEnd = delStart;
             if (mComposingStart != -1) {
-                mComposingStart = -1;
-                mComposingEnd = -1;
+                if (delStart <= mComposingStart) {
+                    mComposingStart = -1;
+                    mComposingEnd = -1;
+                } else {
+                    mComposingEnd = Math.max(mComposingStart, mComposingEnd - deletedChars);
+                    if (mComposingEnd == mComposingStart) {
+                        mComposingStart = -1;
+                        mComposingEnd = -1;
+                    }
+                }
             }
         }
         return deletedChars;

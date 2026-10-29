@@ -38,3 +38,4 @@ Termux Pro là ứng dụng terminal Linux độc lập phân nhánh từ termux
 - [x] **Phase 8 (Vietnamese Input Round 2)**: Pure JVM engine, English auto-restore, alt-screen/password bypass.
 - [x] **Phase 9 (Single-Writer Pipeline v3)**: InputModel mirror, RegionWriter PTY sole-writer, InputProducer RAW vs COMPOSER, latency <= 16ms, repeat-key undo table N=1..12.
 - [x] **Phase 10 (Real-Keyboard Self-Test & Built-in Keyboard)**: ImeSelfTestActivity 14-phrases, live HUD, JSON trace export, BuiltinKeyboardView glass layout. 6877/6877 test assertions pass 100%.
+- [x] **Phase 11 (Input v3 Hotfix: Non-Disappearing Letters)**: Fix commitText non-composing branch, InputModel span shrink, Rule 1 committed text protection, Safe Mode & Auto-Fallback Toast, Full-Line Oracle Fuzz 10k ops. 15,206 assertions pass 100%.

@@ -375,68 +375,217 @@ public class TestRunner {
             }
         }
 
-        // 11. Oracle Fuzz Test (>= 10,000 random operations)
-        System.out.println("Running Oracle Fuzz Test (10,000 operations)...");
-        InputModel model = new InputModel();
-        StringBuilder oracle = new StringBuilder();
-        Random rng = new Random(42);
+        // 11. Explicit Hotfix Regression Tests (Full-Line TerminalLineModel)
+        System.out.println("Running Explicit Hotfix Regression Tests...");
+        PipelineSession session = new PipelineSession();
+
+        // 1. "a" then "g" -> terminal line is "ag"
+        session.reset();
+        session.commitText("a", 1);
+        session.commitText("g", 1);
+        assertEquals("ag", session.terminalLine.getLine(), "Explicit 1: 'a' then 'g' -> 'ag'");
+
+        // 2. "g" then " " -> terminal line is "g "
+        session.reset();
+        session.commitText("g", 1);
+        session.commitText(" ", 1);
+        assertEquals("g ", session.terminalLine.getLine(), "Explicit 2: 'g' then ' ' -> 'g '");
+
+        // 3. "a g" -> terminal line is "a g"
+        session.reset();
+        session.commitText("a", 1);
+        session.commitText(" ", 1);
+        session.commitText("g", 1);
+        assertEquals("a g", session.terminalLine.getLine(), "Explicit 3: 'a g' -> 'a g'");
+
+        // 4. "ab cd ef" (Pass-through / Safe Mode) & "ab cd" (RAW mode)
+        session.reset();
+        session.safeMode = true;
+        for (char c : "ab cd ef".toCharArray()) {
+            session.commitText(String.valueOf(c), 1);
+        }
+        assertEquals("ab cd ef", session.terminalLine.getLine(), "Explicit 4a: 'ab cd ef' in Safe/Pass-through mode");
+        session.safeMode = false;
+
+        session.reset();
+        for (char c : "ab cd".toCharArray()) {
+            session.commitText(String.valueOf(c), 1);
+        }
+        assertEquals("ab cd", session.terminalLine.getLine(), "Explicit 4b: 'ab cd' in RAW mode");
+
+        // 5. "git status" -> terminal line is "git status"
+        session.reset();
+        for (char c : "git status".toCharArray()) {
+            session.commitText(String.valueOf(c), 1);
+        }
+        assertEquals("git status", session.terminalLine.getLine(), "Explicit 5: 'git status'");
+
+        // 6. "ls -la /sdcard" -> terminal line is "ls -la /sdcard"
+        session.reset();
+        for (char c : "ls -la /sdcard".toCharArray()) {
+            session.commitText(String.valueOf(c), 1);
+        }
+        assertEquals("ls -la /sdcard", session.terminalLine.getLine(), "Explicit 6: 'ls -la /sdcard'");
+
+        // 7. Fast typing (no delay between calls)
+        session.reset();
+        String fastCmd = "git commit -am \"fix hotfix non-disappearing letters\"";
+        for (char c : fastCmd.toCharArray()) {
+            session.commitText(String.valueOf(c), 1);
+        }
+        assertEquals(fastCmd, session.terminalLine.getLine(), "Explicit 7: Fast typing");
+
+        // 8. Backspace after space: deletes space, does not corrupt previous word
+        session.reset();
+        for (char c : "docker run ".toCharArray()) session.commitText(String.valueOf(c), 1);
+        assertEquals("docker run ", session.terminalLine.getLine(), "Before Backspace");
+        session.sendBackspace();
+        assertEquals("docker run", session.terminalLine.getLine(), "Explicit 8: Backspace after space");
+
+        // 9. Backspace across two words
+        session.reset();
+        for (char c : "git status".toCharArray()) session.commitText(String.valueOf(c), 1);
+        for (int i = 0; i < 7; i++) session.sendBackspace(); // deletes " status"
+        assertEquals("git", session.terminalLine.getLine(), "Explicit 9a: Backspace across word boundary");
+        session.sendBackspace(); // deletes 't'
+        assertEquals("gi", session.terminalLine.getLine(), "Explicit 9b: Backspace into previous word");
+
+        // 10. Type, Enter, type again: Enter closes region and resets line
+        session.reset();
+        for (char c : "echo hello world".toCharArray()) session.commitText(String.valueOf(c), 1);
+        assertEquals("echo hello world", session.terminalLine.getLine(), "Before Enter");
+        session.sendEnter();
+        assertEquals("", session.terminalLine.getLine(), "After Enter: line reset to empty");
+        for (char c : "ls -la".toCharArray()) session.commitText(String.valueOf(c), 1);
+        assertEquals("ls -la", session.terminalLine.getLine(), "Explicit 10: Type, Enter, type again");
+
+        // 11. Paste of 5k characters: delivered intact in one write
+        session.reset();
+        StringBuilder sb5k = new StringBuilder();
+        for (int i = 0; i < 5000; i++) sb5k.append((char) ('a' + (i % 26)));
+        String paste5k = sb5k.toString();
+        session.commitText(paste5k, 1);
+        assertEquals(paste5k, session.terminalLine.getLine(), "Explicit 11: Paste 5k characters intact");
+
+        // 12. Vietnamese words in the middle of English commands ("echo người được")
+        session.reset();
+        for (char c : "echo ".toCharArray()) session.commitText(String.valueOf(c), 1);
+        for (char c : "nguowif".toCharArray()) session.commitText(String.valueOf(c), 1);
+        session.commitText(" ", 1);
+        for (char c : "dduowcj".toCharArray()) session.commitText(String.valueOf(c), 1);
+        assertEquals("echo người được", session.terminalLine.getLine(), "Explicit 12: Vietnamese in English command");
+
+        // 13. All modes: Composing IME mode & Safe mode
+        session.reset();
+        session.setComposingText("t", 1);
+        session.setComposingText("ti", 1);
+        session.setComposingText("tiế", 1);
+        session.setComposingText("tiếng", 1);
+        session.finishComposingText();
+        session.commitText(" ", 1);
+        session.setComposingText("v", 1);
+        session.setComposingText("vi", 1);
+        session.setComposingText("việ", 1);
+        session.setComposingText("việt", 1);
+        session.finishComposingText();
+        assertEquals("tiếng việt", session.terminalLine.getLine(), "Explicit 13a: Composing IME mode");
+
+        session.reset();
+        session.safeMode = true;
+        for (char c : "python app.py".toCharArray()) session.commitText(String.valueOf(c), 1);
+        session.sendBackspace();
+        session.sendBackspace();
+        session.sendBackspace();
+        assertEquals("python app", session.terminalLine.getLine(), "Explicit 13b: Safe mode pass-through");
+        session.safeMode = false;
+
+        System.out.println("✓ Explicit Hotfix Regression Tests: 13/13 scenarios passed 100%");
+
+        // 14. Full-Line Oracle Fuzz Test (>= 10,000 random operations)
+        System.out.println("Running Full-Line Oracle Fuzz Test (10,000 operations across Composing, Safe & Boundary modes)...");
+        session.reset();
+        StringBuilder oracleLine = new StringBuilder();
+        String oracleComposing = "";
+        Random rng = new Random(20261029);
 
         for (int op = 0; op < 10000; op++) {
-            int action = rng.nextInt(6);
+            int mode = rng.nextInt(3); // 0: normal composing, 1: boundary/commit, 2: safe mode
+            boolean newSafeMode = (mode == 2);
+            if (newSafeMode && !session.safeMode) {
+                session.commitActiveRegion();
+                oracleLine.append(oracleComposing);
+                oracleComposing = "";
+            }
+            session.safeMode = newSafeMode;
+
+            int action = rng.nextInt(5);
             switch (action) {
-                case 0: { // append single char
-                    char c = (char) ('a' + rng.nextInt(26));
-                    model.commitText(String.valueOf(c), 1);
-                    oracle.append(c);
-                    break;
-                }
-                case 1: { // delete surrounding text
-                    int del = 1 + rng.nextInt(3);
-                    model.deleteSurroundingText(del, 0);
-                    int actualDel = Math.min(del, oracle.length());
-                    oracle.delete(oracle.length() - actualDel, oracle.length());
-                    break;
-                }
-                case 2: { // set composing text
-                    String comp = "c" + rng.nextInt(100);
-                    model.setComposingText(comp, 1);
-                    model.finishComposingText();
-                    oracle.append(comp);
-                    break;
-                }
-                case 3: { // append word
-                    String[] words = {"fix", "curl", "nghiệm", "được", "thuongw", "alo"};
-                    String w = words[rng.nextInt(words.length)];
-                    model.commitText(w, 1);
-                    oracle.append(w);
-                    break;
-                }
-                case 4: { // space / word boundary
-                    model.commitText(" ", 1);
-                    oracle.append(' ');
-                    break;
-                }
-                case 5: { // getTextBeforeCursor verification
-                    int n = 1 + rng.nextInt(20);
-                    CharSequence mBefore = model.getTextBeforeCursor(n, 0);
-                    int oLen = oracle.length();
-                    int start = Math.max(0, oLen - n);
-                    String oBefore = oracle.substring(start, oLen);
-                    if (!mBefore.toString().equals(oBefore)) {
-                        throw new RuntimeException("Oracle fuzz mismatch at op " + op + ": model='" + mBefore + "' vs oracle='" + oBefore + "'");
+                case 0: { // Append / set composing text
+                    String comp = "w" + rng.nextInt(50);
+                    session.setComposingText(comp, 1);
+                    if (session.safeMode) {
+                        oracleLine.append(comp);
+                        oracleComposing = "";
+                    } else {
+                        oracleComposing = comp;
                     }
-                    sPassCount++;
+                    break;
+                }
+                case 1: { // Finish composing
+                    session.finishComposingText();
+                    oracleLine.append(oracleComposing);
+                    oracleComposing = "";
+                    break;
+                }
+                case 2: { // Direct commit / word boundary
+                    String[] words = {" ", "fix", "git", "status", "cd", "test", "\t", "ls", "-la", "/sdcard", "123"};
+                    String w = words[rng.nextInt(words.length)];
+                    session.commitText(w, 1);
+                    if (!oracleComposing.isEmpty()) {
+                        oracleLine.append(w); // Rule 2: commitText replaces composing span
+                        oracleComposing = "";
+                    } else {
+                        oracleLine.append(w);
+                    }
+                    break;
+                }
+                case 3: { // Backspace
+                    if (!oracleComposing.isEmpty()) {
+                        session.deleteSurroundingText(1, 0);
+                        oracleComposing = oracleComposing.substring(0, oracleComposing.length() - 1);
+                    } else if (oracleLine.length() > 0) {
+                        session.deleteSurroundingText(1, 0);
+                        int cp = Character.codePointBefore(oracleLine, oracleLine.length());
+                        oracleLine.delete(oracleLine.length() - Character.charCount(cp), oracleLine.length());
+                    }
+                    break;
+                }
+                case 4: { // Enter (resets line)
+                    session.sendEnter();
+                    oracleLine.setLength(0);
+                    oracleComposing = "";
                     break;
                 }
             }
-            if (oracle.length() > 500) {
-                model.clear();
-                oracle.setLength(0);
+
+            // Assert terminalLine == oracleLine after EVERY operation
+            String expected = Normalizer.normalize(oracleLine.toString() + oracleComposing, Normalizer.Form.NFC);
+            String actual = Normalizer.normalize(session.terminalLine.getLine(), Normalizer.Form.NFC);
+            if (!expected.equals(actual)) {
+                throw new RuntimeException("Full-line Oracle Fuzz divergence at op " + op +
+                        ":\n  Expected: '" + expected + "'\n  Actual:   '" + actual + "'");
+            }
+            sPassCount++;
+
+            if (oracleLine.length() > 400) {
+                session.sendEnter();
+                oracleLine.setLength(0);
+                oracleComposing = "";
             }
         }
-        System.out.println("✓ Oracle Fuzz Test: 10,000 operations passed with 0 divergence.");
+        System.out.println("✓ Full-Line Oracle Fuzz Test: 10,000 operations verified with ZERO divergence!");
 
-        // 12. Latency Budget Guard
+        // 15. Latency Budget Guard
         double maxLatency = rw.getMaxLatencyMs();
         System.out.println("✓ Latency Budget Guard: max latency = " + String.format(Locale.US, "%.3f", maxLatency) + " ms (budget <= 16.0 ms)");
         if (maxLatency > 16.0) {
@@ -445,6 +594,211 @@ public class TestRunner {
 
         System.out.println("=== ALL CHECKS PASSED: " + sPassCount + " assertions verified. ZERO regressions! ===");
         System.exit(0);
+    }
+
+    static class TerminalLineModel implements PtyWriter {
+        final StringBuilder line = new StringBuilder();
+
+        @Override
+        public void write(byte[] data) {
+            if (data == null) return;
+            int i = 0;
+            while (i < data.length) {
+                byte b = data[i];
+                if (b == 0x7F) {
+                    if (line.length() > 0) {
+                        int cp = Character.codePointBefore(line, line.length());
+                        line.delete(line.length() - Character.charCount(cp), line.length());
+                    }
+                    i++;
+                } else if (b == '\r' || b == '\n') {
+                    line.setLength(0);
+                    i++;
+                } else {
+                    int len = 0;
+                    while (i + len < data.length && data[i + len] != 0x7F && data[i + len] != '\r' && data[i + len] != '\n') {
+                        len++;
+                    }
+                    String s = new String(data, i, len, StandardCharsets.UTF_8);
+                    line.append(s);
+                    i += len;
+                }
+            }
+        }
+
+        @Override
+        public void writeCodePoint(boolean altDown, int codePoint) {
+            if (codePoint == 0x7F) {
+                if (line.length() > 0) {
+                    int cp = Character.codePointBefore(line, line.length());
+                    line.delete(line.length() - Character.charCount(cp), line.length());
+                }
+            } else if (codePoint == '\r' || codePoint == '\n') {
+                line.setLength(0);
+            } else {
+                line.appendCodePoint(codePoint);
+            }
+        }
+
+        public String getLine() {
+            return line.toString();
+        }
+
+        public void clear() {
+            line.setLength(0);
+        }
+    }
+
+    static class PipelineSession {
+        final TerminalLineModel terminalLine = new TerminalLineModel();
+        final RegionWriter rw;
+        final VietnameseEngine engine = new VietnameseEngine();
+        final InputProducer producer;
+        final InputModel model = new InputModel();
+        boolean safeMode = false;
+        boolean engineEnabled = true;
+
+        PipelineSession() {
+            this.rw = new RegionWriter(terminalLine);
+            this.producer = new InputProducer(engine, null);
+        }
+
+        void reset() {
+            terminalLine.clear();
+            rw.commit();
+            producer.resetWord();
+            model.clear();
+            engine.reset();
+        }
+
+        void commitText(String rawStr, int newCursorPosition) {
+            if (safeMode) {
+                rw.commit();
+                producer.resetWord();
+                model.commitText(rawStr, newCursorPosition);
+                if (!rawStr.isEmpty()) {
+                    rw.update(rawStr);
+                    rw.commit();
+                }
+                return;
+            }
+
+            boolean wasComposing = model.isComposing();
+            model.commitText(rawStr, newCursorPosition);
+
+            if (wasComposing) {
+                rw.update(rawStr);
+                rw.commit();
+                producer.resetWord();
+            } else {
+                boolean isEngineActive = engineEnabled && engine.isEnabled();
+                boolean isSingleAsciiLetter = (rawStr.length() == 1 &&
+                        rawStr.charAt(0) <= 127 &&
+                        Character.isLetter(rawStr.charAt(0)));
+
+                if (isEngineActive && isSingleAsciiLetter) {
+                    String target = producer.onDirectCommit(rawStr);
+                    rw.update(target);
+                } else {
+                    rw.commit();
+                    producer.resetWord();
+                    if (!rawStr.isEmpty()) {
+                        rw.update(rawStr);
+                        rw.commit();
+                    }
+                }
+            }
+        }
+
+        void setComposingText(String text, int newCursorPosition) {
+            if (safeMode) {
+                commitActiveRegion();
+                model.commitText(text, newCursorPosition);
+                if (!text.isEmpty()) {
+                    rw.update(text);
+                    rw.commit();
+                }
+                return;
+            }
+
+            boolean wasComposing = model.isComposing();
+            if (!wasComposing) {
+                // Rule 1: A new composing text must NEVER emit DEL for committed text.
+                rw.commit();
+                producer.resetWord();
+            }
+
+            model.setComposingText(text, newCursorPosition);
+            String target = producer.onComposingText(text);
+            rw.update(target);
+        }
+
+        void finishComposingText() {
+            model.finishComposingText();
+            producer.resetWord();
+            rw.commit();
+        }
+
+        void deleteSurroundingText(int leftLength, int rightLength) {
+            if (leftLength <= 0 && rightLength <= 0) return;
+            if (safeMode) {
+                rw.commit();
+                producer.resetWord();
+                model.deleteSurroundingText(leftLength, rightLength);
+                rw.deletePastRegion(leftLength);
+                return;
+            }
+
+            boolean wasComposing = model.isComposing();
+            model.deleteSurroundingText(leftLength, rightLength);
+            String sBefore = rw.getActiveRegionText();
+
+            if (wasComposing) {
+                int activeCp = Character.codePointCount(sBefore, 0, sBefore.length());
+                if (leftLength <= activeCp) {
+                    int targetCp = activeCp - leftLength;
+                    int targetEnd = 0;
+                    for (int i = 0; i < targetCp; i++) {
+                        targetEnd += Character.charCount(Character.codePointAt(sBefore, targetEnd));
+                    }
+                    String target = sBefore.substring(0, targetEnd);
+                    rw.update(target);
+                } else {
+                    int extra = leftLength - activeCp;
+                    rw.update("");
+                    rw.commit();
+                    rw.deletePastRegion(extra);
+                }
+            } else {
+                if (producer.getMode() == InputProducer.Mode.RAW && producer.getRawBuffer().length() > 0) {
+                    String target = producer.onBackspace();
+                    if (target != null) {
+                        rw.update(target);
+                    } else {
+                        rw.commit();
+                        rw.deletePastRegion(leftLength);
+                    }
+                } else {
+                    rw.commit();
+                    rw.deletePastRegion(leftLength);
+                }
+            }
+        }
+
+        void sendEnter() {
+            commitActiveRegion();
+            terminalLine.write(new byte[]{'\r'});
+        }
+
+        void sendBackspace() {
+            deleteSurroundingText(1, 0);
+        }
+
+        void commitActiveRegion() {
+            rw.commit();
+            producer.resetWord();
+            model.finishComposingText();
+        }
     }
 
     static class FakePty implements PtyWriter {

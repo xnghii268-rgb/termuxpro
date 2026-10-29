@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Single-Writer InputConnection for Termux Pro (v3 Single-Writer Pipeline).
+ * Single-Writer InputConnection for Termux Pro (v3 Hotfix Pipeline).
  *
- * Architecture:
- * 1. InputModel: Faithful data mirror of Android Editable with composing spans.
- * 2. RegionWriter: The SOLE writer of text and DEL (0x7F) bytes to the Linux PTY.
- * 3. KeyWriter: Commits active region before emitting action keys or control escape sequences.
- * 4. InputProducer: Pure-raw vs Composer state machine preventing double-transformation.
- * 5. TraceRecorder: Nanosecond latency and event trace recorder.
+ * RegionWriter Semantics (Fix Rules):
+ * 1. S = text currently displayed that is still EDITABLE by the IME (composing region only).
+ * 2. commit(), finishComposingText, boundary (space/Enter/punct), and KeyEvent close the region: S = "" AFTER final text is written.
+ * 3. commitText(text) with composing span: final text replaces composing span; update(S -> text) then close region.
+ * 4. commitText(text) without composing span: pure append, ZERO DEL.
+ * 5. In RAW engine mode: "a" then "g" continues word "ag" with common prefix "a" (0 DELs).
+ * 6. Safe Mode: direct hardware-accurate pass-through, no engine, no composing mirror, backspace = single DEL.
  */
 public class TerminalInputConnection extends BaseInputConnection {
 
@@ -43,6 +44,7 @@ public class TerminalInputConnection extends BaseInputConnection {
         void onComposingStateChanged(String composingText);
         boolean isBypassInputEngine();
         default boolean isControlOrAltActive() { return false; }
+        default void onFallbackToSafeMode() {}
     }
 
     private final InputModel mInputModel;
@@ -59,6 +61,7 @@ public class TerminalInputConnection extends BaseInputConnection {
     private static final List<String> sDebugLog = new ArrayList<>();
     private String mActiveImeId = "unknown";
     private int mInputMethodMode = 0; // 0 = app engine, 1 = keyboard ime, 2 = builtin keyboard
+    private boolean mSafeMode = false;
 
     public TerminalInputConnection(View targetView, PtyWriter ptyWriter, TerminalInputListener listener) {
         super(targetView, true);
@@ -69,6 +72,7 @@ public class TerminalInputConnection extends BaseInputConnection {
         this.mInputProducer = new InputProducer(null, new InputProducer.BypassChecker() {
             @Override
             public boolean isBypassed() {
+                if (mSafeMode) return true;
                 if (mInputMethodMode == 1) return true; // External keyboard IME owns composition
                 return mListener != null && mListener.isBypassInputEngine();
             }
@@ -108,12 +112,35 @@ public class TerminalInputConnection extends BaseInputConnection {
         this.mInputMethodMode = mode;
         if (mInputProducer.getVietnameseEngine() != null) {
             // Mode 1: disable internal engine (external keyboard handles everything)
-            mInputProducer.getVietnameseEngine().setEnabled(mode != 1);
+            mInputProducer.getVietnameseEngine().setEnabled(mode != 1 && !mSafeMode);
         }
     }
 
     public int getInputMethodMode() {
         return mInputMethodMode;
+    }
+
+    public void setSafeMode(boolean safeMode) {
+        this.mSafeMode = safeMode;
+        if (safeMode) {
+            commitActiveRegion();
+            if (mInputProducer.getVietnameseEngine() != null) {
+                mInputProducer.getVietnameseEngine().setEnabled(false);
+            }
+        } else {
+            setInputMethodMode(mInputMethodMode);
+        }
+    }
+
+    public boolean isSafeMode() {
+        return mSafeMode;
+    }
+
+    public void triggerSafeModeFallback() {
+        setSafeMode(true);
+        if (mListener != null) {
+            mListener.onFallbackToSafeMode();
+        }
     }
 
     public void setActiveImeId(String imeId) {
@@ -181,6 +208,25 @@ public class TerminalInputConnection extends BaseInputConnection {
         String str = (text != null) ? text.toString() : "";
         logEvent("setComposingText(\"" + str + "\", " + newCursorPosition + ")");
 
+        if (mSafeMode) {
+            // Safe mode: pass-through plain commit
+            commitActiveRegion();
+            mInputModel.commitText(str, newCursorPosition);
+            if (!str.isEmpty()) {
+                mRegionWriter.update(str);
+                mRegionWriter.commit();
+            }
+            return true;
+        }
+
+        boolean wasComposing = mInputModel.isComposing();
+        if (!wasComposing) {
+            // Rule 1: A new composing text must NEVER emit DEL for committed text.
+            // Close any previous editable region so S = "" before starting new composing text.
+            mRegionWriter.commit();
+            mInputProducer.resetWord();
+        }
+
         mInputModel.setComposingText(text, newCursorPosition);
         try {
             super.setComposingText(text, newCursorPosition);
@@ -225,6 +271,7 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public boolean setComposingRegion(int start, int end) {
         logEvent("setComposingRegion(" + start + ", " + end + ")");
+        if (mSafeMode) return true;
         mInputModel.setComposingRegion(start, end);
         try {
             super.setComposingRegion(start, end);
@@ -243,7 +290,7 @@ public class TerminalInputConnection extends BaseInputConnection {
         } catch (Throwable ignored) {}
 
         mInputProducer.resetWord();
-        mRegionWriter.commit();
+        mRegionWriter.commit(); // S = "" AFTER final text is written
 
         if (mListener != null) {
             mListener.onComposingStateChanged("");
@@ -266,7 +313,23 @@ public class TerminalInputConnection extends BaseInputConnection {
         String rawStr = text.toString();
         logEvent("commitText(\"" + rawStr + "\", " + newCursorPosition + ")");
 
+        if (mSafeMode) {
+            mRegionWriter.commit();
+            mInputProducer.resetWord();
+            mInputModel.commitText(text, newCursorPosition);
+            try {
+                super.commitText(text, newCursorPosition);
+            } catch (Throwable ignored) {}
+            if (!rawStr.isEmpty()) {
+                mRegionWriter.update(rawStr);
+                mRegionWriter.commit();
+            }
+            return true;
+        }
+
+        boolean wasComposing = mInputModel.isComposing();
         String sBefore = mRegionWriter.getActiveRegionText();
+
         mInputModel.commitText(text, newCursorPosition);
         try {
             super.commitText(text, newCursorPosition);
@@ -285,9 +348,9 @@ public class TerminalInputConnection extends BaseInputConnection {
             mListener.onComposingStateChanged("");
         }
 
-        boolean hadActiveRegion = !sBefore.isEmpty();
-        if (hadActiveRegion) {
-            // Commit replacing an existing composing region
+        if (wasComposing) {
+            // Rule 2: commitText while a composing span exists:
+            // final text replaces the composing span; write update(S -> text) then close the region.
             if (mBatchDepth > 0) {
                 mBatchPendingTarget = rawStr;
                 mBatchPendingCommit = true;
@@ -297,30 +360,40 @@ public class TerminalInputConnection extends BaseInputConnection {
             }
             mInputProducer.resetWord();
         } else {
-            // Direct commit character / text
+            // Rule 2 & 3: commitText with no composing span: pure append, no DEL.
+            // For a raw keyboard (engine mode), "a" then "g" with no boundary between is the same word "ag".
+            boolean isEngineActive = (mInputMethodMode == 0 || mInputMethodMode == 2)
+                    && (mListener == null || !mListener.isBypassInputEngine())
+                    && mInputProducer.getVietnameseEngine() != null
+                    && mInputProducer.getVietnameseEngine().isEnabled();
+
             boolean isSingleAsciiLetter = (rawStr.length() == 1 &&
                     rawStr.charAt(0) <= 127 &&
                     Character.isLetter(rawStr.charAt(0)));
 
-            String target = mInputProducer.onDirectCommit(rawStr);
-
-            if (mInputProducer.getMode() == InputProducer.Mode.RAW && isSingleAsciiLetter) {
+            if (isEngineActive && isSingleAsciiLetter) {
+                String target = mInputProducer.onDirectCommit(rawStr);
                 if (mBatchDepth > 0) {
                     mBatchPendingTarget = target;
                 } else {
                     mRegionWriter.update(target);
                 }
             } else {
-                // Word boundary or non-ASCII commit
-                if (mBatchDepth > 0) {
-                    mBatchPendingTarget = target;
-                    mBatchPendingCommit = true;
-                } else {
-                    mRegionWriter.commit();
-                    mRegionWriter.update(target);
-                    mRegionWriter.commit();
-                }
+                // Word boundary (space, enter, punct) or engine disabled:
+                // Close active word region first (S = "") so committed text is NEVER erased by DEL.
+                mRegionWriter.commit();
                 mInputProducer.resetWord();
+
+                // Pure append without DEL
+                if (!rawStr.isEmpty()) {
+                    if (mBatchDepth > 0) {
+                        mBatchPendingTarget = rawStr;
+                        mBatchPendingCommit = true;
+                    } else {
+                        mRegionWriter.update(rawStr);
+                        mRegionWriter.commit();
+                    }
+                }
             }
         }
 
@@ -341,29 +414,25 @@ public class TerminalInputConnection extends BaseInputConnection {
     @Override
     public boolean deleteSurroundingText(int leftLength, int rightLength) {
         logEvent("deleteSurroundingText(" + leftLength + ", " + rightLength + ")");
+        if (leftLength <= 0 && rightLength <= 0) return true;
+
+        if (mSafeMode) {
+            mRegionWriter.commit();
+            mInputProducer.resetWord();
+            mInputModel.deleteSurroundingText(leftLength, rightLength);
+            mRegionWriter.deletePastRegion(leftLength);
+            return true;
+        }
+
+        boolean wasComposing = mInputModel.isComposing();
         mInputModel.deleteSurroundingText(leftLength, rightLength);
         try {
             super.deleteSurroundingText(leftLength, rightLength);
         } catch (Throwable ignored) {}
 
-        if (leftLength <= 0 && rightLength <= 0) return true;
-
         String sBefore = mRegionWriter.getActiveRegionText();
 
-        if (mInputProducer.getMode() == InputProducer.Mode.RAW) {
-            String target = mInputProducer.onBackspace();
-            if (target != null) {
-                if (mBatchDepth > 0) {
-                    mBatchPendingTarget = target;
-                } else {
-                    mRegionWriter.update(target);
-                }
-            } else {
-                mRegionWriter.commit();
-                mRegionWriter.deletePastRegion(leftLength);
-            }
-        } else {
-            // COMPOSER mode
+        if (wasComposing) {
             int activeCp = Character.codePointCount(sBefore, 0, sBefore.length());
             if (leftLength <= activeCp) {
                 int targetCp = activeCp - leftLength;
@@ -382,6 +451,25 @@ public class TerminalInputConnection extends BaseInputConnection {
                 mRegionWriter.update("");
                 mRegionWriter.commit();
                 mRegionWriter.deletePastRegion(extra);
+            }
+        } else {
+            // Not composing
+            if (mInputProducer.getMode() == InputProducer.Mode.RAW && mInputProducer.getRawBuffer().length() > 0) {
+                String target = mInputProducer.onBackspace();
+                if (target != null) {
+                    if (mBatchDepth > 0) {
+                        mBatchPendingTarget = target;
+                    } else {
+                        mRegionWriter.update(target);
+                    }
+                } else {
+                    mRegionWriter.commit();
+                    mRegionWriter.deletePastRegion(leftLength);
+                }
+            } else {
+                // Plain committed text deletion
+                mRegionWriter.commit();
+                mRegionWriter.deletePastRegion(leftLength);
             }
         }
 

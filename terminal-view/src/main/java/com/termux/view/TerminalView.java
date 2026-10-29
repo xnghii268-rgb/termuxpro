@@ -79,6 +79,8 @@ public final class TerminalView extends View {
             SharedPreferences sp = getContext().getSharedPreferences("termuxpro_settings", Context.MODE_PRIVATE);
             int inputMethodMode = sp.getInt("input_method_mode", 0);
             setInputMethodMode(inputMethodMode);
+            boolean safeMode = sp.getBoolean("safe_mode", false);
+            setSafeMode(safeMode);
             VietnameseEngine engine = mTelexEngine.getUnderlyingEngine();
             if (engine != null) {
                 VietnameseEngine.Options opt = engine.getOptions();
@@ -354,6 +356,7 @@ public final class TerminalView extends View {
     private TerminalInputConnection mTerminalInputConnection;
     private PtyWriter mPtyWriter;
     private int mInputMethodMode = 0; // 0 = app engine, 1 = keyboard ime, 2 = builtin keyboard
+    private boolean mSafeMode = false;
 
     public TerminalInputConnection getTerminalInputConnection() {
         return mTerminalInputConnection;
@@ -370,9 +373,20 @@ public final class TerminalView extends View {
         return mInputMethodMode;
     }
 
+    public void setSafeMode(boolean safeMode) {
+        this.mSafeMode = safeMode;
+        if (mTerminalInputConnection != null) {
+            mTerminalInputConnection.setSafeMode(safeMode);
+        }
+    }
+
+    public boolean isSafeMode() {
+        return mSafeMode;
+    }
+
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        if (mInputMethodMode == 0) {
+        if (!mSafeMode && mInputMethodMode == 0) {
             outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
         } else {
             outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
@@ -424,8 +438,21 @@ public final class TerminalView extends View {
             public boolean isControlOrAltActive() {
                 return mClient != null && (mClient.isControlActive() || mClient.isAltActive());
             }
+
+            @Override
+            public void onFallbackToSafeMode() {
+                mSafeMode = true;
+                try {
+                    SharedPreferences sp = getContext().getSharedPreferences("termuxpro_settings", Context.MODE_PRIVATE);
+                    sp.edit().putBoolean("safe_mode", true).apply();
+                } catch (Throwable ignored) {}
+                post(() -> {
+                    android.widget.Toast.makeText(getContext(), "Đã chuyển sang chế độ gõ an toàn", android.widget.Toast.LENGTH_SHORT).show();
+                });
+            }
         });
         mTerminalInputConnection.setInputMethodMode(mInputMethodMode);
+        mTerminalInputConnection.setSafeMode(mSafeMode);
 
         if (mTelexEngine != null) {
             mTerminalInputConnection.setVietnameseEngine(mTelexEngine.getUnderlyingEngine());

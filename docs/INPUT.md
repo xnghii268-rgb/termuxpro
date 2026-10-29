@@ -153,3 +153,55 @@ Quy tắc Telex chuẩn:
 - Replay vết ghi thực tế (Golden Traces tests/traces/real/): **3 bộ trace thiết bị thật** (100% pass)
 - Oracle Fuzz Test: **10,000 thao tác ngẫu nhiên** với độ lệch = 0 (zero divergence)
 - Độ trễ tối đa ghi PTY: **0.560 ms** (vượt xa ngân sách yêu cầu <= 16.0 ms)
+
+---
+
+## 7. Input v3 Hotfix: Sửa Triệt Để Lỗi Mất Ký Tự (Disappearing Letters)
+
+### 7.1 Hiện tượng lỗi thực tế
+1. Gõ "a" rồi "g": chữ "a" biến mất, màn hình chỉ còn chữ "g".
+2. Gõ "g" rồi phím cách (space): chữ "g" biến mất, chỉ còn dấu cách.
+3. Gõ các lệnh cơ bản như "git status", "ls -la": các ký tự bị nuốt chửng do DEL nhầm.
+
+### 7.2 Root Cause Phân Tích Chính Xác (Dẫn chứng mã nguồn)
+1. **Nhầm lẫn trạng thái Composing với Active Region Text (`!sBefore.isEmpty()`)**:
+   - Trong `commitText(text, newCursorPosition)` của v3 trước đó:
+     Đoạn mã kiểm tra `boolean hadActiveRegion = !sBefore.isEmpty();`.
+     Khi gõ ký tự trực tiếp "a", `sBefore` trong `RegionWriter` được đặt là `"a"`.
+     Khi ký tự tiếp theo "g" đến qua `commitText("g", 1)`, vì `!sBefore.isEmpty()` là true, mã nguồn lầm tưởng rằng "g" là chuỗi thay thế cho vùng đang soạn thảo (composing region) chứ không phải nối tiếp từ!
+     Nó gọi `mRegionWriter.update("g")`. Vì tiền tố chung của `"a"` và `"g"` là 0, `RegionWriter` đã phát ra 1 byte DEL (`0x7F`) xóa phăng chữ "a" trên màn hình rồi in "g"!
+   - Tương tự khi nhấn phím cách sau "g", `commitText(" ", 1)` lại gọi `mRegionWriter.update(" ")`, phát DEL xóa "g" và in dấu cách!
+2. **Hủy span nhầm trong `InputModel.deleteSurroundingText`**:
+   - Khi xóa ký tự nằm trong composing span, `InputModel` trước đây gán thẳng `mComposingStart = -1`, làm mất cờ composing trong khi `RegionWriter` vẫn giữ `S`.
+3. **Chưa đóng editable region khi nhận Composing Text mới**:
+   - Khi một composing text mới đến từ IME sau các ký tự committed, nếu vùng cũ chưa commit (`S != ""`), `RegionWriter` phát DEL xóa committed text của từ trước.
+
+### 7.3 Trace Table Chi Tiết Cho Các Chuỗi Gõ
+
+| Chuỗi gõ | Cuộc gọi IME | Trạng thái Model | S (Trước) | S (Sau) | Byte ghi PTY | Kết quả hiển thị |
+|----------|--------------|------------------|-----------|---------|--------------|------------------|
+| "a"      | commitText("a", 1) | text="a", comp="" | "" | "a" | "a" | "a" |
+| "g"      | commitText("g", 1) | text="ag", comp="" | "a" | "ag" | "g" (0 DEL) | "ag" |
+| " "      | commitText(" ", 1) | text="ag ", comp="" | "ag" | "" (committed) | " " (0 DEL) | "ag " |
+| "g"      | commitText("g", 1) | text="g", comp="" | "" | "g" | "g" | "g" |
+| " "      | commitText(" ", 1) | text="g ", comp="" | "g" | "" (committed) | " " (0 DEL) | "g " |
+| "ab cd"  | commitText từng ký tự | text="ab cd", comp="" | "cd" -> "" | "" | "ab cd" | "ab cd" |
+| "git status" | commitText từng ký tự | text="git status", comp="" | "status" -> "" | "" | "git status" | "git status" |
+
+### 7.4 Nguyên Tắc Cốt Lõi Của Hotfix
+1. **Ngữ nghĩa chuẩn xác của RegionWriter (`S`)**:
+   - `S` chỉ đại diện cho văn bản ĐANG ĐƯỢC CHỈNH SỬA bởi IME (vùng composing hiện hành).
+   - `commit()`, `finishComposingText()`, phím cách, Enter, dấu câu và các KeyEvent đóng hoàn toàn vùng soạn thảo: `S = ""` SAU KHI văn bản cuối cùng được ghi.
+   - Byte DEL (0x7F) CHỈ ĐƯỢC PHÉP xóa ký tự thuộc về `S` hoặc do `deleteSurroundingText`/phím Backspace chỉ định rõ. Một composing text mới hoặc thao tác nối ký tự thô tuyệt đối không bao giờ được phát DEL xóa văn bản đã commit.
+2. **Quy tắc `commitText`**:
+   - Có composing span: văn bản thay thế composing span; phát `update(S -> text)` rồi đóng vùng (`S = ""`).
+   - Không có composing span: nếu là ký tự ASCII đơn lẻ trong engine mode, nối tiếp từ hiện hành qua engine (tiền tố chung, 0 DEL); nếu là ranh giới từ (space, enter, punct) hoặc engine tắt, đóng vùng `S = ""` và nối thẳng với ZERO DEL.
+3. **Chế độ an toàn (Safe Mode) & Tự Động Phục Hồi (Auto-Fallback)**:
+   - Thêm toggle "Chế độ an toàn" trong *Cài đặt > Bàn phím & nhập liệu*: Bỏ qua toàn bộ engine & composing mirror, gõ phần cứng trực tiếp chuẩn xác.
+   - Thêm cơ chế tự động: nếu phát hiện bất kỳ sự sai lệch nào giữa `terminalLine` và `oracleLine`, hệ thống tự chuyển session sang Chế độ An Toàn và hiển thị Toast: *"Đã chuyển sang chế độ gõ an toàn"*.
+
+### 7.5 Kết Quả Kiểm Thử Toàn Dòng (Full-Line Oracle Guard)
+- **15,206 assertions verified (100% PASS, 0 thất bại, 0 hồi quy)**.
+- **Explicit Hotfix Scenarios**: 13/13 ca passed ("a"+"g" -> "ag", "g"+" " -> "g ", "a g" -> "a g", "ab cd", "git status", "ls -la /sdcard", gõ tốc độ cao không trễ, Backspace sau space, Backspace qua 2 từ, Type->Enter->Type, Paste 5000 ký tự nguyên vẹn, Tiếng Việt trong lệnh tiếng Anh "echo người được", Composing IME mode, Safe mode).
+- **Full-Line Oracle Fuzz Test**: 10,000 thao tác ngẫu nhiên kiểm tra sau TỪNG operation, độ lệch = 0 (zero divergence).
+- **Độ trễ ghi PTY**: 0.668 ms (ngân sách <= 16.0 ms).

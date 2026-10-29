@@ -48,7 +48,8 @@ import java.util.Locale;
 
 /**
  * Real-Keyboard Self-Test & Trace Recorder (Section G).
- * Provides guided typing across 14 phrases, live HUD (latency, mode, buffer),
+ * Provides guided typing across 19 phrases (5 basic non-disappearing checks + 14 guided phrases),
+ * live HUD (latency, mode, buffer), expected vs actual comparison with PASS/FAIL badges (mint/graphite, no red),
  * and one-click JSON trace export for bug reproduction and verification.
  */
 public class ImeSelfTestActivity extends AppCompatActivity {
@@ -66,6 +67,14 @@ public class ImeSelfTestActivity extends AppCompatActivity {
     }
 
     private static final TestPhrase[] PHRASES = {
+        // 5 Basic Non-Disappearing Rows at top
+        new TestPhrase("a g", "a g", "Gõ chữ a và g (kiểm tra không mất chữ)"),
+        new TestPhrase("g ", "g ", "Gõ chữ g và phím cách (kiểm tra không mất chữ)"),
+        new TestPhrase("ab cd", "ab cd", "Gõ nhiều từ cách nhau (kiểm tra ranh giới từ)"),
+        new TestPhrase("git status", "git status", "Lệnh git cơ bản"),
+        new TestPhrase("ls -la", "ls -la", "Lệnh shell cơ bản"),
+
+        // 14 Guided Phrases
         new TestPhrase("d d d d d d d", "dddddd", "Lặp phím d (kiểm tra parity & hoàn tác)"),
         new TestPhrase("thuongw", "thương", "Gõ tổ hợp ư + ơ + dấu"),
         new TestPhrase("ddawtj", "đặt", "Gõ đ + ắ + nặng"),
@@ -88,6 +97,8 @@ public class ImeSelfTestActivity extends AppCompatActivity {
     private TextView mTvProgress;
     private ProgressBar mProgressBar;
     private EditText mEtInput;
+    private TextView mTvActual;
+    private TextView mTvStatusBadge;
 
     private TextView mTvHudIme;
     private TextView mTvHudMode;
@@ -133,7 +144,7 @@ public class ImeSelfTestActivity extends AppCompatActivity {
         topBar.addView(btnBack);
 
         TextView title = new TextView(this);
-        title.setText("Tự kiểm tra bộ gõ (14 mục)");
+        title.setText("Tự kiểm tra bộ gõ (19 mục)");
         title.setTextColor(0xFFF2EDE4);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -149,13 +160,13 @@ public class ImeSelfTestActivity extends AppCompatActivity {
         progressRow.setPadding(0, 0, 0, dp(12));
 
         mTvProgress = new TextView(this);
-        mTvProgress.setText("Mục 1 / 14");
+        mTvProgress.setText("Mục 1 / " + PHRASES.length);
         mTvProgress.setTextColor(0xFF9E988F);
         mTvProgress.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         progressRow.addView(mTvProgress);
 
         mProgressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
-        mProgressBar.setMax(14);
+        mProgressBar.setMax(PHRASES.length);
         mProgressBar.setProgress(1);
         LinearLayout.LayoutParams pbLp = new LinearLayout.LayoutParams(0, dp(6), 1.0f);
         pbLp.setMargins(dp(12), 0, 0, 0);
@@ -235,11 +246,36 @@ public class ImeSelfTestActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateHud();
+                updateActualComparison(s != null ? s.toString() : "");
             }
             @Override
             public void afterTextChanged(Editable s) {}
         });
         cardInput.addView(mEtInput);
+
+        // Actual vs Expected comparison row with status badge
+        LinearLayout compRow = new LinearLayout(this);
+        compRow.setOrientation(LinearLayout.HORIZONTAL);
+        compRow.setGravity(Gravity.CENTER_VERTICAL);
+        compRow.setPadding(0, dp(6), 0, dp(4));
+
+        mTvActual = new TextView(this);
+        mTvActual.setText("Thực tế: \"\"");
+        mTvActual.setTextColor(0xFFF2EDE4);
+        mTvActual.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        LinearLayout.LayoutParams actLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+        mTvActual.setLayoutParams(actLp);
+        compRow.addView(mTvActual);
+
+        mTvStatusBadge = new TextView(this);
+        mTvStatusBadge.setText("ĐANG GÕ");
+        mTvStatusBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        mTvStatusBadge.setTypeface(null, android.graphics.Typeface.BOLD);
+        mTvStatusBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+        setStatusBadge(false);
+        compRow.addView(mTvStatusBadge);
+
+        cardInput.addView(compRow);
 
         root.addView(cardInput);
 
@@ -340,6 +376,35 @@ public class ImeSelfTestActivity extends AppCompatActivity {
         return btn;
     }
 
+    private void setStatusBadge(boolean pass) {
+        if (mTvStatusBadge == null) return;
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(4));
+        if (pass) {
+            bg.setColor(0x2E3DDC97);
+            bg.setStroke(dp(1), 0xFF3DDC97);
+            mTvStatusBadge.setTextColor(0xFF3DDC97);
+            mTvStatusBadge.setText("PASS");
+        } else {
+            bg.setColor(0x2E8C867D);
+            bg.setStroke(dp(1), 0xFF8C867D);
+            mTvStatusBadge.setTextColor(0xFF8C867D);
+            mTvStatusBadge.setText("ĐANG GÕ");
+        }
+        mTvStatusBadge.setBackground(bg);
+    }
+
+    private void updateActualComparison(String actual) {
+        if (mTvActual != null) {
+            mTvActual.setText("Thực tế: \"" + actual + "\"");
+        }
+        if (mCurrentIndex < PHRASES.length) {
+            TestPhrase p = PHRASES[mCurrentIndex];
+            boolean pass = p.targetExpected.equals(actual.trim());
+            setStatusBadge(pass);
+        }
+    }
+
     private void updatePhraseDisplay() {
         if (mCurrentIndex < PHRASES.length) {
             TestPhrase p = PHRASES[mCurrentIndex];
@@ -348,11 +413,13 @@ public class ImeSelfTestActivity extends AppCompatActivity {
             mTvProgress.setText("Mục " + (mCurrentIndex + 1) + " / " + PHRASES.length);
             mProgressBar.setProgress(mCurrentIndex + 1);
             mEtInput.setText("");
+            updateActualComparison("");
         } else {
             mTvTarget.setText("Hoàn thành bài kiểm tra!");
-            mTvNote.setText("Bạn đã hoàn thành toàn bộ 14 bài gõ thực tế.");
-            mTvProgress.setText("14 / 14");
-            mProgressBar.setProgress(14);
+            mTvNote.setText("Bạn đã hoàn thành toàn bộ " + PHRASES.length + " bài gõ thực tế.");
+            mTvProgress.setText(PHRASES.length + " / " + PHRASES.length);
+            mProgressBar.setProgress(PHRASES.length);
+            updateActualComparison("");
         }
     }
 
@@ -361,7 +428,7 @@ public class ImeSelfTestActivity extends AppCompatActivity {
             mCurrentIndex++;
             updatePhraseDisplay();
         } else {
-            Toast.makeText(this, "Đã hoàn thành toàn bộ 14 bài gõ!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đã hoàn thành toàn bộ " + PHRASES.length + " bài gõ!", Toast.LENGTH_SHORT).show();
         }
     }
 

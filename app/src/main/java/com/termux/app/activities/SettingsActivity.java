@@ -52,6 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_TELEX_MODE = "telex_mode";
     public static final String KEY_INPUT_ENGINE_MODE = "input_engine_mode";
     public static final String KEY_INPUT_METHOD_MODE = "input_method_mode";
+    public static final String KEY_SAFE_MODE = "safe_mode";
     public static final String KEY_AUTO_RESTORE_ENGLISH = "auto_restore_english";
     public static final String KEY_TONE_PLACEMENT = "tone_placement";
     public static final String KEY_W_FIRST_TO_U = "w_first_to_u";
@@ -159,7 +160,9 @@ public class SettingsActivity extends AppCompatActivity {
         addDivider(cardInput);
         addToggleRow(cardInput, "Tắt khi nhập mật khẩu", "Bảo vệ mật khẩu khi PTY tắt echo", KEY_DISABLE_ON_PASSWORD, true);
         addDivider(cardInput);
-        addNavigationRow(cardInput, "Tự kiểm tra bộ gõ", "Gõ 14 bài mẫu kiểm tra độ trễ & ghi vết log", R.drawable.ic_nav_command, v -> {
+        addToggleRow(cardInput, "Chế độ an toàn", "Bỏ qua toàn bộ bộ gõ, nhập trực tiếp ký tự phần cứng chuẩn xác", KEY_SAFE_MODE, false);
+        addDivider(cardInput);
+        addNavigationRow(cardInput, "Tự kiểm tra bộ gõ", "Gõ 19 bài mẫu kiểm tra độ trễ & ghi vết log", R.drawable.ic_nav_command, v -> {
             startActivity(new Intent(this, ImeSelfTestActivity.class));
         });
         addDivider(cardInput);
