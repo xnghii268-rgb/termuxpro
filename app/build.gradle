@@ -44,15 +44,15 @@ android {
         applicationId "com.termuxpro.app"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
-        versionCode 144
-        versionName "0.120.11"
+        versionCode 145
+        versionName "0.120.12"
 
         if (appVersionName) versionName = appVersionName
         validateVersionName(versionName)
 
         buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by TermuxApplication class
-        buildConfigField "String", "GIT_COMMIT_HASH", "\"restore2\""
-        buildConfigField "String", "BUILD_TIMESTAMP", "\"2026-10-29 11:00:00\""
+        buildConfigField "String", "GIT_COMMIT_HASH", "\"ctrlfix\""
+        buildConfigField "String", "BUILD_TIMESTAMP", "\"2026-10-29 14:40:00\""
         buildConfigField "String", "INPUT_ENGINE_VERSION", "\"engine 3.2 (Single-Writer Pipeline + Real IME Self-Test)\""
         buildConfigField "String", "INPUT_TEST_COUNT", "\"6877/6877 passed\""
 

@@ -461,6 +461,28 @@ public final class TerminalView extends View {
             }
 
             @Override
+            public void onCommitControlOrAlt(String text) {
+                if (text == null || text.isEmpty()) return;
+                stopTextSelectionMode();
+                final int len = text.length();
+                for (int i = 0; i < len; i++) {
+                    char firstChar = text.charAt(i);
+                    int codePoint;
+                    if (Character.isHighSurrogate(firstChar)) {
+                        if (++i < len) {
+                            codePoint = Character.toCodePoint(firstChar, text.charAt(i));
+                        } else {
+                            codePoint = TerminalEmulator.UNICODE_REPLACEMENT_CHAR;
+                        }
+                    } else {
+                        codePoint = firstChar;
+                    }
+
+                    inputCodePoint(KEY_EVENT_SOURCE_SOFT_KEYBOARD, codePoint, false, false);
+                }
+            }
+
+            @Override
             public void onFallbackToSafeMode() {
                 mSafeMode = true;
                 try {
@@ -968,10 +990,13 @@ public final class TerminalView extends View {
         if (mEmulator != null)
             mEmulator.setCursorBlinkState(true);
 
-        final boolean controlDown = controlDownFromEvent || mClient.readControlKey();
-        final boolean altDown = leftAltDownFromEvent || mClient.readAltKey();
+        final boolean controlDown = controlDownFromEvent || (mClient != null && mClient.readControlKey());
+        final boolean altDown = leftAltDownFromEvent || (mClient != null && mClient.readAltKey());
 
-        if (mClient.onCodePoint(codePoint, controlDown, mTermSession)) return;
+        if (mClient != null && mClient.readShiftKey())
+            codePoint = Character.toUpperCase(codePoint);
+
+        if (mClient != null && mClient.onCodePoint(codePoint, controlDown, mTermSession)) return;
 
         if (controlDown) {
             if (codePoint >= 'a' && codePoint <= 'z') {

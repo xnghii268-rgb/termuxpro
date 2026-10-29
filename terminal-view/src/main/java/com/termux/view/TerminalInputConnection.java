@@ -44,6 +44,7 @@ public class TerminalInputConnection extends BaseInputConnection {
         void onComposingStateChanged(String composingText);
         boolean isBypassInputEngine();
         default boolean isControlOrAltActive() { return false; }
+        default void onCommitControlOrAlt(String text) {}
         default void onFallbackToSafeMode() {}
     }
 
@@ -208,6 +209,19 @@ public class TerminalInputConnection extends BaseInputConnection {
         String str = (text != null) ? text.toString() : "";
         logEvent("setComposingText(\"" + str + "\", " + newCursorPosition + ")");
 
+        if (mListener != null && mListener.isControlOrAltActive()) {
+            if (!str.isEmpty()) {
+                commitActiveRegion();
+                mInputProducer.resetWord();
+                mListener.onCommitControlOrAlt(str);
+                mInputModel.finishComposingText();
+                try {
+                    super.finishComposingText();
+                } catch (Throwable ignored) {}
+            }
+            return true;
+        }
+
         if (mSafeMode) {
             // Safe mode: pass-through plain commit
             commitActiveRegion();
@@ -231,15 +245,6 @@ public class TerminalInputConnection extends BaseInputConnection {
         try {
             super.setComposingText(text, newCursorPosition);
         } catch (Throwable ignored) {}
-
-        if (mListener != null && mListener.isControlOrAltActive()) {
-            if (!str.isEmpty()) {
-                mRegionWriter.commit();
-                mRegionWriter.update(str);
-                mRegionWriter.commit();
-            }
-            return true;
-        }
 
         if (mListener != null) {
             mListener.onComposingStateChanged(str);
@@ -313,6 +318,19 @@ public class TerminalInputConnection extends BaseInputConnection {
         String rawStr = text.toString();
         logEvent("commitText(\"" + rawStr + "\", " + newCursorPosition + ")");
 
+        if (mListener != null && mListener.isControlOrAltActive()) {
+            if (!rawStr.isEmpty()) {
+                commitActiveRegion();
+                mInputProducer.resetWord();
+                mListener.onCommitControlOrAlt(rawStr);
+                mInputModel.finishComposingText();
+                try {
+                    super.finishComposingText();
+                } catch (Throwable ignored) {}
+            }
+            return true;
+        }
+
         if (mSafeMode) {
             mRegionWriter.commit();
             mInputProducer.resetWord();
@@ -334,15 +352,6 @@ public class TerminalInputConnection extends BaseInputConnection {
         try {
             super.commitText(text, newCursorPosition);
         } catch (Throwable ignored) {}
-
-        if (mListener != null && mListener.isControlOrAltActive()) {
-            if (!rawStr.isEmpty()) {
-                mRegionWriter.commit();
-                mRegionWriter.update(rawStr);
-                mRegionWriter.commit();
-            }
-            return true;
-        }
 
         if (mListener != null) {
             mListener.onComposingStateChanged("");
@@ -549,9 +558,17 @@ public class TerminalInputConnection extends BaseInputConnection {
         logEvent("sendKeyEvent(action=" + event.getAction() + ", code=" + event.getKeyCode() + ")");
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+                if (mListener != null && mListener.isControlOrAltActive()) {
+                    mListener.onSendKeyEvent(event);
+                    return true;
+                }
                 return deleteSurroundingText(1, 0);
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 commitActiveRegion();
+                if (mListener != null && mListener.isControlOrAltActive()) {
+                    mListener.onSendKeyEvent(event);
+                    return true;
+                }
                 if (mInputProducer.getVietnameseEngine() != null) {
                     mInputProducer.getVietnameseEngine().getOptions().commandPosition = true;
                 }
