@@ -121,4 +121,23 @@ public final class VietnamesePhonotactics {
 
         return true;
     }
+
+    public static boolean isVietnameseDiacritic(char c) {
+        char l = Character.toLowerCase(c);
+        if (l == 'đ') return true;
+        String s = "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ";
+        return s.indexOf(l) != -1;
+    }
+
+    public static boolean hasExplicitTransform(String rawLower, String parsedText) {
+        if (rawLower == null || rawLower.isEmpty()) return false;
+        char c0 = rawLower.charAt(0);
+        if (c0 == 'f' || c0 == 'j' || c0 == 'z') return false;
+
+        return rawLower.contains("dd") || rawLower.contains("aa") || rawLower.contains("ee") ||
+               rawLower.contains("oo") || rawLower.contains("aw") || rawLower.contains("ow") ||
+               rawLower.contains("uw") || rawLower.contains("d9") || rawLower.contains("a6") ||
+               rawLower.contains("e6") || rawLower.contains("o6") || rawLower.contains("a8") ||
+               rawLower.contains("o7") || rawLower.contains("u7");
+    }
 }

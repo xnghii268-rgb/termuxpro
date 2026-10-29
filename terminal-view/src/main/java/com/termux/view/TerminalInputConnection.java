@@ -384,6 +384,12 @@ public class TerminalInputConnection extends BaseInputConnection {
                 mRegionWriter.commit();
                 mInputProducer.resetWord();
 
+                if (rawStr.contains(" ") || rawStr.contains("\t") || rawStr.contains("\n") || rawStr.contains("\r")) {
+                    if (mInputProducer.getVietnameseEngine() != null) {
+                        mInputProducer.getVietnameseEngine().getOptions().commandPosition = false;
+                    }
+                }
+
                 // Pure append without DEL
                 if (!rawStr.isEmpty()) {
                     if (mBatchDepth > 0) {
@@ -546,6 +552,9 @@ public class TerminalInputConnection extends BaseInputConnection {
                 return deleteSurroundingText(1, 0);
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 commitActiveRegion();
+                if (mInputProducer.getVietnameseEngine() != null) {
+                    mInputProducer.getVietnameseEngine().getOptions().commandPosition = true;
+                }
                 mKeyWriter.writeCodePoint(false, '\r');
                 return true;
             }
@@ -555,6 +564,22 @@ public class TerminalInputConnection extends BaseInputConnection {
             mListener.onSendKeyEvent(event);
         }
         return true;
+    }
+
+    public synchronized boolean togglePerWordOverride() {
+        if (mInputProducer.hasActiveWord()) {
+            String target = mInputProducer.togglePerWordOverride();
+            if (target != null) {
+                mRegionWriter.update(target);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public synchronized boolean isPerWordOverrideRaw() {
+        return mInputProducer.getVietnameseEngine() != null &&
+               mInputProducer.getVietnameseEngine().isPerWordOverrideRaw();
     }
 
     /**
@@ -576,5 +601,8 @@ public class TerminalInputConnection extends BaseInputConnection {
     public void resetContext() {
         commitActiveRegion();
         mInputModel.clear();
+        if (mInputProducer.getVietnameseEngine() != null) {
+            mInputProducer.getVietnameseEngine().getOptions().commandPosition = true;
+        }
     }
 }

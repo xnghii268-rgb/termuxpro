@@ -1,0 +1,1822 @@
+[
+  {
+    "input": "ddc",
+    "expected": "đc",
+    "note": "ddc -> đc (explicit dd wins over invalid syllable)"
+  },
+  {
+    "input": "ddk",
+    "expected": "đk",
+    "note": "ddk -> đk"
+  },
+  {
+    "input": "ddm",
+    "expected": "đm",
+    "note": "ddm -> đm"
+  },
+  {
+    "input": "ddi",
+    "expected": "đi",
+    "note": "ddi -> đi"
+  },
+  {
+    "input": "ddow",
+    "expected": "đơ",
+    "note": "ddow -> đơ"
+  },
+  {
+    "input": "dday",
+    "expected": "đay",
+    "note": "dday -> đay"
+  },
+  {
+    "input": "ddayf",
+    "expected": "đày",
+    "note": "ddayf -> đày"
+  },
+  {
+    "input": "ddays",
+    "expected": "đáy",
+    "note": "ddays -> đáy"
+  },
+  {
+    "input": "ddaay",
+    "expected": "đây",
+    "note": "ddaay -> đây"
+  },
+  {
+    "input": "ddoong",
+    "expected": "đông",
+    "note": "ddoong -> đông"
+  },
+  {
+    "input": "dduwngf",
+    "expected": "đừng",
+    "note": "dduwngf -> đừng"
+  },
+  {
+    "input": "ko",
+    "expected": "ko",
+    "note": "ko -> ko (short token, no restore)"
+  },
+  {
+    "input": "k",
+    "expected": "k",
+    "note": "k -> k"
+  },
+  {
+    "input": "vs",
+    "expected": "vs",
+    "note": "vs -> vs"
+  },
+  {
+    "input": "dc",
+    "expected": "dc",
+    "note": "dc -> dc"
+  },
+  {
+    "input": "ntn",
+    "expected": "ntn",
+    "note": "ntn -> ntn"
+  },
+  {
+    "input": "ok",
+    "expected": "ok",
+    "note": "ok -> ok"
+  },
+  {
+    "input": "ae",
+    "expected": "ae",
+    "note": "ae -> ae"
+  },
+  {
+    "input": "mn",
+    "expected": "mn",
+    "note": "mn -> mn"
+  },
+  {
+    "input": "j",
+    "expected": "j",
+    "note": "j -> j"
+  },
+  {
+    "input": "cx",
+    "expected": "cx",
+    "note": "cx -> cx"
+  },
+  {
+    "input": "kb",
+    "expected": "kb",
+    "note": "kb -> kb"
+  },
+  {
+    "input": "ib",
+    "expected": "ib",
+    "note": "ib -> ib"
+  },
+  {
+    "input": "ms",
+    "expected": "ms",
+    "note": "ms -> ms"
+  },
+  {
+    "input": "lm",
+    "expected": "lm",
+    "note": "lm -> lm"
+  },
+  {
+    "input": "uk",
+    "expected": "uk",
+    "note": "uk -> uk"
+  },
+  {
+    "input": "uh",
+    "expected": "uh",
+    "note": "uh -> uh"
+  },
+  {
+    "input": "vl",
+    "expected": "vl",
+    "note": "vl -> vl"
+  },
+  {
+    "input": "cg",
+    "expected": "cg",
+    "note": "cg -> cg"
+  },
+  {
+    "input": "trc",
+    "expected": "trc",
+    "note": "trc -> trc"
+  },
+  {
+    "input": "Zalo",
+    "expected": "Zalo",
+    "note": "Zalo -> Zalo (foreign initial Z)"
+  },
+  {
+    "input": "Facebook",
+    "expected": "Facebook",
+    "note": "Facebook -> Facebook"
+  },
+  {
+    "input": "Google",
+    "expected": "Google",
+    "note": "Google -> Google"
+  },
+  {
+    "input": "Linux",
+    "expected": "Linux",
+    "note": "Linux -> Linux"
+  },
+  {
+    "input": "Termux",
+    "expected": "Termux",
+    "note": "Termux -> Termux"
+  },
+  {
+    "input": "Android",
+    "expected": "Android",
+    "note": "Android -> Android"
+  },
+  {
+    "input": "GitLab",
+    "expected": "GitLab",
+    "note": "GitLab -> GitLab"
+  },
+  {
+    "input": "Ubuntu",
+    "expected": "Ubuntu",
+    "note": "Ubuntu -> Ubuntu"
+  },
+  {
+    "input": "tieengs",
+    "expected": "tiếng",
+    "note": "tieengs -> tiếng"
+  },
+  {
+    "input": "vieetj",
+    "expected": "việt",
+    "note": "vieetj -> việt"
+  },
+  {
+    "input": "nguwowif",
+    "expected": "người",
+    "note": "nguwowif -> người"
+  },
+  {
+    "input": "nguoiwf",
+    "expected": "người",
+    "note": "nguoiwf -> người"
+  },
+  {
+    "input": "dduowcj",
+    "expected": "được",
+    "note": "dduowcj -> được"
+  },
+  {
+    "input": "dduwowcj",
+    "expected": "được",
+    "note": "dduwowcj -> được"
+  },
+  {
+    "input": "thuongw",
+    "expected": "thương",
+    "note": "thuongw -> thương"
+  },
+  {
+    "input": "thuowng",
+    "expected": "thương",
+    "note": "thuowng -> thương"
+  },
+  {
+    "input": "Vieetj",
+    "expected": "Việt",
+    "note": "Vieetj -> Việt"
+  },
+  {
+    "input": "Vietj",
+    "expected": "Việt",
+    "note": "Vietj -> Việt"
+  },
+  {
+    "input": "quoocs",
+    "expected": "quốc",
+    "note": "quoocs -> quốc"
+  },
+  {
+    "input": "truongwf",
+    "expected": "trường",
+    "note": "truongwf -> trường"
+  },
+  {
+    "input": "nhuwngx",
+    "expected": "những",
+    "note": "nhuwngx -> những"
+  },
+  {
+    "input": "khuyeens",
+    "expected": "khuyến",
+    "note": "khuyeens -> khuyến"
+  },
+  {
+    "input": "nguyeenx",
+    "expected": "nguyễn",
+    "note": "nguyeenx -> nguyễn"
+  },
+  {
+    "input": "huowngs",
+    "expected": "hướng",
+    "note": "huowngs -> hướng"
+  },
+  {
+    "input": "fix",
+    "expected": "fix",
+    "note": "fix -> fix (must never be fĩ)"
+  },
+  {
+    "input": "exit",
+    "expected": "exit",
+    "note": "exit -> exit"
+  },
+  {
+    "input": "curl",
+    "expected": "curl",
+    "note": "curl -> curl"
+  },
+  {
+    "input": "git",
+    "expected": "git",
+    "note": "git -> git"
+  },
+  {
+    "input": "docker",
+    "expected": "docker",
+    "note": "docker -> docker"
+  },
+  {
+    "input": "sudo",
+    "expected": "sudo",
+    "note": "sudo -> sudo"
+  },
+  {
+    "input": "wget",
+    "expected": "wget",
+    "note": "wget -> wget"
+  },
+  {
+    "input": "install",
+    "expected": "install",
+    "note": "install -> install"
+  },
+  {
+    "input": "cargo",
+    "expected": "cargo",
+    "note": "cargo -> cargo"
+  },
+  {
+    "input": "npm",
+    "expected": "npm",
+    "note": "npm -> npm"
+  },
+  {
+    "input": "python",
+    "expected": "python",
+    "note": "python -> python"
+  },
+  {
+    "input": "node",
+    "expected": "node",
+    "note": "node -> node"
+  },
+  {
+    "input": "grep",
+    "expected": "grep",
+    "note": "grep -> grep"
+  },
+  {
+    "input": "ssh",
+    "expected": "ssh",
+    "note": "ssh -> ssh"
+  },
+  {
+    "input": "ls",
+    "expected": "ls",
+    "note": "ls -> ls"
+  },
+  {
+    "input": "cd",
+    "expected": "cd",
+    "note": "cd -> cd"
+  },
+  {
+    "input": "cat",
+    "expected": "cat",
+    "note": "cat -> cat"
+  },
+  {
+    "input": "echo",
+    "expected": "echo",
+    "note": "echo -> echo"
+  },
+  {
+    "input": "chmod",
+    "expected": "chmod",
+    "note": "chmod -> chmod"
+  },
+  {
+    "input": "tmux",
+    "expected": "tmux",
+    "note": "tmux -> tmux"
+  },
+  {
+    "input": "vim",
+    "expected": "vim",
+    "note": "vim -> vim"
+  },
+  {
+    "input": "nano",
+    "expected": "nano",
+    "note": "nano -> nano"
+  },
+  {
+    "input": "apt",
+    "expected": "apt",
+    "note": "apt -> apt"
+  },
+  {
+    "input": "pkg",
+    "expected": "pkg",
+    "note": "pkg -> pkg"
+  },
+  {
+    "input": "test",
+    "expected": "test",
+    "note": "test -> test"
+  },
+  {
+    "input": "raw",
+    "expected": "raw",
+    "note": "raw -> raw"
+  },
+  {
+    "input": "reset",
+    "expected": "reset",
+    "note": "reset -> reset"
+  },
+  {
+    "input": "diff",
+    "expected": "diff",
+    "note": "diff -> diff"
+  },
+  {
+    "input": "class",
+    "expected": "class",
+    "note": "class -> class"
+  },
+  {
+    "input": "error",
+    "expected": "error",
+    "note": "error -> error"
+  },
+  {
+    "input": "status",
+    "expected": "status",
+    "note": "status -> status"
+  },
+  {
+    "input": "box",
+    "expected": "box",
+    "note": "box -> box"
+  },
+  {
+    "input": "mix",
+    "expected": "mix",
+    "note": "mix -> mix"
+  },
+  {
+    "input": "six",
+    "expected": "six",
+    "note": "six -> six"
+  },
+  {
+    "input": "commit",
+    "expected": "commit",
+    "note": "Dev command: commit"
+  },
+  {
+    "input": "push",
+    "expected": "push",
+    "note": "Dev command: push"
+  },
+  {
+    "input": "pull",
+    "expected": "pull",
+    "note": "Dev command: pull"
+  },
+  {
+    "input": "clone",
+    "expected": "clone",
+    "note": "Dev command: clone"
+  },
+  {
+    "input": "checkout",
+    "expected": "checkout",
+    "note": "Dev command: checkout"
+  },
+  {
+    "input": "branch",
+    "expected": "branch",
+    "note": "Dev command: branch"
+  },
+  {
+    "input": "merge",
+    "expected": "merge",
+    "note": "Dev command: merge"
+  },
+  {
+    "input": "rebase",
+    "expected": "rebase",
+    "note": "Dev command: rebase"
+  },
+  {
+    "input": "remote",
+    "expected": "remote",
+    "note": "Dev command: remote"
+  },
+  {
+    "input": "init",
+    "expected": "init",
+    "note": "Dev command: init"
+  },
+  {
+    "input": "fetch",
+    "expected": "fetch",
+    "note": "Dev command: fetch"
+  },
+  {
+    "input": "log",
+    "expected": "log",
+    "note": "Dev command: log"
+  },
+  {
+    "input": "show",
+    "expected": "show",
+    "note": "Dev command: show"
+  },
+  {
+    "input": "add",
+    "expected": "add",
+    "note": "Dev command: add"
+  },
+  {
+    "input": "mv",
+    "expected": "mv",
+    "note": "Dev command: mv"
+  },
+  {
+    "input": "rm",
+    "expected": "rm",
+    "note": "Dev command: rm"
+  },
+  {
+    "input": "cp",
+    "expected": "cp",
+    "note": "Dev command: cp"
+  },
+  {
+    "input": "mkdir",
+    "expected": "mkdir",
+    "note": "Dev command: mkdir"
+  },
+  {
+    "input": "rmdir",
+    "expected": "rmdir",
+    "note": "Dev command: rmdir"
+  },
+  {
+    "input": "touch",
+    "expected": "touch",
+    "note": "Dev command: touch"
+  },
+  {
+    "input": "find",
+    "expected": "find",
+    "note": "Dev command: find"
+  },
+  {
+    "input": "sed",
+    "expected": "sed",
+    "note": "Dev command: sed"
+  },
+  {
+    "input": "awk",
+    "expected": "awk",
+    "note": "Dev command: awk"
+  },
+  {
+    "input": "tar",
+    "expected": "tả",
+    "note": "Vietnamese tone: tả"
+  },
+  {
+    "input": "gzip",
+    "expected": "gzip",
+    "note": "Dev command: gzip"
+  },
+  {
+    "input": "gunzip",
+    "expected": "gunzip",
+    "note": "Dev command: gunzip"
+  },
+  {
+    "input": "zip",
+    "expected": "zip",
+    "note": "Dev command: zip"
+  },
+  {
+    "input": "unzip",
+    "expected": "unzip",
+    "note": "Dev command: unzip"
+  },
+  {
+    "input": "which",
+    "expected": "which",
+    "note": "Dev command: which"
+  },
+  {
+    "input": "whereis",
+    "expected": "whereis",
+    "note": "Dev command: whereis"
+  },
+  {
+    "input": "whoami",
+    "expected": "whoami",
+    "note": "Dev command: whoami"
+  },
+  {
+    "input": "uname",
+    "expected": "uname",
+    "note": "Dev command: uname"
+  },
+  {
+    "input": "df",
+    "expected": "df",
+    "note": "Dev command: df"
+  },
+  {
+    "input": "du",
+    "expected": "du",
+    "note": "Dev command: du"
+  },
+  {
+    "input": "top",
+    "expected": "top",
+    "note": "Dev command: top"
+  },
+  {
+    "input": "htop",
+    "expected": "htop",
+    "note": "Dev command: htop"
+  },
+  {
+    "input": "ps",
+    "expected": "ps",
+    "note": "Dev command: ps"
+  },
+  {
+    "input": "kill",
+    "expected": "kill",
+    "note": "Dev command: kill"
+  },
+  {
+    "input": "pkill",
+    "expected": "pkill",
+    "note": "Dev command: pkill"
+  },
+  {
+    "input": "env",
+    "expected": "env",
+    "note": "Dev command: env"
+  },
+  {
+    "input": "export",
+    "expected": "export",
+    "note": "Dev command: export"
+  },
+  {
+    "input": "alias",
+    "expected": "alias",
+    "note": "Dev command: alias"
+  },
+  {
+    "input": "unalias",
+    "expected": "unalias",
+    "note": "Dev command: unalias"
+  },
+  {
+    "input": "source",
+    "expected": "source",
+    "note": "Dev command: source"
+  },
+  {
+    "input": "history",
+    "expected": "history",
+    "note": "Dev command: history"
+  },
+  {
+    "input": "clear",
+    "expected": "clear",
+    "note": "Dev command: clear"
+  },
+  {
+    "input": "sleep",
+    "expected": "sleep",
+    "note": "Dev command: sleep"
+  },
+  {
+    "input": "wait",
+    "expected": "wait",
+    "note": "Dev command: wait"
+  },
+  {
+    "input": "true",
+    "expected": "true",
+    "note": "Dev command: true"
+  },
+  {
+    "input": "false",
+    "expected": "false",
+    "note": "Dev command: false"
+  },
+  {
+    "input": "head",
+    "expected": "head",
+    "note": "Dev command: head"
+  },
+  {
+    "input": "tail",
+    "expected": "tail",
+    "note": "Dev command: tail"
+  },
+  {
+    "input": "less",
+    "expected": "less",
+    "note": "Dev command: less"
+  },
+  {
+    "input": "more",
+    "expected": "more",
+    "note": "Dev command: more"
+  },
+  {
+    "input": "wc",
+    "expected": "wc",
+    "note": "Dev command: wc"
+  },
+  {
+    "input": "sort",
+    "expected": "sort",
+    "note": "Dev command: sort"
+  },
+  {
+    "input": "uniq",
+    "expected": "uniq",
+    "note": "Dev command: uniq"
+  },
+  {
+    "input": "cut",
+    "expected": "cut",
+    "note": "Dev command: cut"
+  },
+  {
+    "input": "paste",
+    "expected": "paste",
+    "note": "Dev command: paste"
+  },
+  {
+    "input": "tr",
+    "expected": "tr",
+    "note": "Dev command: tr"
+  },
+  {
+    "input": "tee",
+    "expected": "tee",
+    "note": "Dev command: tee"
+  },
+  {
+    "input": "xargs",
+    "expected": "xargs",
+    "note": "Dev command: xargs"
+  },
+  {
+    "input": "date",
+    "expected": "date",
+    "note": "Dev command: date"
+  },
+  {
+    "input": "cal",
+    "expected": "cal",
+    "note": "Dev command: cal"
+  },
+  {
+    "input": "bc",
+    "expected": "bc",
+    "note": "Dev command: bc"
+  },
+  {
+    "input": "expr",
+    "expected": "expr",
+    "note": "Dev command: expr"
+  },
+  {
+    "input": "printf",
+    "expected": "printf",
+    "note": "Dev command: printf"
+  },
+  {
+    "input": "read",
+    "expected": "read",
+    "note": "Dev command: read"
+  },
+  {
+    "input": "enable",
+    "expected": "enable",
+    "note": "Dev command: enable"
+  },
+  {
+    "input": "disable",
+    "expected": "disable",
+    "note": "Dev command: disable"
+  },
+  {
+    "input": "type",
+    "expected": "type",
+    "note": "Dev command: type"
+  },
+  {
+    "input": "help",
+    "expected": "help",
+    "note": "Dev command: help"
+  },
+  {
+    "input": "man",
+    "expected": "man",
+    "note": "Dev command: man"
+  },
+  {
+    "input": "info",
+    "expected": "info",
+    "note": "Dev command: info"
+  },
+  {
+    "input": "ping",
+    "expected": "ping",
+    "note": "Dev command: ping"
+  },
+  {
+    "input": "netstat",
+    "expected": "netstat",
+    "note": "Dev command: netstat"
+  },
+  {
+    "input": "ip",
+    "expected": "ip",
+    "note": "Dev command: ip"
+  },
+  {
+    "input": "ifconfig",
+    "expected": "ifconfig",
+    "note": "Dev command: ifconfig"
+  },
+  {
+    "input": "route",
+    "expected": "route",
+    "note": "Dev command: route"
+  },
+  {
+    "input": "traceroute",
+    "expected": "traceroute",
+    "note": "Dev command: traceroute"
+  },
+  {
+    "input": "nslookup",
+    "expected": "nslookup",
+    "note": "Dev command: nslookup"
+  },
+  {
+    "input": "dig",
+    "expected": "dig",
+    "note": "Dev command: dig"
+  },
+  {
+    "input": "host",
+    "expected": "host",
+    "note": "Dev command: host"
+  },
+  {
+    "input": "nmap",
+    "expected": "nmap",
+    "note": "Dev command: nmap"
+  },
+  {
+    "input": "nc",
+    "expected": "nc",
+    "note": "Dev command: nc"
+  },
+  {
+    "input": "netcat",
+    "expected": "netcat",
+    "note": "Dev command: netcat"
+  },
+  {
+    "input": "socat",
+    "expected": "socat",
+    "note": "Dev command: socat"
+  },
+  {
+    "input": "telnet",
+    "expected": "telnet",
+    "note": "Dev command: telnet"
+  },
+  {
+    "input": "ftp",
+    "expected": "ftp",
+    "note": "Dev command: ftp"
+  },
+  {
+    "input": "sftp",
+    "expected": "sftp",
+    "note": "Dev command: sftp"
+  },
+  {
+    "input": "scp",
+    "expected": "scp",
+    "note": "Dev command: scp"
+  },
+  {
+    "input": "rsync",
+    "expected": "rsync",
+    "note": "Dev command: rsync"
+  },
+  {
+    "input": "ssh-keygen",
+    "expected": "ssh-keygen",
+    "note": "Dev command: ssh-keygen"
+  },
+  {
+    "input": "ssh-agent",
+    "expected": "ssh-agent",
+    "note": "Dev command: ssh-agent"
+  },
+  {
+    "input": "ssh-add",
+    "expected": "ssh-add",
+    "note": "Dev command: ssh-add"
+  },
+  {
+    "input": "gpg",
+    "expected": "gpg",
+    "note": "Dev command: gpg"
+  },
+  {
+    "input": "openssl",
+    "expected": "openssl",
+    "note": "Dev command: openssl"
+  },
+  {
+    "input": "clang",
+    "expected": "clang",
+    "note": "Dev command: clang"
+  },
+  {
+    "input": "gcc",
+    "expected": "gcc",
+    "note": "Dev command: gcc"
+  },
+  {
+    "input": "make",
+    "expected": "make",
+    "note": "Dev command: make"
+  },
+  {
+    "input": "cmake",
+    "expected": "cmake",
+    "note": "Dev command: cmake"
+  },
+  {
+    "input": "ninja",
+    "expected": "ninja",
+    "note": "Dev command: ninja"
+  },
+  {
+    "input": "rustc",
+    "expected": "rustc",
+    "note": "Dev command: rustc"
+  },
+  {
+    "input": "rustup",
+    "expected": "rustup",
+    "note": "Dev command: rustup"
+  },
+  {
+    "input": "go",
+    "expected": "go",
+    "note": "Dev command: go"
+  },
+  {
+    "input": "java",
+    "expected": "java",
+    "note": "Dev command: java"
+  },
+  {
+    "input": "javac",
+    "expected": "javac",
+    "note": "Dev command: javac"
+  },
+  {
+    "input": "jar",
+    "expected": "jar",
+    "note": "Dev command: jar"
+  },
+  {
+    "input": "gradle",
+    "expected": "gradle",
+    "note": "Dev command: gradle"
+  },
+  {
+    "input": "mvn",
+    "expected": "mvn",
+    "note": "Dev command: mvn"
+  },
+  {
+    "input": "ruby",
+    "expected": "ruby",
+    "note": "Dev command: ruby"
+  },
+  {
+    "input": "perl",
+    "expected": "perl",
+    "note": "Dev command: perl"
+  },
+  {
+    "input": "php",
+    "expected": "php",
+    "note": "Dev command: php"
+  },
+  {
+    "input": "lua",
+    "expected": "lua",
+    "note": "Dev command: lua"
+  },
+  {
+    "input": "kotlin",
+    "expected": "kotlin",
+    "note": "Dev command: kotlin"
+  },
+  {
+    "input": "swift",
+    "expected": "swift",
+    "note": "Dev command: swift"
+  },
+  {
+    "input": "flutter",
+    "expected": "flutter",
+    "note": "Dev command: flutter"
+  },
+  {
+    "input": "dart",
+    "expected": "dart",
+    "note": "Dev command: dart"
+  },
+  {
+    "input": "yarn",
+    "expected": "yarn",
+    "note": "Dev command: yarn"
+  },
+  {
+    "input": "pnpm",
+    "expected": "pnpm",
+    "note": "Dev command: pnpm"
+  },
+  {
+    "input": "bun",
+    "expected": "bun",
+    "note": "Dev command: bun"
+  },
+  {
+    "input": "pip",
+    "expected": "pip",
+    "note": "Dev command: pip"
+  },
+  {
+    "input": "pip3",
+    "expected": "pip3",
+    "note": "Dev command: pip3"
+  },
+  {
+    "input": "gem",
+    "expected": "gem",
+    "note": "Dev command: gem"
+  },
+  {
+    "input": "bundle",
+    "expected": "bundle",
+    "note": "Dev command: bundle"
+  },
+  {
+    "input": "composer",
+    "expected": "composer",
+    "note": "Dev command: composer"
+  },
+  {
+    "input": "sbt",
+    "expected": "sbt",
+    "note": "Dev command: sbt"
+  },
+  {
+    "input": "ant",
+    "expected": "ant",
+    "note": "Dev command: ant"
+  },
+  {
+    "input": "format",
+    "expected": "format",
+    "note": "Dev command: format"
+  },
+  {
+    "input": "clean",
+    "expected": "clean",
+    "note": "Dev command: clean"
+  },
+  {
+    "input": "build",
+    "expected": "build",
+    "note": "Dev command: build"
+  },
+  {
+    "input": "dist",
+    "expected": "dist",
+    "note": "Dev command: dist"
+  },
+  {
+    "input": "release",
+    "expected": "release",
+    "note": "Dev command: release"
+  },
+  {
+    "input": "debug",
+    "expected": "debug",
+    "note": "Dev command: debug"
+  },
+  {
+    "input": "target",
+    "expected": "target",
+    "note": "Dev command: target"
+  },
+  {
+    "input": "output",
+    "expected": "output",
+    "note": "Dev command: output"
+  },
+  {
+    "input": "input",
+    "expected": "input",
+    "note": "Dev command: input"
+  },
+  {
+    "input": "stream",
+    "expected": "stream",
+    "note": "Dev command: stream"
+  },
+  {
+    "input": "server",
+    "expected": "server",
+    "note": "Dev command: server"
+  },
+  {
+    "input": "client",
+    "expected": "client",
+    "note": "Dev command: client"
+  },
+  {
+    "input": "socket",
+    "expected": "socket",
+    "note": "Dev command: socket"
+  },
+  {
+    "input": "proxy",
+    "expected": "proxy",
+    "note": "Dev command: proxy"
+  },
+  {
+    "input": "port",
+    "expected": "port",
+    "note": "Dev command: port"
+  },
+  {
+    "input": "host",
+    "expected": "host",
+    "note": "Dev command: host"
+  },
+  {
+    "input": "packet",
+    "expected": "packet",
+    "note": "Dev command: packet"
+  },
+  {
+    "input": "frame",
+    "expected": "frame",
+    "note": "Dev command: frame"
+  },
+  {
+    "input": "router",
+    "expected": "router",
+    "note": "Dev command: router"
+  },
+  {
+    "input": "switch",
+    "expected": "switch",
+    "note": "Dev command: switch"
+  },
+  {
+    "input": "thread",
+    "expected": "thread",
+    "note": "Dev command: thread"
+  },
+  {
+    "input": "process",
+    "expected": "process",
+    "note": "Dev command: process"
+  },
+  {
+    "input": "memory",
+    "expected": "memory",
+    "note": "Dev command: memory"
+  },
+  {
+    "input": "buffer",
+    "expected": "buffer",
+    "note": "Dev command: buffer"
+  },
+  {
+    "input": "cache",
+    "expected": "cache",
+    "note": "Dev command: cache"
+  },
+  {
+    "input": "stack",
+    "expected": "stack",
+    "note": "Dev command: stack"
+  },
+  {
+    "input": "heap",
+    "expected": "heap",
+    "note": "Dev command: heap"
+  },
+  {
+    "input": "queue",
+    "expected": "queue",
+    "note": "Dev command: queue"
+  },
+  {
+    "input": "vector",
+    "expected": "vector",
+    "note": "Dev command: vector"
+  },
+  {
+    "input": "array",
+    "expected": "array",
+    "note": "Dev command: array"
+  },
+  {
+    "input": "tooi",
+    "expected": "tôi",
+    "note": "VN transform: tooi -> tôi"
+  },
+  {
+    "input": "bas",
+    "expected": "bá",
+    "note": "VN transform: bas -> bá"
+  },
+  {
+    "input": "baf",
+    "expected": "bà",
+    "note": "VN transform: baf -> bà"
+  },
+  {
+    "input": "bar",
+    "expected": "bả",
+    "note": "VN transform: bar -> bả"
+  },
+  {
+    "input": "bax",
+    "expected": "bã",
+    "note": "VN transform: bax -> bã"
+  },
+  {
+    "input": "baj",
+    "expected": "bạ",
+    "note": "VN transform: baj -> bạ"
+  },
+  {
+    "input": "cas",
+    "expected": "cá",
+    "note": "VN transform: cas -> cá"
+  },
+  {
+    "input": "caf",
+    "expected": "cà",
+    "note": "VN transform: caf -> cà"
+  },
+  {
+    "input": "car",
+    "expected": "cả",
+    "note": "VN transform: car -> cả"
+  },
+  {
+    "input": "cax",
+    "expected": "cã",
+    "note": "VN transform: cax -> cã"
+  },
+  {
+    "input": "caj",
+    "expected": "cạ",
+    "note": "VN transform: caj -> cạ"
+  },
+  {
+    "input": "ddas",
+    "expected": "đá",
+    "note": "VN transform: ddas -> đá"
+  },
+  {
+    "input": "ddaf",
+    "expected": "đà",
+    "note": "VN transform: ddaf -> đà"
+  },
+  {
+    "input": "ddar",
+    "expected": "đả",
+    "note": "VN transform: ddar -> đả"
+  },
+  {
+    "input": "ddax",
+    "expected": "đã",
+    "note": "VN transform: ddax -> đã"
+  },
+  {
+    "input": "ddaj",
+    "expected": "đạ",
+    "note": "VN transform: ddaj -> đạ"
+  },
+  {
+    "input": "ddoo",
+    "expected": "đô",
+    "note": "VN transform: ddoo -> đô"
+  },
+  {
+    "input": "ddoor",
+    "expected": "đổ",
+    "note": "VN transform: ddoor -> đổ"
+  },
+  {
+    "input": "ddoof",
+    "expected": "đồ",
+    "note": "VN transform: ddoof -> đồ"
+  },
+  {
+    "input": "ddoox",
+    "expected": "đỗ",
+    "note": "VN transform: ddoox -> đỗ"
+  },
+  {
+    "input": "ddooj",
+    "expected": "độ",
+    "note": "VN transform: ddooj -> độ"
+  },
+  {
+    "input": "ddi",
+    "expected": "đi",
+    "note": "VN transform: ddi -> đi"
+  },
+  {
+    "input": "ddis",
+    "expected": "đí",
+    "note": "VN transform: ddis -> đí"
+  },
+  {
+    "input": "ddif",
+    "expected": "đì",
+    "note": "VN transform: ddif -> đì"
+  },
+  {
+    "input": "ddir",
+    "expected": "đỉ",
+    "note": "VN transform: ddir -> đỉ"
+  },
+  {
+    "input": "ddix",
+    "expected": "đĩ",
+    "note": "VN transform: ddix -> đĩ"
+  },
+  {
+    "input": "ddij",
+    "expected": "đị",
+    "note": "VN transform: ddij -> đị"
+  },
+  {
+    "input": "ddaau",
+    "expected": "đâu",
+    "note": "VN transform: ddaau -> đâu"
+  },
+  {
+    "input": "ddaauf",
+    "expected": "đầu",
+    "note": "VN transform: ddaauf -> đầu"
+  },
+  {
+    "input": "ddaaus",
+    "expected": "đấu",
+    "note": "VN transform: ddaaus -> đấu"
+  },
+  {
+    "input": "meej",
+    "expected": "mệ",
+    "note": "VN transform: meej -> mệ"
+  },
+  {
+    "input": "meef",
+    "expected": "mề",
+    "note": "VN transform: meef -> mề"
+  },
+  {
+    "input": "mees",
+    "expected": "mế",
+    "note": "VN transform: mees -> mế"
+  },
+  {
+    "input": "meex",
+    "expected": "mễ",
+    "note": "VN transform: meex -> mễ"
+  },
+  {
+    "input": "meer",
+    "expected": "mể",
+    "note": "VN transform: meer -> mể"
+  },
+  {
+    "input": "noois",
+    "expected": "nối",
+    "note": "VN transform: noois -> nối"
+  },
+  {
+    "input": "nooif",
+    "expected": "nồi",
+    "note": "VN transform: nooif -> nồi"
+  },
+  {
+    "input": "nooir",
+    "expected": "nổi",
+    "note": "VN transform: nooir -> nổi"
+  },
+  {
+    "input": "nooix",
+    "expected": "nỗi",
+    "note": "VN transform: nooix -> nỗi"
+  },
+  {
+    "input": "nooij",
+    "expected": "nội",
+    "note": "VN transform: nooij -> nội"
+  },
+  {
+    "input": "nhas",
+    "expected": "nhá",
+    "note": "VN transform: nhas -> nhá"
+  },
+  {
+    "input": "nhaf",
+    "expected": "nhà",
+    "note": "VN transform: nhaf -> nhà"
+  },
+  {
+    "input": "nhar",
+    "expected": "nhả",
+    "note": "VN transform: nhar -> nhả"
+  },
+  {
+    "input": "nhax",
+    "expected": "nhã",
+    "note": "VN transform: nhax -> nhã"
+  },
+  {
+    "input": "nhaj",
+    "expected": "nhạ",
+    "note": "VN transform: nhaj -> nhạ"
+  },
+  {
+    "input": "tras",
+    "expected": "trá",
+    "note": "VN transform: tras -> trá"
+  },
+  {
+    "input": "traf",
+    "expected": "trà",
+    "note": "VN transform: traf -> trà"
+  },
+  {
+    "input": "trar",
+    "expected": "trả",
+    "note": "VN transform: trar -> trả"
+  },
+  {
+    "input": "trax",
+    "expected": "trã",
+    "note": "VN transform: trax -> trã"
+  },
+  {
+    "input": "traj",
+    "expected": "trạ",
+    "note": "VN transform: traj -> trạ"
+  },
+  {
+    "input": "hoas",
+    "expected": "hoá",
+    "note": "VN transform: hoas -> hoá"
+  },
+  {
+    "input": "hoaf",
+    "expected": "hoà",
+    "note": "VN transform: hoaf -> hoà"
+  },
+  {
+    "input": "hoar",
+    "expected": "hoả",
+    "note": "VN transform: hoar -> hoả"
+  },
+  {
+    "input": "hoax",
+    "expected": "hoã",
+    "note": "VN transform: hoax -> hoã"
+  },
+  {
+    "input": "hoaj",
+    "expected": "hoạ",
+    "note": "VN transform: hoaj -> hoạ"
+  },
+  {
+    "input": "thuys",
+    "expected": "thúy",
+    "note": "VN transform: thuys -> thúy"
+  },
+  {
+    "input": "thuyf",
+    "expected": "thùy",
+    "note": "VN transform: thuyf -> thùy"
+  },
+  {
+    "input": "thuyr",
+    "expected": "thủy",
+    "note": "VN transform: thuyr -> thủy"
+  },
+  {
+    "input": "thuyx",
+    "expected": "thũy",
+    "note": "VN transform: thuyx -> thũy"
+  },
+  {
+    "input": "thuyj",
+    "expected": "thụy",
+    "note": "VN transform: thuyj -> thụy"
+  },
+  {
+    "input": "nghees",
+    "expected": "nghế",
+    "note": "VN transform: nghees -> nghế"
+  },
+  {
+    "input": "ngheef",
+    "expected": "nghề",
+    "note": "VN transform: ngheef -> nghề"
+  },
+  {
+    "input": "ngheer",
+    "expected": "nghể",
+    "note": "VN transform: ngheer -> nghể"
+  },
+  {
+    "input": "ngheex",
+    "expected": "nghễ",
+    "note": "VN transform: ngheex -> nghễ"
+  },
+  {
+    "input": "ngheej",
+    "expected": "nghệ",
+    "note": "VN transform: ngheej -> nghệ"
+  },
+  {
+    "input": "khos",
+    "expected": "khó",
+    "note": "VN transform: khos -> khó"
+  },
+  {
+    "input": "khof",
+    "expected": "khò",
+    "note": "VN transform: khof -> khò"
+  },
+  {
+    "input": "khor",
+    "expected": "khỏ",
+    "note": "VN transform: khor -> khỏ"
+  },
+  {
+    "input": "khox",
+    "expected": "khõ",
+    "note": "VN transform: khox -> khõ"
+  },
+  {
+    "input": "khoj",
+    "expected": "khọ",
+    "note": "VN transform: khoj -> khọ"
+  },
+  {
+    "input": "ddur",
+    "expected": "đủ",
+    "note": "VN transform: ddur -> đủ"
+  },
+  {
+    "input": "ddus",
+    "expected": "đú",
+    "note": "VN transform: ddus -> đú"
+  },
+  {
+    "input": "dduf",
+    "expected": "đù",
+    "note": "VN transform: dduf -> đù"
+  },
+  {
+    "input": "ddux",
+    "expected": "đũ",
+    "note": "VN transform: ddux -> đũ"
+  },
+  {
+    "input": "dduj",
+    "expected": "đụ",
+    "note": "VN transform: dduj -> đụ"
+  },
+  {
+    "input": "chaof",
+    "expected": "chào",
+    "note": "VN transform: chaof -> chào"
+  },
+  {
+    "input": "buooif",
+    "expected": "buồi",
+    "note": "VN transform: buooif -> buồi"
+  },
+  {
+    "input": "muoois",
+    "expected": "muối",
+    "note": "VN transform: muoois -> muối"
+  },
+  {
+    "input": "chuooif",
+    "expected": "chuồi",
+    "note": "VN transform: chuooif -> chuồi"
+  },
+  {
+    "input": "cuooif",
+    "expected": "cuồi",
+    "note": "VN transform: cuooif -> cuồi"
+  },
+  {
+    "input": "uoongs",
+    "expected": "uống",
+    "note": "VN transform: uoongs -> uống"
+  },
+  {
+    "input": "uoongf",
+    "expected": "uồng",
+    "note": "VN transform: uoongf -> uồng"
+  },
+  {
+    "input": "luoongf",
+    "expected": "luồng",
+    "note": "VN transform: luoongf -> luồng"
+  },
+  {
+    "input": "dc",
+    "expected": "dc",
+    "note": "Abbreviation: dc -> dc"
+  },
+  {
+    "input": "vs",
+    "expected": "vs",
+    "note": "Abbreviation: vs -> vs"
+  },
+  {
+    "input": "ntn",
+    "expected": "ntn",
+    "note": "Abbreviation: ntn -> ntn"
+  },
+  {
+    "input": "kt",
+    "expected": "kt",
+    "note": "Abbreviation: kt -> kt"
+  },
+  {
+    "input": "pt",
+    "expected": "pt",
+    "note": "Abbreviation: pt -> pt"
+  },
+  {
+    "input": "cntt",
+    "expected": "cntt",
+    "note": "Abbreviation: cntt -> cntt"
+  },
+  {
+    "input": "sg",
+    "expected": "sg",
+    "note": "Abbreviation: sg -> sg"
+  },
+  {
+    "input": "hn",
+    "expected": "hn",
+    "note": "Abbreviation: hn -> hn"
+  },
+  {
+    "input": "dn",
+    "expected": "dn",
+    "note": "Abbreviation: dn -> dn"
+  },
+  {
+    "input": "hp",
+    "expected": "hp",
+    "note": "Abbreviation: hp -> hp"
+  },
+  {
+    "input": "ct",
+    "expected": "ct",
+    "note": "Abbreviation: ct -> ct"
+  },
+  {
+    "input": "sp",
+    "expected": "sp",
+    "note": "Abbreviation: sp -> sp"
+  },
+  {
+    "input": "sv",
+    "expected": "sv",
+    "note": "Abbreviation: sv -> sv"
+  },
+  {
+    "input": "gv",
+    "expected": "gv",
+    "note": "Abbreviation: gv -> gv"
+  },
+  {
+    "input": "bs",
+    "expected": "bs",
+    "note": "Abbreviation: bs -> bs"
+  },
+  {
+    "input": "ks",
+    "expected": "ks",
+    "note": "Abbreviation: ks -> ks"
+  },
+  {
+    "input": "ns",
+    "expected": "ns",
+    "note": "Abbreviation: ns -> ns"
+  },
+  {
+    "input": "tg",
+    "expected": "tg",
+    "note": "Abbreviation: tg -> tg"
+  },
+  {
+    "input": "nxb",
+    "expected": "nxb",
+    "note": "Abbreviation: nxb -> nxb"
+  },
+  {
+    "input": "ubnd",
+    "expected": "ubnd",
+    "note": "Abbreviation: ubnd -> ubnd"
+  },
+  {
+    "input": "hđnd",
+    "expected": "hđnd",
+    "note": "Abbreviation: hđnd -> hđnd"
+  },
+  {
+    "input": "bch",
+    "expected": "bch",
+    "note": "Abbreviation: bch -> bch"
+  },
+  {
+    "input": "tphcm",
+    "expected": "tphcm",
+    "note": "Abbreviation: tphcm -> tphcm"
+  },
+  {
+    "input": "thcs",
+    "expected": "thcs",
+    "note": "Abbreviation: thcs -> thcs"
+  },
+  {
+    "input": "thpt",
+    "expected": "thpt",
+    "note": "Abbreviation: thpt -> thpt"
+  },
+  {
+    "input": "đc",
+    "expected": "đc",
+    "note": "Abbreviation: đc -> đc"
+  },
+  {
+    "input": "đk",
+    "expected": "đk",
+    "note": "Abbreviation: đk -> đk"
+  },
+  {
+    "input": "đm",
+    "expected": "đm",
+    "note": "Abbreviation: đm -> đm"
+  },
+  {
+    "input": "đb",
+    "expected": "đb",
+    "note": "Abbreviation: đb -> đb"
+  },
+  {
+    "input": "đh",
+    "expected": "đh",
+    "note": "Abbreviation: đh -> đh"
+  },
+  {
+    "input": "đv",
+    "expected": "đv",
+    "note": "Abbreviation: đv -> đv"
+  },
+  {
+    "input": "đt",
+    "expected": "đt",
+    "note": "Abbreviation: đt -> đt"
+  },
+  {
+    "input": "đd",
+    "expected": "đd",
+    "note": "Abbreviation: đd -> đd"
+  },
+  {
+    "input": "đg",
+    "expected": "đg",
+    "note": "Abbreviation: đg -> đg"
+  },
+  {
+    "input": "đp",
+    "expected": "đp",
+    "note": "Abbreviation: đp -> đp"
+  }
+]

@@ -33,7 +33,7 @@
     "step": 6,
     "imeCall": "commitText(\"c\", 1)",
     "producer": "RAW",
-    "expectedTerminal": "dduowc"
+    "expectedTerminal": "đươc"
   },
   {
     "step": 7,

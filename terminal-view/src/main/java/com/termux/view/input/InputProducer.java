@@ -109,6 +109,9 @@ public class InputProducer {
         if (isSingleAsciiLetter && mEngine != null && mEngine.isEnabled() && mCurrentMode == Mode.RAW) {
             mRawWordBuffer.append(committedText.charAt(0));
             mPreviousImeText = mRawWordBuffer.toString();
+            if (mEngine.isPerWordOverrideRaw()) {
+                return mRawWordBuffer.toString();
+            }
             VietnameseEngine.Result res = VietnameseEngine.process(mRawWordBuffer.toString(), mEngine.getOptions());
             return res.text;
         } else {
@@ -129,10 +132,31 @@ public class InputProducer {
                 return "";
             }
             if (mEngine != null && mEngine.isEnabled()) {
+                if (mEngine.isPerWordOverrideRaw()) {
+                    return mRawWordBuffer.toString();
+                }
                 VietnameseEngine.Result res = VietnameseEngine.process(mRawWordBuffer.toString(), mEngine.getOptions());
                 return res.text;
             } else {
                 return mRawWordBuffer.toString();
+            }
+        }
+        return null;
+    }
+
+    public synchronized boolean hasActiveWord() {
+        return mRawWordBuffer.length() > 0;
+    }
+
+    public synchronized String togglePerWordOverride() {
+        if (mEngine == null || mRawWordBuffer.length() == 0) return null;
+        VietnameseEngine.TransformResult tr = mEngine.togglePerWordOverride();
+        if (tr != null) {
+            if (mEngine.isPerWordOverrideRaw()) {
+                return mRawWordBuffer.toString();
+            } else {
+                VietnameseEngine.Result res = VietnameseEngine.process(mRawWordBuffer.toString(), mEngine.getOptions());
+                return res.text;
             }
         }
         return null;

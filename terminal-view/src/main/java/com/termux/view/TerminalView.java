@@ -91,7 +91,14 @@ public final class TerminalView extends View {
                     case 2: opt.mode = VietnameseEngine.Options.Mode.VNI; break;
                     case 3: opt.mode = VietnameseEngine.Options.Mode.OFF; break;
                 }
-                opt.autoRestore = sp.getBoolean("auto_restore_english", true);
+                int restoreIdx = sp.getInt("auto_restore_mode", 1);
+                switch (restoreIdx) {
+                    case 0: opt.restoreMode = VietnameseEngine.Options.RestoreMode.OFF; break;
+                    case 1: opt.restoreMode = VietnameseEngine.Options.RestoreMode.SMART; break;
+                    case 2: opt.restoreMode = VietnameseEngine.Options.RestoreMode.AGGRESSIVE; break;
+                    default: opt.restoreMode = VietnameseEngine.Options.RestoreMode.SMART; break;
+                }
+                opt.autoRestore = (opt.restoreMode != VietnameseEngine.Options.RestoreMode.OFF);
                 int toneIdx = sp.getInt("tone_placement", 0);
                 opt.modernTonePlacement = (toneIdx == 0);
                 opt.wFirstToU = sp.getBoolean("w_first_to_u", false);
@@ -382,6 +389,20 @@ public final class TerminalView extends View {
 
     public boolean isSafeMode() {
         return mSafeMode;
+    }
+
+    public boolean togglePerWordOverride() {
+        if (mTerminalInputConnection != null) {
+            return mTerminalInputConnection.togglePerWordOverride();
+        }
+        return false;
+    }
+
+    public boolean isPerWordOverrideRaw() {
+        if (mTerminalInputConnection != null) {
+            return mTerminalInputConnection.isPerWordOverrideRaw();
+        }
+        return false;
     }
 
     @Override

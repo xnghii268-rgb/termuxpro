@@ -205,3 +205,53 @@ Quy tắc Telex chuẩn:
 - **Explicit Hotfix Scenarios**: 13/13 ca passed ("a"+"g" -> "ag", "g"+" " -> "g ", "a g" -> "a g", "ab cd", "git status", "ls -la /sdcard", gõ tốc độ cao không trễ, Backspace sau space, Backspace qua 2 từ, Type->Enter->Type, Paste 5000 ký tự nguyên vẹn, Tiếng Việt trong lệnh tiếng Anh "echo người được", Composing IME mode, Safe mode).
 - **Full-Line Oracle Fuzz Test**: 10,000 thao tác ngẫu nhiên kiểm tra sau TỪNG operation, độ lệch = 0 (zero divergence).
 - **Độ trễ ghi PTY**: 0.668 ms (ngân sách <= 16.0 ms).
+
+## 8. Input v3 Hotfix 2: Sửa Triệt Để Lỗi Tự Phục Hồi Quá Mức (Auto-Restore Aggressive Reversion)
+
+### 8.1 Hiện tượng lỗi thực tế
+Gõ "dd" ra "đ" (chuẩn), sau đó gõ thêm "c" thì bị biến thành "ddc" thay vì "đc".
+Hiện tượng tương tự với các từ viết tắt, từ ngắn, tên riêng ("ddk" -> "ddk" thay vì "đk", "ddm" -> "ddm", "ko", "vs", "dc", "ntn", "ok").
+
+### 8.2 Nguyên nhân gốc rễ (Root Cause)
+1. **Lỗi trong hàm `parseTelex` / `parseBody` (dòng 306-309 `VietnameseEngine.java`)**:
+   Khi gõ "ddc", `extractInitial("ddc")` tách ra phụ âm đầu `init.text = "đ"`, phần còn lại `remainder = "c"`.
+   Hàm `parseBody("c")` không tìm thấy nguyên âm (nucleus) nên trả về `null`.
+   Hàm `parseTelex` trước đó khi thấy `body == null` đã vội vã trả về chuỗi thô `new Result(raw, false, false, raw)` tức `"ddc"` thay vì giữ lại phụ âm đã biến đổi `init.text + remainder` (`"đc"`).
+2. **Quy tắc Auto-Restore cũ quá hung hăng (`!parsed.isVietnamese -> restore`)**:
+   Code cũ kiểm tra `if (options.autoRestore && !parsed.isVietnamese) return rawBuffer;`.
+   Vì "đc" không có nguyên âm nên `VietnamesePhonotactics.isValidSyllable` trả về `false`, kích hoạt auto-restore hung hăng ép "đc" quay ngược về "ddc".
+
+### 8.3 Trace Table Chi Tiết Cho Chuỗi Gõ Yêu Cầu
+
+| Chuỗi phím | Raw Buffer | Engine Output | isValidSyllable | isValidPrefix | Quyết định Restore | Quy tắc áp dụng |
+|------------|------------|---------------|-----------------|---------------|-------------------|-----------------|
+| "dd"       | "dd"       | "đ"           | false           | true          | KEEP ("đ")        | Rule 3: Explicit transform "dd" -> "đ" |
+| "ddc"      | "ddc"      | "đc"          | false           | false         | KEEP ("đc")       | Rule 3 & 4: Explicit "dd" + Slang abbreviation |
+| "ddk"      | "ddk"      | "đk"          | false           | false         | KEEP ("đk")       | Rule 3 & 4: Explicit "dd" + Short abbreviation |
+| "ddm"      | "ddm"      | "đm"          | false           | false         | KEEP ("đm")       | Rule 3 & 4: Explicit "dd" + Short abbreviation |
+| "ko"       | "ko"       | "ko"          | false           | false         | KEEP ("ko")       | Rule 4: Short slang token, no restore |
+| "vs"       | "vs"       | "vs"          | false           | false         | KEEP ("vs")       | Rule 4: Short slang token, no restore |
+| "dc"       | "dc"       | "dc"          | false           | false         | KEEP ("dc")       | Rule 4: Short slang token, no restore |
+| "ntn"      | "ntn"      | "ntn"         | false           | false         | KEEP ("ntn")      | Rule 4: Short slang token, no restore |
+| "ok"       | "ok"       | "ok"          | false           | false         | KEEP ("ok")       | Rule 4: Short slang token, no restore |
+| "Zalo"     | "Zalo"     | "Zalo"        | false           | false         | KEEP ("Zalo")     | Rule 2b: Foreign initial Z, length >= 3 -> keep/restore English |
+| "Facebook" | "Facebook" | "Facebook"    | false           | false         | RESTORE ("Facebook") | Rule 2b & Lexicon: Foreign initial F, in lexicon |
+| "dduowcj"  | "dduowcj"  | "được"        | true            | true          | KEEP ("được")     | Rule 3: Valid VN syllable with explicit transform |
+| "thuongw"  | "thuongw"  | "thương"      | true            | true          | KEEP ("thương")   | Rule 1 & 3: Valid VN syllable, not in English lexicon |
+
+### 8.4 Chính Sách Phục Hồi Mới (Vietnamese-Leaning by Default)
+1. **Âm tiết không hợp lệ trong từ điển KHÔNG PHẢI là lý do để restore**: Mặc định giữ nguyên kết quả engine.
+2. **Chỉ phục hồi khi có tín hiệu tiếng Anh chắc chắn**:
+   - a. Khớp từ điển tiếng Anh (>= 20,000 từ + lệnh/tệp thực thi runtime `$PREFIX/bin`).
+   - b. Bắt đầu bằng phụ âm ngoại lai (f, j, z) hoặc cụm phụ âm không có trong tiếng Việt (cl, cr, dr, fl, fr, gl, gr, pl, pr, sc, sk, sl, sm, sn, sp, st, sw, tw) VÀ độ dài >= 3.
+   - c. Là token đầu tiên tại command prompt (`commandPosition == true`).
+3. **Ý định biến đổi rõ ràng (dd, aa, ee, oo, aw, ow, uw, dấu thanh) THẮNG restore**:
+   - Ngoại lệ duy nhất là các từ/lệnh dev cốt lõi: `test, raw, reset, class, diff, error`.
+   - "đc", "đk", "đm", "đi", "đây" luôn giữ nguyên dạng đã biến đổi.
+4. **Từ lóng và từ viết tắt ngắn**:
+   - `ko, k, vs, dc, ntn, đc, đk, đm, ok, pls, thg, ng`: Không bao giờ bị restore.
+5. **Nút gạt VI/EN thủ công trên bàn phím phụ**:
+   - Nhấn VI/EN khi đang gõ từ sẽ đảo RAW <-> TRANSFORMED tức thì cho riêng từ đó + haptic tick + glass toast.
+6. **Cài đặt 3 mức**:
+   - Tắt (OFF) / Thông minh (SMART, mặc định) / Mạnh (AGGRESSIVE).
+   - Thẻ Chẩn đoán hiển thị số từ thực tế của `EnglishLexicon`.

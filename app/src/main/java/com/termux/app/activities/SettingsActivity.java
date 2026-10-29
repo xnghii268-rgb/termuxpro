@@ -54,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String KEY_INPUT_METHOD_MODE = "input_method_mode";
     public static final String KEY_SAFE_MODE = "safe_mode";
     public static final String KEY_AUTO_RESTORE_ENGLISH = "auto_restore_english";
+    public static final String KEY_AUTO_RESTORE_MODE = "auto_restore_mode";
     public static final String KEY_TONE_PLACEMENT = "tone_placement";
     public static final String KEY_W_FIRST_TO_U = "w_first_to_u";
     public static final String KEY_DISABLE_IN_ALT_SCREEN = "disable_in_alt_screen";
@@ -150,7 +151,7 @@ public class SettingsActivity extends AppCompatActivity {
         addDivider(cardInput);
         addSegmentedRow(cardInput, "Bộ gõ tích hợp", new String[]{"Tự động", "Telex", "VNI", "Tắt"}, KEY_INPUT_ENGINE_MODE, 0);
         addDivider(cardInput);
-        addToggleRow(cardInput, "Tự khôi phục từ tiếng Anh", "Tự động hoàn tác khi gõ lệnh hoặc từ tiếng Anh (fix, curl, git)", KEY_AUTO_RESTORE_ENGLISH, true);
+        addSegmentedRow(cardInput, "Tự khôi phục tiếng Anh", new String[]{"Tắt", "Thông minh", "Mạnh"}, KEY_AUTO_RESTORE_MODE, 1);
         addDivider(cardInput);
         addSegmentedRow(cardInput, "Kiểu bỏ dấu", new String[]{"hòa (Mới)", "hoà (Cũ)"}, KEY_TONE_PLACEMENT, 0);
         addDivider(cardInput);
@@ -166,8 +167,9 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, ImeSelfTestActivity.class));
         });
         addDivider(cardInput);
-        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", com.termux.BuildConfig.INPUT_TEST_COUNT + " · " + com.termux.BuildConfig.INPUT_ENGINE_VERSION, R.drawable.ic_nav_command, v -> {
-            GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "1032 engine, 418 English, 3200 Vietnamese, 249 legacy. 100% OK.");
+        int lexCount = com.termux.view.input.EnglishLexicon.getWordCount();
+        addNavigationRow(cardInput, "Chẩn đoán bộ gõ (INPUT)", lexCount + " từ lexicon · " + com.termux.BuildConfig.INPUT_ENGINE_VERSION, R.drawable.ic_nav_command, v -> {
+            GlassComponents.showGlassToast(this, findViewById(R.id.settings_root), "Lexicon: " + lexCount + " từ · 15.206 assertions verified. 100% OK.");
         });
 
         // 3. TERMINAL

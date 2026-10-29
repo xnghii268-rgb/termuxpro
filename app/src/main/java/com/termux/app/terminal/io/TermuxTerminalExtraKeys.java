@@ -184,12 +184,22 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         if (buttonInfo != null && ("TELEX".equalsIgnoreCase(buttonInfo.getKey()) || "VI".equalsIgnoreCase(buttonInfo.getKey()) || "VI_EN".equalsIgnoreCase(buttonInfo.getKey()))) {
             TerminalView tv = mActivity.getTerminalView();
             if (tv != null && tv.getTelexEngine() != null) {
+                // Section C: Press VI/EN key while a word is in progress -> toggle RAW <-> TRANSFORMED for that word only
+                if (tv.togglePerWordOverride()) {
+                    boolean isRaw = tv.isPerWordOverrideRaw();
+                    view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
+                    com.termux.app.ui.GlassComponents.showGlassToast(mActivity, mActivity.getWindow().getDecorView(),
+                        isRaw ? "Từ này: giữ nguyên chữ gõ" : "Từ này: bỏ dấu");
+                    return;
+                }
+
                 boolean nextState = !tv.getTelexEngine().isEnabled();
                 tv.getTelexEngine().setEnabled(nextState);
                 if (button != null) {
                     button.setText(nextState ? "VI" : "EN");
                     button.setTextColor(nextState ? 0xFF3DDC97 : 0xFF9E988F);
                 }
+                view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
                 com.termux.app.ui.GlassComponents.showGlassToast(mActivity, mActivity.getWindow().getDecorView(),
                     "Bộ gõ tiếng Việt: " + (nextState ? "BẬT (VI)" : "TẮT (EN)"));
                 return;

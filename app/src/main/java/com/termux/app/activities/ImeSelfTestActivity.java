@@ -67,14 +67,21 @@ public class ImeSelfTestActivity extends AppCompatActivity {
     }
 
     private static final TestPhrase[] PHRASES = {
-        // 5 Basic Non-Disappearing Rows at top
+        // Hotfix 2: Vietnamese-leaning restore checks
+        new TestPhrase("ddc", "đc", "Viết tắt Telex ddc -> đc (không bị auto-restore hoàn tác)"),
+        new TestPhrase("ddk", "đk", "Viết tắt Telex ddk -> đk"),
+        new TestPhrase("ko", "ko", "Viết tắt không dấu giữ nguyên"),
+        new TestPhrase("fix", "fix", "Lệnh tiếng Anh tự khôi phục fix"),
+        new TestPhrase("exit", "exit", "Lệnh shell tự khôi phục exit"),
+
+        // 5 Basic Non-Disappearing Rows
         new TestPhrase("a g", "a g", "Gõ chữ a và g (kiểm tra không mất chữ)"),
         new TestPhrase("g ", "g ", "Gõ chữ g và phím cách (kiểm tra không mất chữ)"),
         new TestPhrase("ab cd", "ab cd", "Gõ nhiều từ cách nhau (kiểm tra ranh giới từ)"),
         new TestPhrase("git status", "git status", "Lệnh git cơ bản"),
         new TestPhrase("ls -la", "ls -la", "Lệnh shell cơ bản"),
 
-        // 14 Guided Phrases
+        // Guided Phrases
         new TestPhrase("d d d d d d d", "dddddd", "Lặp phím d (kiểm tra parity & hoàn tác)"),
         new TestPhrase("thuongw", "thương", "Gõ tổ hợp ư + ơ + dấu"),
         new TestPhrase("ddawtj", "đặt", "Gõ đ + ắ + nặng"),
@@ -144,7 +151,7 @@ public class ImeSelfTestActivity extends AppCompatActivity {
         topBar.addView(btnBack);
 
         TextView title = new TextView(this);
-        title.setText("Tự kiểm tra bộ gõ (19 mục)");
+        title.setText("Tự kiểm tra bộ gõ (" + PHRASES.length + " mục)");
         title.setTextColor(0xFFF2EDE4);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         title.setTypeface(null, android.graphics.Typeface.BOLD);

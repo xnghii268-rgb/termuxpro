@@ -13,10 +13,14 @@ public final class VietnameseEngine {
 
     public static class Options {
         public enum Mode { OFF, TELEX, VNI, AUTO }
+        public enum RestoreMode { OFF, SMART, AGGRESSIVE }
+
         public Mode mode = Mode.AUTO;
-        public boolean autoRestore = true;
+        public RestoreMode restoreMode = RestoreMode.SMART;
+        public boolean autoRestore = true; // legacy compatibility sync
         public boolean modernTonePlacement = true; // "hòa/thủy" vs "hoà/thuỷ"
         public boolean wFirstToU = false; // default false in terminal
+        public boolean commandPosition = false; // true when typing at command position (first token)
     }
 
     public static class Result {
@@ -49,6 +53,7 @@ public final class VietnameseEngine {
     private final StringBuilder mRawBuffer = new StringBuilder();
     private String mLastDisplayText = "";
     private boolean mIsFlagOrPath = false;
+    private boolean mPerWordOverrideRaw = false;
 
     public VietnameseEngine() {}
 
@@ -69,6 +74,36 @@ public final class VietnameseEngine {
         mRawBuffer.setLength(0);
         mLastDisplayText = "";
         mIsFlagOrPath = false;
+        mPerWordOverrideRaw = false;
+    }
+
+    public synchronized boolean hasActiveWord() {
+        return mRawBuffer.length() > 0;
+    }
+
+    public synchronized boolean isPerWordOverrideRaw() {
+        return mPerWordOverrideRaw;
+    }
+
+    public synchronized TransformResult togglePerWordOverride() {
+        mPerWordOverrideRaw = !mPerWordOverrideRaw;
+        String newText;
+        if (mPerWordOverrideRaw) {
+            newText = mRawBuffer.toString();
+        } else {
+            Result r = process(mRawBuffer.toString(), mOptions);
+            newText = r.text;
+        }
+
+        int commonPrefixLen = 0;
+        int minLen = Math.min(mLastDisplayText.length(), newText.length());
+        while (commonPrefixLen < minLen && mLastDisplayText.charAt(commonPrefixLen) == newText.charAt(commonPrefixLen)) {
+            commonPrefixLen++;
+        }
+        int backspaces = mLastDisplayText.length() - commonPrefixLen;
+        String rep = newText.substring(commonPrefixLen);
+        mLastDisplayText = newText;
+        return new TransformResult(backspaces, rep);
     }
 
     public synchronized void handleBackspace() {
@@ -79,8 +114,12 @@ public final class VietnameseEngine {
             reset();
             return;
         }
-        Result r = process(mRawBuffer.toString(), mOptions);
-        mLastDisplayText = r.text;
+        if (mPerWordOverrideRaw) {
+            mLastDisplayText = mRawBuffer.toString();
+        } else {
+            Result r = process(mRawBuffer.toString(), mOptions);
+            mLastDisplayText = r.text;
+        }
     }
 
     public synchronized TransformResult processChar(char c) {
@@ -119,9 +158,14 @@ public final class VietnameseEngine {
         }
 
         mRawBuffer.append(c);
-        Result r = process(mRawBuffer.toString(), mOptions);
+        String newText;
+        if (mPerWordOverrideRaw) {
+            newText = mRawBuffer.toString();
+        } else {
+            Result r = process(mRawBuffer.toString(), mOptions);
+            newText = r.text;
+        }
 
-        String newText = r.text;
         int commonPrefixLen = 0;
         int minLen = Math.min(mLastDisplayText.length(), newText.length());
         while (commonPrefixLen < minLen && mLastDisplayText.charAt(commonPrefixLen) == newText.charAt(commonPrefixLen)) {
@@ -154,42 +198,88 @@ public final class VietnameseEngine {
 
         String rawLower = rawBuffer.toLowerCase();
 
-        // 1. Check foreign initials / foreign consonant clusters
-        if (VietnamesePhonotactics.isForeignInitial(rawLower, options.wFirstToU)) {
-            return new Result(rawBuffer, false, options.autoRestore, rawBuffer);
-        }
-
-        // Terminal safety rule: common terminal commands 'test', 'raw', 'reset'
-        if (rawLower.equals("test") || rawLower.equals("raw") || rawLower.equals("reset")) {
-            return new Result(rawBuffer, false, options.autoRestore, rawBuffer);
-        }
-
-        // Terminal safety rule: English words ending in x (box, mix, six)
-        if (rawLower.equals("box") || rawLower.equals("mix") || rawLower.equals("six")) {
-            return new Result(rawBuffer, false, options.autoRestore, rawBuffer);
-        }
-
-        // Terminal safety rule: English words with double modifiers (diff, class, error, etc.)
-        if (rawLower.length() >= 3 && (rawLower.contains("ff") || rawLower.contains("ss") ||
-            rawLower.contains("rr") || rawLower.contains("xx") || rawLower.contains("jj") || rawLower.contains("ww"))) {
-            return new Result(rawBuffer, false, options.autoRestore, rawBuffer);
-        }
-
-        // 2. Parse based on mode
+        // 1. Parse based on mode
         boolean isVni = (options.mode == Options.Mode.VNI) ||
             (options.mode == Options.Mode.AUTO && containsVniDigits(rawBuffer));
 
         Result parsed = isVni ? parseVni(rawBuffer, options) : parseTelex(rawBuffer, options);
 
-        if (parsed.isVietnamese) {
-            return parsed;
-        }
+        // 2. Evaluate restore policy (Vietnamese-leaning by default, Section B)
+        boolean shouldRestore = shouldRestoreToRaw(rawLower, rawBuffer, parsed, options);
 
-        if (options.autoRestore) {
+        if (shouldRestore) {
             return new Result(rawBuffer, false, true, rawBuffer);
         } else {
             return parsed;
         }
+    }
+
+    private static boolean isShortSlangToken(String s) {
+        return s.equals("ko") || s.equals("k") || s.equals("vs") || s.equals("dc") ||
+               s.equals("ntn") || s.equals("đc") || s.equals("đk") || s.equals("đm") ||
+               s.equals("ok") || s.equals("pls") || s.equals("thg") || s.equals("ng");
+    }
+
+    private static boolean shouldRestoreToRaw(String rawLower, String rawBuffer, Result parsed, Options options) {
+        if (options.restoreMode == Options.RestoreMode.OFF) {
+            return false;
+        }
+        if (options.restoreMode == Options.RestoreMode.AGGRESSIVE) {
+            return !parsed.isVietnamese;
+        }
+
+        // Section B: SMART Restore Policy (Vietnamese-leaning by default)
+        // Rule 4: Short non-dictionary tokens (abbreviations, slang) - NEVER restore
+        if (isShortSlangToken(rawLower)) {
+            return false;
+        }
+
+        // Known dev commands and software terms always restore (test, raw, reset, class, diff, error...)
+        if (EnglishLexicon.isDevWord(rawLower)) {
+            return true;
+        }
+
+        // Rule 3: Explicit "dd" transforms (đc, đk, đm, đi, đây) ALWAYS STAY transformed
+        if (rawLower.startsWith("dd")) {
+            return false;
+        }
+
+        // Rule 2c: First token of command line at prompt -> restore English lexicon words
+        if (options.commandPosition && EnglishLexicon.contains(rawLower)) {
+            return true;
+        }
+
+        // Rule 3: Explicit stroke/transform intent (aa, ee, oo, aw, ow, uw) WINS over restore
+        boolean hasExplicit = VietnamesePhonotactics.hasExplicitTransform(rawLower, parsed.text);
+        if (hasExplicit) {
+            return false;
+        }
+
+        // Rule 3: Explicit tone key on a valid vowel syllable wins over English restore (e.g. has -> há)
+        if (parsed.isVietnamese && !rawLower.equals(parsed.text) &&
+            !VietnamesePhonotactics.isForeignInitial(rawLower, false)) {
+            return false;
+        }
+
+        // Rule 2a: Bundled English lexicon match
+        if (EnglishLexicon.contains(rawLower)) {
+            return true;
+        }
+
+        // Rule 2b: Foreign initials or impossible Vietnamese consonant clusters at start with length >= 3
+        if (rawLower.length() >= 3 && VietnamesePhonotactics.isForeignInitial(rawLower, options.wFirstToU)) {
+            return true;
+        }
+
+        // English words ending in x (box, mix, six) or double modifiers (ff, ss, rr, xx, jj, ww) >= 3 letters
+        if (rawLower.length() >= 3 && (rawLower.endsWith("x") || rawLower.contains("ff") ||
+            rawLower.contains("ss") || rawLower.contains("rr") || rawLower.contains("xx") ||
+            rawLower.contains("jj") || rawLower.contains("ww"))) {
+            return true;
+        }
+
+        // Rule 1: Default keep engine output
+        return false;
     }
 
     private static boolean containsVniDigits(String s) {
@@ -219,7 +309,7 @@ public final class VietnameseEngine {
         // Parse Vowels, Finals, Modifiers, Tones
         ParsedBody body = parseBody(remainder, init.text, options, false);
         if (body == null) {
-            return new Result(raw, false, false, raw);
+            return new Result(init.text + remainder, false, false, raw);
         }
 
         String fullSyllable = applyToneToSyllable(init.text, body.vowels, body.finals, body.tone, options.modernTonePlacement);
@@ -245,7 +335,7 @@ public final class VietnameseEngine {
 
         ParsedBody body = parseBody(remainder, init.text, options, true);
         if (body == null) {
-            return new Result(raw, false, false, raw);
+            return new Result(init.text + remainder, false, false, raw);
         }
 
         String fullSyllable = applyToneToSyllable(init.text, body.vowels, body.finals, body.tone, options.modernTonePlacement);
@@ -418,7 +508,7 @@ public final class VietnameseEngine {
 
         // Single initials
         char c0 = lower.charAt(0);
-        if ("bcdđghklmnpqrstvx".indexOf(c0) != -1) {
+        if ("bcdđfghjklmnpqrstvwxz".indexOf(c0) != -1) {
             return new ParsedInitial(raw.substring(0, 1), 1);
         }
 
@@ -605,6 +695,13 @@ public final class VietnameseEngine {
 
         if (uoHorn) {
             transformedVowels = replaceCaseInsensitive(transformedVowels, "uo", "ươ", "ƯƠ", "Ươ");
+        } else {
+            if (uHorn) {
+                transformedVowels = replaceCaseInsensitive(transformedVowels, "u", "ư", "Ư", "Ư");
+            }
+            if (oHorn) {
+                transformedVowels = replaceCaseInsensitive(transformedVowels, "o", "ơ", "Ơ", "Ơ");
+            }
         }
         if (aBreve) {
             transformedVowels = replaceCaseInsensitive(transformedVowels, "a", "ă", "Ă", "Ă");
@@ -616,11 +713,6 @@ public final class VietnameseEngine {
         }
         if (oCircumflex) {
             transformedVowels = replaceCaseInsensitive(transformedVowels, "o", "ô", "Ô", "Ô");
-        } else if (oHorn) {
-            transformedVowels = replaceCaseInsensitive(transformedVowels, "o", "ơ", "Ơ", "Ơ");
-        }
-        if (uHorn) {
-            transformedVowels = replaceCaseInsensitive(transformedVowels, "u", "ư", "Ư", "Ư");
         }
 
         return new ParsedBody(transformedVowels, finalBuf.toString(), tone);
@@ -727,62 +819,21 @@ public final class VietnameseEngine {
         return 1;
     }
 
+    private static final String[] TONE_TABLE = {
+        "aáàảãạ", "ăắằẳẵặ", "âấầẩẫậ", "eéèẻẽẹ", "êếềểễệ", "iíìỉĩị",
+        "oóòỏõọ", "ôốồổỗộ", "ơớờởỡợ", "uúùủũụ", "ưứừửữự", "yýỳỷỹỵ"
+    };
+
     private static char applyToneToChar(char c, int tone) {
+        if (tone < 1 || tone > 5) return c;
         boolean isUpper = Character.isUpperCase(c);
         char lower = Character.toLowerCase(c);
-        char res = lower;
-
-        switch (lower) {
-            case 'a':
-                if (tone == 1) res = 'á'; else if (tone == 2) res = 'à'; else if (tone == 3) res = 'ả';
-                else if (tone == 4) res = 'ã'; else if (tone == 5) res = 'ạ';
-                break;
-            case 'ă':
-                if (tone == 1) res = 'ắ'; else if (tone == 2) res = 'ằ'; else if (tone == 3) res = 'ẳ';
-                else if (tone == 4) res = 'ẵ'; else if (tone == 5) res = 'ặ';
-                break;
-            case 'â':
-                if (tone == 1) res = 'ấ'; else if (tone == 2) res = 'ầ'; else if (tone == 3) res = 'ẩ';
-                else if (tone == 4) res = 'ẫ'; else if (tone == 5) res = 'ậ';
-                break;
-            case 'e':
-                if (tone == 1) res = 'é'; else if (tone == 2) res = 'è'; else if (tone == 3) res = 'ẻ';
-                else if (tone == 4) res = 'ẽ'; else if (tone == 5) res = 'ẹ';
-                break;
-            case 'ê':
-                if (tone == 1) res = 'ế'; else if (tone == 2) res = 'ề'; else if (tone == 3) res = 'ể';
-                else if (tone == 4) res = 'ễ'; else if (tone == 5) res = 'ệ';
-                break;
-            case 'i':
-                if (tone == 1) res = 'í'; else if (tone == 2) res = 'ì'; else if (tone == 3) res = 'ỉ';
-                else if (tone == 4) res = 'ĩ'; else if (tone == 5) res = 'ị';
-                break;
-            case 'o':
-                if (tone == 1) res = 'ó'; else if (tone == 2) res = 'ò'; else if (tone == 3) res = 'ỏ';
-                else if (tone == 4) res = 'õ'; else if (tone == 5) res = 'ọ';
-                break;
-            case 'ô':
-                if (tone == 1) res = 'ố'; else if (tone == 2) res = 'ồ'; else if (tone == 3) res = 'ổ';
-                else if (tone == 4) res = 'ỗ'; else if (tone == 5) res = 'ộ';
-                break;
-            case 'ơ':
-                if (tone == 1) res = 'ớ'; else if (tone == 2) res = 'ờ'; else if (tone == 3) res = 'ở';
-                else if (tone == 4) res = 'ỡ'; else if (tone == 5) res = 'ợ';
-                break;
-            case 'u':
-                if (tone == 1) res = 'ú'; else if (tone == 2) res = 'ù'; else if (tone == 3) res = 'ủ';
-                else if (tone == 4) res = 'ũ'; else if (tone == 5) res = 'ụ';
-                break;
-            case 'ư':
-                if (tone == 1) res = 'ứ'; else if (tone == 2) res = 'ừ'; else if (tone == 3) res = 'ử';
-                else if (tone == 4) res = 'ữ'; else if (tone == 5) res = 'ự';
-                break;
-            case 'y':
-                if (tone == 1) res = 'ý'; else if (tone == 2) res = 'ỳ'; else if (tone == 3) res = 'ỷ';
-                else if (tone == 4) res = 'ỹ'; else if (tone == 5) res = 'ỵ';
-                break;
+        for (String row : TONE_TABLE) {
+            if (row.charAt(0) == lower) {
+                char res = row.charAt(tone);
+                return isUpper ? Character.toUpperCase(res) : res;
+            }
         }
-
-        return isUpper ? Character.toUpperCase(res) : res;
+        return c;
     }
 }

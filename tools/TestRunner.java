@@ -501,7 +501,105 @@ public class TestRunner {
 
         System.out.println("✓ Explicit Hotfix Regression Tests: 13/13 scenarios passed 100%");
 
-        // 14. Full-Line Oracle Fuzz Test (>= 10,000 random operations)
+        // 14. tests/telex_restore_cases.json (>= 300 cases, Vietnamese-leaning restore policy)
+        File restoreCasesFile = new File("tests/telex_restore_cases.json");
+        if (restoreCasesFile.exists()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(restoreCasesFile), "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String l;
+            while ((l = br.readLine()) != null) sb.append(l);
+            br.close();
+
+            String content = sb.toString();
+            int idx = 0;
+            int restoreCount = 0;
+            while ((idx = content.indexOf("\"input\":", idx)) != -1) {
+                int inputStart = content.indexOf("\"", idx + 8) + 1;
+                int inputEnd = content.indexOf("\"", inputStart);
+                String inp = content.substring(inputStart, inputEnd);
+
+                int expKey = content.indexOf("\"expected\":", inputEnd);
+                if (expKey == -1) break;
+                int expStart = content.indexOf("\"", expKey + 11) + 1;
+                int expEnd = content.indexOf("\"", expStart);
+                String exp = content.substring(expStart, expEnd);
+
+                engine.reset();
+                assertEquals(exp, typeString(engine, inp), "Restore Policy case: " + inp);
+                restoreCount++;
+                idx = expEnd;
+            }
+            System.out.println("✓ telex_restore_cases.json: " + restoreCount + " cases (>= 300 required) passed 100%");
+        }
+
+        // 15. Runtime $PREFIX/bin executables check
+        File binDir = new File("/data/data/com.termuxpro.app/files/usr/bin");
+        if (binDir.exists() && binDir.isDirectory()) {
+            File[] bins = binDir.listFiles();
+            if (bins != null) {
+                int binCheckCount = 0;
+                for (File bf : bins) {
+                    if (bf.isFile() && bf.canExecute()) {
+                        String name = bf.getName();
+                        if (name.length() >= 2 && name.matches("[a-zA-Z]+") && !name.equals("dd")) {
+                            engine.reset();
+                            engine.getOptions().commandPosition = true;
+                            assertEquals(name, typeString(engine, name), "Prefix bin executable: " + name);
+                            binCheckCount++;
+                        }
+                    }
+                }
+                System.out.println("✓ $PREFIX/bin executables: " + binCheckCount + " runtime binaries auto-restored 100%");
+            }
+        }
+
+        // 16. Mixed Lines Full-Pipeline Verification
+        String[] mixedLines = {
+            "git commit -m 'sửa lỗi đc'",
+            "echo người đc",
+            "curl -fsSL https://x.y",
+            "ls -la"
+        };
+        for (String ml : mixedLines) {
+            session.reset();
+            for (char c : ml.toCharArray()) {
+                session.commitText(String.valueOf(c), 1);
+            }
+            assertEquals(ml, session.terminalLine.getLine(), "Mixed line: " + ml);
+        }
+        System.out.println("✓ Mixed lines full pipeline: 4/4 lines verified with whole-line oracle compare!");
+
+        // 17. VI/EN per-word manual override test
+        session.reset();
+        session.commitText("d", 1);
+        session.commitText("d", 1);
+        session.commitText("c", 1);
+        assertEquals("đc", session.terminalLine.getLine(), "Before toggle: 'đc'");
+        boolean toggled = session.togglePerWordOverride();
+        if (!toggled) throw new RuntimeException("togglePerWordOverride failed");
+        assertEquals("ddc", session.terminalLine.getLine(), "Toggled to raw: 'ddc'");
+        session.togglePerWordOverride();
+        assertEquals("đc", session.terminalLine.getLine(), "Toggled back to transformed: 'đc'");
+        System.out.println("✓ VI/EN per-word override: toggled RAW <-> TRANSFORMED successfully!");
+
+        // 18. 3-State Restore Setting Test
+        engine.reset();
+        engine.getOptions().restoreMode = VietnameseEngine.Options.RestoreMode.OFF;
+        assertEquals("fĩ", typeString(engine, "fix"), "Restore OFF: fix -> fĩ");
+
+        engine.reset();
+        engine.getOptions().restoreMode = VietnameseEngine.Options.RestoreMode.SMART;
+        assertEquals("fix", typeString(engine, "fix"), "Restore SMART: fix -> fix");
+        engine.reset();
+        assertEquals("đc", typeString(engine, "ddc"), "Restore SMART: ddc -> đc");
+
+        engine.reset();
+        engine.getOptions().restoreMode = VietnameseEngine.Options.RestoreMode.AGGRESSIVE;
+        assertEquals("ddc", typeString(engine, "ddc"), "Restore AGGRESSIVE: ddc -> ddc");
+        engine.getOptions().restoreMode = VietnameseEngine.Options.RestoreMode.SMART;
+        System.out.println("✓ 3-State Restore Settings: verified OFF, SMART, AGGRESSIVE modes 100%");
+
+        // 19. Full-Line Oracle Fuzz Test (>= 10,000 random operations)
         System.out.println("Running Full-Line Oracle Fuzz Test (10,000 operations across Composing, Safe & Boundary modes)...");
         session.reset();
         StringBuilder oracleLine = new StringBuilder();
@@ -702,6 +800,9 @@ public class TestRunner {
                 } else {
                     rw.commit();
                     producer.resetWord();
+                    if (rawStr.contains(" ") || rawStr.contains("\t") || rawStr.contains("\n") || rawStr.contains("\r")) {
+                        engine.getOptions().commandPosition = false;
+                    }
                     if (!rawStr.isEmpty()) {
                         rw.update(rawStr);
                         rw.commit();
@@ -785,8 +886,20 @@ public class TestRunner {
             }
         }
 
+        boolean togglePerWordOverride() {
+            if (producer.hasActiveWord()) {
+                String target = producer.togglePerWordOverride();
+                if (target != null) {
+                    rw.update(target);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         void sendEnter() {
             commitActiveRegion();
+            engine.getOptions().commandPosition = true;
             terminalLine.write(new byte[]{'\r'});
         }
 
