@@ -224,7 +224,7 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
             if(mTermuxTerminalSessionActivityClient != null)
                 mTermuxTerminalSessionActivityClient.onPasteTextFromClipboard(null);
         } else if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(key) || "PASTE_IMAGE".equalsIgnoreCase(key)) {
-            com.termux.app.image.TermuxProImageHelper.pasteImageFromClipboard(mActivity);
+            com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(mActivity);
         } else if ("RECENT_IMAGE".equalsIgnoreCase(key) || "ẢNH MỚI".equalsIgnoreCase(key)) {
             com.termux.app.image.TermuxProImageHelper.fetchLatestImage(mActivity);
         } else if ("PALETTE".equalsIgnoreCase(key) || "LỆNH".equalsIgnoreCase(key)) {
@@ -252,7 +252,7 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         if (buttonInfo != null && buttonInfo.getKey() != null) {
             String key = buttonInfo.getKey();
             if ("CLIP_IMAGE".equalsIgnoreCase(key) || "DÁN ẢNH".equalsIgnoreCase(key) || "PASTE_IMAGE".equalsIgnoreCase(key)) {
-                com.termux.app.image.TermuxProImageHelper.openSystemPhotoPicker(mActivity);
+                com.termux.app.image.TermuxProImageHelper.pasteImageFromClipboard(mActivity);
                 return true;
             }
         }

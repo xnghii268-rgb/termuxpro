@@ -95,7 +95,17 @@ public class TestRunner {
             {"tool", "tool"},
             {"loop", "loop"},
             {"speed", "speed"},
-            {"browser", "browser"}
+            {"browser", "browser"},
+            {"ter", "ter"},
+            {"terr", "ter"},
+            {"terrr", "terr"},
+            {"terrrr", "terrr"},
+            {"barr", "bar"},
+            {"carr", "car"},
+            {"cass", "cas"},
+            {"pass", "pass"},
+            {"loss", "loss"},
+            {"userr", "user"}
         };
 
         for (String[] tc : mandatory) {

@@ -34,7 +34,7 @@ public final class VietnamesePhonotactics {
 
     private static final Set<String> FOREIGN_CLUSTERS = new HashSet<>(Arrays.asList(
         "bl", "br", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "pl", "pr",
-        "sk", "sl", "sm", "sn", "sp", "st", "sw", "sc", "sh", "sq",
+        "sd", "sk", "sl", "sm", "sn", "sp", "st", "sw", "sc", "sh", "sq",
         "tw", "dw", "kw", "qw", "wh", "wr", "tm", "ts", "ps", "kl", "kn"
     ));
 

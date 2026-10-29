@@ -242,12 +242,25 @@ public class TermuxProImageHelper {
 
     public static void openSystemPhotoPicker(Activity activity) {
         try {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            activity.startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), REQUEST_CODE_PICK_IMAGE);
+            Intent intent;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
+                intent.putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 50);
+            } else {
+                intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            }
+            activity.startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
         } catch (Exception e) {
-            Logger.logError(LOG_TAG, "Error launching photo picker: " + e.getMessage());
+            try {
+                Intent fallback = new Intent(Intent.ACTION_GET_CONTENT);
+                fallback.setType("image/*");
+                fallback.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                activity.startActivityForResult(Intent.createChooser(fallback, "Chọn ảnh"), REQUEST_CODE_PICK_IMAGE);
+            } catch (Exception ex) {
+                Logger.logError(LOG_TAG, "Error launching photo picker: " + ex.getMessage());
+            }
         }
     }
 

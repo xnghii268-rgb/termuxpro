@@ -490,24 +490,25 @@ public final class VietnameseEngine {
             }
         }
 
-        // 5. Repeated tone key after single vowel: e.g. a + tone*N (N >= 2)
-        if (raw.length() >= 3) {
-            char c0 = lower.charAt(0);
-            if (c0 == 'a' || c0 == 'e' || c0 == 'i' || c0 == 'o' || c0 == 'u' || c0 == 'y') {
-                char last = lower.charAt(raw.length() - 1);
-                if (last == 's' || last == 'f' || last == 'r' || last == 'x' || last == 'j') {
-                    boolean allTones = true;
-                    for (int i = 1; i < raw.length(); i++) {
-                        if (lower.charAt(i) != last) {
-                            allTones = false;
-                            break;
-                        }
+        // 5. Repeated tone key after vowel(s): e.g. terr -> ter, barr -> bar, cass -> cas, arr -> ar
+        char lastTone = lower.charAt(len - 1);
+        if (len >= 2 && (lastTone == 's' || lastTone == 'f' || lastTone == 'r' || lastTone == 'x' || lastTone == 'j')) {
+            int tCount = 0;
+            while (tCount < len && lower.charAt(len - 1 - tCount) == lastTone) {
+                tCount++;
+            }
+            if (tCount >= 2) {
+                String prefix = raw.substring(0, len - tCount);
+                String prefixLower = prefix.toLowerCase();
+                if (hasAnyVowel(prefixLower)) {
+                    if (VietnamesePhonotactics.isForeignInitial(lower, false) ||
+                        EnglishLexicon.isDevWord(lower) ||
+                        (options.commandPosition && EnglishLexicon.contains(lower))) {
+                        return new Result(raw, false, true, raw);
                     }
-                    if (allTones) {
-                        int n = raw.length() - 1;
-                        char useFirst = raw.charAt(0);
-                        return new Result(useFirst + repeatChar(last, n - 1), true, false, raw);
-                    }
+                    char useChar = raw.charAt(len - 1);
+                    String restored = prefix + repeatChar(useChar, tCount - 1);
+                    return new Result(restored, true, false, raw);
                 }
             }
         }
@@ -515,16 +516,20 @@ public final class VietnameseEngine {
         return null;
     }
 
+    private static boolean hasAnyVowel(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if ("aeiouyáàảãạâấầẩẫậăắằẳẵặéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ".indexOf(s.charAt(i)) != -1) return true;
+        }
+        return false;
+    }
+
     private static ParsedInitial extractInitial(String raw) {
         String lower = raw.toLowerCase();
-        // Compound initials
         if (lower.startsWith("ngh")) return new ParsedInitial(raw.substring(0, 3), 3);
         String[] doubleInits = {"ng", "nh", "ch", "gh", "gi", "kh", "ph", "qu", "th", "tr"};
         for (String di : doubleInits) {
             if (lower.startsWith(di)) return new ParsedInitial(raw.substring(0, 2), 2);
         }
-
-        // dd -> đ
         if (lower.startsWith("dd")) {
             boolean isUpper = Character.isUpperCase(raw.charAt(0));
             return new ParsedInitial(isUpper ? "Đ" : "đ", 2);
