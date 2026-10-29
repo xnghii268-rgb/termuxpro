@@ -197,6 +197,17 @@ public final class VietnameseEngine {
         }
 
         String rawLower = rawBuffer.toLowerCase();
+        // Normalize embedded escaped transform keys (e.g. dowwn -> down, dowwnload -> download)
+        if (rawLower.contains("oww")) {
+            rawBuffer = rawBuffer.replaceAll("(?i)oww", "ow");
+            rawLower = rawBuffer.toLowerCase();
+        } else if (rawLower.contains("uww")) {
+            rawBuffer = rawBuffer.replaceAll("(?i)uww", "uw");
+            rawLower = rawBuffer.toLowerCase();
+        } else if (rawLower.contains("aww")) {
+            rawBuffer = rawBuffer.replaceAll("(?i)aww", "aw");
+            rawLower = rawBuffer.toLowerCase();
+        }
 
         // 1. Parse based on mode
         boolean isVni = (options.mode == Options.Mode.VNI) ||
@@ -249,10 +260,19 @@ public final class VietnameseEngine {
             return true;
         }
 
+        // If parsed is NOT a valid Vietnamese syllable (e.g. boot -> bôt, tool -> tôl, dơnl, loop -> lôp),
+        // and it matches English lexicon or has length >= 3, always restore to raw!
+        if (!parsed.isVietnamese && (EnglishLexicon.contains(rawLower) || rawLower.length() >= 3)) {
+            return true;
+        }
+
         // Rule 3: Explicit stroke/transform intent (aa, ee, oo, aw, ow, uw) WINS over restore
+        // only if valid Vietnamese and not an English lexicon word
         boolean hasExplicit = VietnamesePhonotactics.hasExplicitTransform(rawLower, parsed.text);
-        if (hasExplicit) {
-            return false;
+        if (hasExplicit && parsed.isVietnamese) {
+            if (!EnglishLexicon.contains(rawLower)) {
+                return false;
+            }
         }
 
         // Rule 3: Explicit tone key on a valid vowel syllable wins over English restore (e.g. has -> há)
@@ -411,17 +431,12 @@ public final class VietnameseEngine {
                 if (n == 2) return new Result(isUpper ? "Ô" : "ô", true, false, raw);
                 return new Result(repeatChar(isUpper ? 'O' : 'o', n - 1), true, false, raw);
             } else if (c0 == 'w') {
-                if (options.wFirstToU) {
-                    if (n == 1) return new Result(isUpper ? "Ư" : "ư", true, false, raw);
-                    return new Result(repeatChar(isUpper ? 'W' : 'w', n - 1), true, false, raw);
-                } else {
-                    if (n <= 2) return new Result(repeatChar(isUpper ? 'W' : 'w', 1), true, false, raw);
-                    return new Result(repeatChar(isUpper ? 'W' : 'w', n - 1), true, false, raw);
-                }
+                if (options.wFirstToU && n == 1) return new Result(isUpper ? "Ư" : "ư", true, false, raw);
+                int count = (options.wFirstToU || n > 2) ? n - 1 : 1;
+                return new Result(repeatChar(isUpper ? 'W' : 'w', count), true, false, raw);
             } else if (c0 == 's' || c0 == 'f' || c0 == 'r' || c0 == 'x' || c0 == 'j') {
                 char useChar = isUpper ? Character.toUpperCase(c0) : c0;
-                if (n <= 2) return new Result(repeatChar(useChar, 1), true, false, raw);
-                return new Result(repeatChar(useChar, n - 1), true, false, raw);
+                return new Result(repeatChar(useChar, n <= 2 ? 1 : n - 1), true, false, raw);
             }
         }
 
@@ -429,10 +444,7 @@ public final class VietnameseEngine {
         if (raw.length() >= 2 && Character.toUpperCase(raw.charAt(0)) == 'D') {
             boolean allRestD = true;
             for (int i = 1; i < raw.length(); i++) {
-                if (Character.toLowerCase(raw.charAt(i)) != 'd') {
-                    allRestD = false;
-                    break;
-                }
+                if (Character.toLowerCase(raw.charAt(i)) != 'd') { allRestD = false; break; }
             }
             if (allRestD) {
                 int n = raw.length();
@@ -441,26 +453,45 @@ public final class VietnameseEngine {
             }
         }
 
-        // 3. u + w*N
-        if (raw.length() >= 2 && (raw.charAt(0) == 'u' || raw.charAt(0) == 'U')) {
-            boolean allW = true;
-            for (int i = 1; i < raw.length(); i++) {
-                if (Character.toLowerCase(raw.charAt(i)) != 'w') {
-                    allW = false;
-                    break;
-                }
+        String lower = raw.toLowerCase();
+        int len = raw.length();
+
+        // 3. Trailing repeated transform key 'w' on prefix ending in vowel (e.g. doww -> dow, uww -> uw, daww -> daw, thuoww -> thuow)
+        if (len >= 2 && lower.endsWith("w")) {
+            int wCount = 0;
+            while (wCount < len && lower.charAt(len - 1 - wCount) == 'w') {
+                wCount++;
             }
-            if (allW) {
-                int n = raw.length() - 1;
+            String prefix = raw.substring(0, len - wCount);
+            String prefixLower = prefix.toLowerCase();
+            if (prefixLower.equals("u") && wCount == 1) {
                 boolean isUpper = Character.isUpperCase(raw.charAt(0));
-                if (n == 1) return new Result(isUpper ? "Ư" : "ư", true, false, raw);
-                return new Result((isUpper ? "U" : "u") + repeatChar('w', n - 1), true, false, raw);
+                return new Result(isUpper ? "Ư" : "ư", true, false, raw);
+            }
+            if (wCount >= 2 && (prefixLower.endsWith("o") || prefixLower.endsWith("u") || prefixLower.endsWith("a"))) {
+                char wChar = raw.charAt(len - 1);
+                String restored = prefix + repeatChar(wChar, wCount - 1);
+                return new Result(restored, true, false, raw);
             }
         }
 
-        // 4. Repeated tone key after single vowel: e.g. a + tone*N (N >= 2)
+        // 4. Repeated trailing vowel transform keys ('a', 'e', 'o') with N >= 3 (e.g. baaa -> baa, beee -> bee, tooo -> too)
+        char lastChar = lower.charAt(len - 1);
+        if (lastChar == 'a' || lastChar == 'e' || lastChar == 'o') {
+            int vCount = 0;
+            while (vCount < len && lower.charAt(len - 1 - vCount) == lastChar) {
+                vCount++;
+            }
+            if (vCount >= 3) {
+                String prefix = raw.substring(0, len - vCount);
+                char useChar = raw.charAt(len - 1);
+                String restored = prefix + repeatChar(useChar, vCount - 1);
+                return new Result(restored, true, false, raw);
+            }
+        }
+
+        // 5. Repeated tone key after single vowel: e.g. a + tone*N (N >= 2)
         if (raw.length() >= 3) {
-            String lower = raw.toLowerCase();
             char c0 = lower.charAt(0);
             if (c0 == 'a' || c0 == 'e' || c0 == 'i' || c0 == 'o' || c0 == 'u' || c0 == 'y') {
                 char last = lower.charAt(raw.length() - 1);
@@ -488,16 +519,10 @@ public final class VietnameseEngine {
         String lower = raw.toLowerCase();
         // Compound initials
         if (lower.startsWith("ngh")) return new ParsedInitial(raw.substring(0, 3), 3);
-        if (lower.startsWith("ng")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("nh")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("ch")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("gh")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("gi")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("kh")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("ph")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("qu")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("th")) return new ParsedInitial(raw.substring(0, 2), 2);
-        if (lower.startsWith("tr")) return new ParsedInitial(raw.substring(0, 2), 2);
+        String[] doubleInits = {"ng", "nh", "ch", "gh", "gi", "kh", "ph", "qu", "th", "tr"};
+        for (String di : doubleInits) {
+            if (lower.startsWith(di)) return new ParsedInitial(raw.substring(0, 2), 2);
+        }
 
         // dd -> đ
         if (lower.startsWith("dd")) {
@@ -603,34 +628,20 @@ public final class VietnameseEngine {
                 if (chl == 'z') { tone = 0; toneSet = false; toneFromKey = false; toneFromCombiningMark = false; continue; }
 
                 if (chl == 'w') {
-                    // Check compound "uo" -> "ươ"
-                    String currentVowels = vowelBuf.toString().toLowerCase();
-                    if (currentVowels.contains("uo")) {
-                        uoHorn = true;
-                    } else if (currentVowels.contains("u")) {
-                        uHorn = true;
-                    } else if (currentVowels.contains("o")) {
-                        oHorn = true;
-                    } else if (currentVowels.contains("a")) {
-                        aBreve = true;
-                    } else {
-                        // 'w' does not modify any preceding vowel (e.g. "new", "view", "brew")
-                        return null;
-                    }
+                    String cv = vowelBuf.toString().toLowerCase();
+                    if (cv.contains("uo")) uoHorn = true;
+                    else if (cv.contains("u")) uHorn = true;
+                    else if (cv.contains("o")) oHorn = true;
+                    else if (cv.contains("a")) aBreve = true;
+                    else return null;
                     continue;
                 }
 
-                if (!vowelEnded && !toneSet && chl == 'a' && vowelBuf.toString().toLowerCase().endsWith("a")) {
-                    aCircumflex = true;
-                    continue;
-                }
-                if (!vowelEnded && !toneSet && chl == 'e' && vowelBuf.toString().toLowerCase().endsWith("e")) {
-                    eCircumflex = true;
-                    continue;
-                }
-                if (!vowelEnded && !toneSet && chl == 'o' && vowelBuf.toString().toLowerCase().endsWith("o")) {
-                    oCircumflex = true;
-                    continue;
+                if (!vowelEnded && !toneSet) {
+                    String vb = vowelBuf.toString().toLowerCase();
+                    if (chl == 'a' && vb.endsWith("a")) { aCircumflex = true; continue; }
+                    if (chl == 'e' && vb.endsWith("e")) { eCircumflex = true; continue; }
+                    if (chl == 'o' && vb.endsWith("o")) { oCircumflex = true; continue; }
                 }
             } else {
                 // VNI Modifiers: 1-5 tones, 6 mũ, 7 móc, 8 trăng, 0 xóa
@@ -642,22 +653,15 @@ public final class VietnameseEngine {
                 if (chl == '0') { tone = 0; toneSet = false; toneFromKey = false; toneFromCombiningMark = false; continue; }
                 if (chl == '6') {
                     String v = vowelBuf.toString().toLowerCase();
-                    if (v.contains("a")) aCircumflex = true;
-                    else if (v.contains("e")) eCircumflex = true;
-                    else if (v.contains("o")) oCircumflex = true;
+                    if (v.contains("a")) aCircumflex = true; else if (v.contains("e")) eCircumflex = true; else if (v.contains("o")) oCircumflex = true;
                     continue;
                 }
                 if (chl == '7') {
                     String v = vowelBuf.toString().toLowerCase();
-                    if (v.contains("uo")) uoHorn = true;
-                    else if (v.contains("u")) uHorn = true;
-                    else if (v.contains("o")) oHorn = true;
+                    if (v.contains("uo")) uoHorn = true; else if (v.contains("u")) uHorn = true; else if (v.contains("o")) oHorn = true;
                     continue;
                 }
-                if (chl == '8') {
-                    aBreve = true;
-                    continue;
-                }
+                if (chl == '8') { aBreve = true; continue; }
             }
 
             // Regular letter

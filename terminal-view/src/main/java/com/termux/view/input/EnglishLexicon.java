@@ -39,6 +39,7 @@ public final class EnglishLexicon {
         "clang", "gcc", "g++", "make", "cmake", "ninja", "rustc", "rustup", "go", "java", "javac",
         "jar", "gradle", "mvn", "ruby", "perl", "php", "lua", "kotlin", "swift", "flutter", "dart",
         "yarn", "pnpm", "bun", "pip", "pip3", "gem", "bundle", "composer", "sbt", "ant",
+        "down", "download", "downloads", "root", "boot", "tool", "loop", "chown", "window", "windows", "browser",
         "zalo", "facebook", "google", "termux", "android", "linux", "github", "gitlab", "ubuntu"
     };
 

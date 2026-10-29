@@ -112,6 +112,7 @@ do
 docker
 document
 documents
+down
 download
 downloads
 du

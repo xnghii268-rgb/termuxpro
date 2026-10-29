@@ -79,7 +79,23 @@ public class TestRunner {
             {"aaa", "aa"},
             {"ww", "w"},
             {"ss", "s"},
-            {"asf", "à"}
+            {"asf", "à"},
+            {"dow", "dơ"},
+            {"doww", "dow"},
+            {"dowww", "doww"},
+            {"down", "down"},
+            {"dowwn", "down"},
+            {"download", "download"},
+            {"downloads", "downloads"},
+            {"dowwnload", "download"},
+            {"window", "window"},
+            {"windows", "windows"},
+            {"root", "root"},
+            {"boot", "boot"},
+            {"tool", "tool"},
+            {"loop", "loop"},
+            {"speed", "speed"},
+            {"browser", "browser"}
         };
 
         for (String[] tc : mandatory) {
