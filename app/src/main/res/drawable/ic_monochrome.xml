@@ -7,16 +7,16 @@
 
     <!-- Monochrome Chevron -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M32,33 L55,54 L32,75 L41,75 L62,54 L41,33 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M33.5,35.9 L51.7,53.8 L33.3,71.5" />
 
     <!-- Monochrome Underscore Cursor -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M66,67 h14 a2,2 0 0 1 2,2 v3 a2,2 0 0 1 -2,2 h-14 a2,2 0 0 1 -2,-2 v-3 a2,2 0 0 1 2,-2 z" />
-
-    <!-- Monochrome PRO Diamond Spark -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M73,33.5 L77.5,40 L73,46.5 L68.5,40 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7.6"
+        android:strokeLineCap="round"
+        android:pathData="M56.3,68.1 L76.3,68.1" />
 </vector>
